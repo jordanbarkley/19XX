@@ -1,3 +1,6 @@
+#ROMs
+*.z64
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
