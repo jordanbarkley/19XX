@@ -2,15 +2,40 @@
 
 // Tournament Settings By Default
 .org	0x42D1B
-hex		{ 020100080400010164FFFFFFFF01000000000000000000000000 }
+hex		{ 020100 }			; (?)
+hex 	{ 08 }				; default time (8 mins)
+hex 	{ 04 }				; default stock (5 stock) 
+hex		{ 00 }				; handicap (off)
+hex 	{ 01 } 				; team attack (on)
+hex 	{ 01 } 				; stage select (on)
+hex		{ 64 } 				; damage (#100%)
+/*
+0 = Item Frequency
 
-// Temporary Default Toggles
-.org	0x42D21
-hex		{ FFE0 }
+01 = $00000080
+02 = $00000100
+03 = $00002000
+04 = $00000200
+05 = $00004000
+06 = $00008000
+07 = $00010000
+08 = $00060000
+09 = $00080000
+10 = $00000800
+11 = $00001000
+12 = $00000400
+13 = $00000010
+14 = $00000020
+15 = $00000040
+*/
 
-// Unlock Everything
+hex		{ 0000420F }		; binary item toggles/debug menu
+hex 	{ 01000000 }		; (?)
+hex 	{ 00000000 }		; (?)
+hex 	{ 00000000 }		; (?)
+hex 	{ 00 }				; item frequency (none)
 .org 	0x42B3B
-hex		{ FFFFFF }
+hex		{ FFFFFF }			; all characters/stages unlocked
 
 // All Computers Are Level 9 By Default [Mada0]
 .org 	0x42D38
@@ -22,14 +47,10 @@ hex		{ 09 }
 .org	0x42E94
 hex		{ 09 }
 
-// Boot to (04 = Debug, 10 = CSS) [Mada0]
+// Boot to (03 = System Debug, 04 = Versus, Debug, 10 = CSS) [Mada0]
 .org 	0x42Cd0
 hex		{ 10 }
  
-// Planet Zebes No Acid [pillowhead]
-.org	0xAA04C
-hex		{ 801056F8 }
-
 // Return to Title Screen  After Inactivity Disabled (CSS)
 .org	0x138BDC			; @ 8013A95c 
 // hex	{ 17190009 }		; bne t8, t9, target
@@ -72,6 +93,7 @@ Table Starts at @ 80073f80 (0xF57BF0)
 Value = Y - 80073F80
 */
 
+/*
 .org	0xF57BF4
 hex 	{ 00001037 }
 hex 	{ 0000102E }
@@ -82,6 +104,7 @@ hex 	{ 00001025 }
 hex 	{ 0000101a }
 hex 	{ 00001042 }
 hex 	{ 0000101a }
+*/
 
 // Disable Anti Aliasing
 
@@ -91,8 +114,6 @@ Gameshark Code Port [xdaniel, Jorgasms]
 8103D55E 0212
 8103D58C 0000
 8103D58E 0212
-
-
 
   Bit   Expl.
   0-1   Type (Pixel Size) (0-3, see below)
@@ -122,25 +143,25 @@ lw		t2, 0x4(t1)				; get value from 80044eec
 jal		0x80035840
 sw		t2, 0xc(t0)				; store value
 
-Note: I can't inject a function here, I get an error because
+Note:cg I can't inject a function here, I get an error because
 that ROM space (where the DMA function is) has not been
 mapped yet.
 */
 
+/*
 .org	0x337F8					; @ 80032BF8
-ori		t2, r0, $0312
-
-
+ori		t2, r0, $0212
+*/
 
 // Widescreen [Danny_SsB]
 .org	0xAA37C
 hex		{ 3FEF311A }
 .org	0x51C80
 hex		{ 3FEF311A }
-
-
-;.org	 0x891B4			; @ 8010D9B4
-;nop							; this line of code resets the above
+/*
+.org	 0x891B4		``	; @ 8010D9B4
+nop							; 
+*/
 
 /*
 // Always show stock as number
@@ -159,34 +180,15 @@ nop
 .org 	0x6e404					; @ 800F2C04
 nop
 
-// Disable Original Stage Select Option Behavior [pillowhead]
-.org	0x138C6C				; @ 8013A9ec
-nop
-nop
-
-// Disable Write to Team Attack Option
-.org	0x127150				; @ 80133970
-nop								; disable store
-
-// Disable Write to Stage Select Option
-.org	0x127160				; @ 80133980
-nop								; disable store
-
-// Disable Read from Stage Select Option
-.org	0x127160				; @ 80170658
-ori		t4, r0, $1				; always load 1
+// Planet Zebes Acid [pillowhead]
+.org	0xAA04C
+hex		{ 801056F8 }
 
 
-// All Players are Skeleton
+// All Players are Skeleton [Mada0]
 
 800F24B0 3C030800
 800E10D8 3C020800
 800F2C2C 3C180800
 800F2D20 3C0F0800
 800F2228 3C0F0800
-
-
-
-
-
-

@@ -111,10 +111,8 @@ lb		v0, 0x0A5C(s0)		; load from stage table
 
 // FD is Playable
 .org	0x80414
-
-addiu	V0, R0, $E
+addiu	v0, r0, $e
 .org	0x189E2B
 hex		{ 18 }
-
 .org	0x640CD2
 hex		{ C33E }
