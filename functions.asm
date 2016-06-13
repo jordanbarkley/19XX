@@ -371,7 +371,7 @@ ori		v0, v0, $ffff			; load unplugged value
 
 SR_P1:
 lh		gp, 0x0(a0)				; get p1 buttons
-beq		gp, v0, Results			; if controller unplugged
+beq		gp, v0, SR_P2			; if controller unplugged
 andi	gp, gp, $f				; check if any c buttons held
 blez	gp, SR_P2				; if not, check p2
 nop
@@ -379,7 +379,7 @@ beq		r0, r0, SR_End
 
 SR_P2:
 lh		gp, 0x8(a0)				; get p2 buttons
-beq		gp, v0, Results			; if controller unplugged
+beq		gp, v0, SR_P3			; if controller unplugged
 andi	gp, gp, $f				; check if any c buttons held
 blez	gp, SR_P3				; if not, check p3
 nop
@@ -387,7 +387,7 @@ beq		r0, r0, SR_End
 
 SR_P3:
 lh		gp, 0x10(a0)			; get p3 buttons
-beq		gp, v0, Results			; if controller unplugged
+beq		gp, v0, SR_P4			; if controller unplugged
 andi	gp, gp, $f				; check if any c buttons held
 blez	gp, SR_P4				; if not, check p4
 nop
