@@ -47,9 +47,15 @@ hex		{ 09 }
 .org	0x42E94
 hex		{ 09 }
 
+/*
 // Boot to (03 = System Debug, 04 = Versus, Debug, 10 = CSS) [Mada0]
 .org 	0x42Cd0
 hex		{ 10 }
+ */
+ 
+ // Nintendo 64 Logo Exits to CSS
+ .org	0x17EE54
+ ori	t1, r0, $10
  
 // Return to Title Screen  After Inactivity Disabled (CSS)
 .org	0x138BDC			; @ 8013A95c 
