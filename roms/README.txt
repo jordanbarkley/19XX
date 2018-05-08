@@ -1,0 +1,1 @@
+ROMs are not included in this repository. Legally aquire your own ROMs.
