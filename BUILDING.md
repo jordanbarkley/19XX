@@ -1,7 +1,7 @@
 # Building
 
 1. In a terminal of your choice, navigate to your desired path.
-2. Clone this repository
+2. Clone this repository.
 ```
 $   git clone https://github.com/jordanbarkley
 ```
@@ -20,7 +20,7 @@ $   make build
 $   cp <rom_path> ./roms/original.z64
 ```
 
-6. Apply the patch
+6. Apply the patch.
 ```
 $   make
 ```
