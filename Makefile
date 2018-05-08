@@ -2,7 +2,7 @@ FILENAME=19XX
 
 all:
 	# assemble rom
-	tools/bass -o $(FILENAME).z64 $(FILENAME).asm -sym bass.log
+	tools/_bass -o $(FILENAME).z64 $(FILENAME).asm -sym
 	
 	# update checksum
 	tools/chksum64 $(FILENAME).z64 > chksum64.log
