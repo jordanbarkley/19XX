@@ -2,6 +2,9 @@
 
 scope Shield {
 
+	// @ Description
+	// This function overwrites the logic to generate a shield color. This is a controversial "fix"
+	// and will soon be replaced by selectable shield colors.
 	scope color_fix_: {
 		OS.patch_start(0x0007C8E8, 0x801010E8)
 		j 		color_fix_
