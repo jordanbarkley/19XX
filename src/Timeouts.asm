@@ -36,8 +36,6 @@ scope Timeouts {
 
 	// Versus options screen
 	OS.patch_start(0x00127284, 0x80133AA4)
-	origin 
-	base 
 	b 0x80133AD4
 	OS.patch_end()
 
