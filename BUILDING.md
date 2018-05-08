@@ -1,6 +1,6 @@
 # Building
 
-1. In a terminal of your choice, navigate to your desired home folder.
+1. In a terminal of your choice, navigate to your desired path.
 2. Clone this repository
 ```
 $   git clone https://github.com/jordanbarkley
