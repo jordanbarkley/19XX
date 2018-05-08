@@ -270,6 +270,10 @@ The following rules are even more arbitrary than the above. Please stick with th
 2. Use the 4 space tab following the longest MIPS instruction, `addiu`, for spacing.
 3. Avoid `li` for bytes and halfwords. Use `lli` and `ori` instead.
 4. Always use 6 digits for numbers (dec uses 00 prefix, hex uses 0x).
+5. While several MIPS conventions are not followed, 19XX developers will follow these.
+    1. Registers a0, a1, a2, and a3 will be used for arguments
+    2. Registers v0 and v1 will be used for return values.
+    3. The stack pointer (sp) must always be 64 bit aligned.
 
 **Spacing Example**
 ```
