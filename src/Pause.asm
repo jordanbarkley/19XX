@@ -4,7 +4,7 @@
 scope Pause {
 
 	// @ Description
-	// number of frames pause needs to be held for
+	// number of frames pause needs to be held to pause
 	constant NUM_FRAMES(30)
 	
 	// @ Description
