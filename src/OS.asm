@@ -83,7 +83,7 @@ scope OS {
         base    {base}
     }
 
-    macro patch_start() {
+    macro patch_end() {
         pullvar base, origin
     }
 
