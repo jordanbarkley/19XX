@@ -6,7 +6,7 @@ all:
 	
 	# update checksum
 	tools/n64crc $(PROGRAM_NAME).z64
-
+	
 	# show time stamp
 	date
 
