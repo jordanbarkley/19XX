@@ -13,7 +13,7 @@ scope Camera {
         nop
         OS.patch_end()
     
-        brek    // break execution in case this gets called
+        break    // break execution in case this gets called
     }
 }
 

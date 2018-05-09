@@ -29,7 +29,7 @@ scope Pause {
         add     t0, t0, s3                  // t0 = input_table + offset
         lhu     t6, 0x0000(s1)              // original line 1 (modified)
         andi    t7, t6, 0x1000              // original line 2
-        beq     t7,	_end                    // return
+        beqz    t7,_end                    // return
         or 	    t1, r0, r0                  // t1 = pX_frames = 0
 
         _held:

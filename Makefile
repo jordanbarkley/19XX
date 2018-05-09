@@ -47,4 +47,4 @@ clean:
 	# remove executables
 	rm -rf tools/*.exe
 	rm -rf tools/_bass
-	rm -rf tools/chksum64
+	rm -rf tools/n64crc

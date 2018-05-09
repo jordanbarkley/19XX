@@ -44,7 +44,7 @@ scope Costumes {
 		_right:
 		or 		t2, r0, r0                  // reset shade
 		sltu 	at, v0, t1                  // ~
-		beql 	at, r0, _e d                // if (costume_id >= num_costumes)
+		beql 	at, r0, _end                // if (costume_id >= num_costumes)
 		or 		v0, r0, r0                  // then, v0 = 0
 		addiu 	v0, v0, 0x0001              // else, costume_id ++
 		b 		_end                        // end
@@ -67,14 +67,14 @@ scope Costumes {
 		b       _end                        // end
 		nop
 
-		Down:
+		_down:
 		bgtz    t2, _end                    // if (costume_id =)
 		addiu   t2, t2,-0x0001              // then, t2--
 		li      t2, 0x00000002              // else, t2 = 2
 		b       _end                        // end
 		nop		
 
-		End:
+		_end:
 		sw      v0, 0x004C(s0)              // store updated costume_id
 		sw      t2, 0x0050(s0)              // store updated shade_id		
 
@@ -121,10 +121,10 @@ scope Costumes {
 		OS.align(4)
 
 		functions:
-		dw Up
-		dw Right
-		dw Down
-		dw Left
+		dw _up
+		dw _right
+		dw _down
+		dw _left
 
 	}
 
