@@ -122,7 +122,7 @@ scope OS {
         cvt.w.s f0, f0                      // convert float to int
         mfc1    v0, f0                      // move int to v0
 
-        lw      t0, 0x0004(sp)              // ~
+        lw       t0, 0x0004(sp)              // ~
         lwc1    f0, 0x0008(sp)              // save registers
         addiu   sp, sp, 0x0010              // deallocate stack space
 

@@ -3,18 +3,18 @@
 // @ Description
 // Enables tournament settings by default
 OS.patch_start(0x00042D1B, 0x800A4D0B)
-db 0x03 									// game mode = time stocked
-dh 0x0100 									// (?)
-db 0x08 									// default time (8 mins)
-db 0x04 									// default stocks (5 stock)
-db 0x00 									// handicap (off)
-db 0x01 									// team attack (on)
-db 0x01 									// stage select (on)
-db 100 										// damage = 100
+db 0x03                                     // game mode = time stocked
+dh 0x0100                                   // (?)
+db 0x08                                     // default time (8 mins)
+db 0x04                                     // default stocks (5 stock)
+db 0x00                                     // handicap (off)
+db 0x01                                     // team attack (on)
+db 0x01                                     // stage select (on)
+db 100                                      // damage = 100
 OS.patch_end()
 
 OS.patch_start(0x00042D34, 0x800A4D24)
-db 00 										// item frequency (none)
+db 00                                       // item frequency (none)
 OS.patch_end()
 
 // @ Description
