@@ -11,7 +11,7 @@ scope BGM {
 
     // @ Description
     // this function is not yet documented.
-    constant stop_(0x00000000) 			
+    constant stop_(0x00000000)
 
     scope stage {
         constant DREAM_LAND(0)

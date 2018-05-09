@@ -4,7 +4,7 @@ scope Stages {
     //macro Stage(id, preview, type, franchise, name)
 
     scope getPreview_: {
-    //	OS.pat
+    //  OS.pat
 
     }
 
@@ -60,31 +60,31 @@ scope Stages {
     // @ TODO
     // document the function
     OS.patch_start(0x0014E02C, 0x00000000)
-    lui 	at, 0x8013
-    ori 	at, at, 0x4644
-    or 		v0, r0, r0
+    lui     at, 0x8013
+    ori     at, at, 0x4644
+    or      v0, r0, r0
 
     _loop:
-    lbu 	t6, 0x0003(at)
-    beq 	t6, a0, _end
+    lbu     t6, 0x0003(at)
+    beq     t6, a0, _end
 
     _check:
-    ori	 	t6, r0, 0x0008
-    beq 	t6, v0, _loop
+    ori     t6, r0, 0x0008
+    beq     t6, v0, _loop
 
 
     _loopInc:
-    addiu 	v0, v0, 0x0001
-    beq 	r0, r0, _loop
-    addiu 	at, at, 0x0004
+    addiu   v0, v0, 0x0001
+    beq     r0, r0, _loop
+    addiu   at, at, 0x0004
 
     _end:
-    jr 		ra
+    jr      ra
     nop
 
     _fail:
-    jr 		ra
-    or 		v0, r0, r0
+    jr      ra
+    or      v0, r0, r0
     OS.patch_end()
 
     // @ Description

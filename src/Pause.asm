@@ -33,10 +33,10 @@ scope Pause {
         or 	    t1, r0, r0                  // t1 = pX_frames = 0
 
         _held:
-        lb 	    t1, 0x0000(t0)              // t1 = pX_frames
+        lb      t1, 0x0000(t0)              // t1 = pX_frames
         addiu   t1, t1, 0x0001              // pX_frames++	
         li      t2, NUM_FRAMES              // t2 = NUM_FRAMES
-        slt	    t7, t2, t1                  // t7 = 1 if NUM_FRAMES < pX_frames; else t7 = 0
+        slt     t7, t2, t1                  // t7 = 1 if NUM_FRAMES < pX_frames; else t7 = 0
         bnel    t7, r0, _end                // if t7 == 1, run next line
         or      t1, r0, r0                  // t1 = 0 (hitstun bug fix)
 

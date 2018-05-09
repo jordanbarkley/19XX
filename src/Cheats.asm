@@ -83,21 +83,7 @@ OS.patch_end()
 // @ Description
 // This allows multiple players to be the same color by bypassing the check.
 OS.patch_start(0x001361C8, 0x80137F48) 	
-b 		0x80137F60
+b       0x80137F60
 OS.patch_end()
 
-// [bit]
-// disable sector z arwings
-//origin 	0x0834B8
-//base 	0x80107CB8
-// nop
 
-// disable planet zebes acid
-//origin 	0x083A5C
-//base 	0x8010825C
-// nop
-
-// disable hyrule castle tornado
-//origin 	0x085BD8
-//base 	0x8010A3D8
-// nop

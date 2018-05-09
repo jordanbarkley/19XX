@@ -4,19 +4,19 @@ scope Spawn {
 
     scope loadRespawnPoint_: {
         OS.patch_start(0x00000000, 0x800FC8B0)
-        //j 		Spawn.loadInitialSpawnPoint_
+        //j         Spawn.loadInitialSpawnPoint_
         //nop
         OS.patch_end()
     }
 
     // Neutral Spawns (2 or 3 plat stages)
 
-    //	                 ________
+    //                   ________
     //
     //        ___S1___             ___S2___
     // 
-    //	_________S3___________________S4_________
-    //	\_______________________________________/
+    //  _________S3___________________S4_________
+    //  \_______________________________________/
 
     
     // Neutral Spawns (other stages)
@@ -25,8 +25,8 @@ scope Spawn {
     //
     //
     // 
-    //	______S1______S3_________S4______S2______
-    //	\_______________________________________/
+    //  ______S1______S3_________S4______S2______
+    //  \_______________________________________/
 
     scope load_neutral_: {
         // a0 holds player
@@ -40,122 +40,122 @@ scope Spawn {
         _load_neutral_return:
         OS.patch_end()
 
-        addiu 	sp, sp,-0x0020          // allocate stack space
-        sw 		t0, 0x0004(sp) 	        // ~
-        sw 		t1, 0x0008(sp)          // ~
-        sw 		t2, 0x000C(sp)          // ~
-        sw 		t3, 0x0010(sp)          // ~
-        sw 		a0, 0x0014(sp)          // ~
-        sw 		v0, 0x0018(sp)          // ~
-        sw 		ra, 0x001C(sp)          // save registers
+        addiu   sp, sp,-0x0020          // allocate stack space
+        sw      t0, 0x0004(sp)          // ~
+        sw      t1, 0x0008(sp)          // ~
+        sw      t2, 0x000C(sp)          // ~
+        sw      t3, 0x0010(sp)          // ~
+        sw      a0, 0x0014(sp)          // ~
+        sw      v0, 0x0018(sp)          // ~
+        sw      ra, 0x001C(sp)          // save registers
 
         _setup:
-        li 		t0, team_table          // t0 = team_table
-        li 		t1, type_table          // t1 = typeTable
+        li      t0, team_table          // t0 = team_table
+        li      t1, type_table          // t1 = typeTable
 
         _p1:
-        li 		t2, Global.vs.p1        // ~
-        lb 		t3, 0x0004(t2)          // t3 = team
-        sb 		t3, 0x0000(t0)          // store team
-        lb 		t3, 0x0002(t2)          // t3 = type
-        sb 		t3, 0x0000(t1)          // store type
+        li      t2, Global.vs.p1        // ~
+        lb      t3, 0x0004(t2)          // t3 = team
+        sb      t3, 0x0000(t0)          // store team
+        lb      t3, 0x0002(t2)          // t3 = type
+        sb      t3, 0x0000(t1)          // store type
 
         _p2:
-        li 		t2, Global.vs.p2        // ~
-        lb 		t3, 0x0004(t2)          // t3 = team
-        sb 		t3, 0x0001(t0)          // store team
-        lb 		t3, 0x0002(t2)          // t3 = type
-        sb 		t3, 0x0001(t1)          // store type
+        li      t2, Global.vs.p2        // ~
+        lb      t3, 0x0004(t2)          // t3 = team
+        sb      t3, 0x0001(t0)          // store team
+        lb      t3, 0x0002(t2)          // t3 = type
+        sb      t3, 0x0001(t1)          // store type
 
         _p3:
-        li 		t2, Global.vs.p3        // ~
-        lb 		t3, 0x0004(t2)          // t3 = team
-        sb 		t3, 0x0002(t0)          // store team
-        lb 		t3, 0x0002(t2)          // t3 = type
-        sb 		t3, 0x0002(t1)          // store type
+        li      t2, Global.vs.p3        // ~
+        lb      t3, 0x0004(t2)          // t3 = team
+        sb      t3, 0x0002(t0)          // store team
+        lb      t3, 0x0002(t2)          // t3 = type
+        sb      t3, 0x0002(t1)          // store type
 
         _p4:
-        li 		t2, Global.vs.p4        // ~
-        lb 		t3, 0x0004(t2)          // t3 = team
-        sb 		t3, 0x0003(t0)          // store team
-        lb 		t3, 0x0002(t2)          // t3 = type
-        sb 		t3, 0x0003(t1)          // store type
+        li      t2, Global.vs.p4        // ~
+        lb      t3, 0x0004(t2)          // t3 = team
+        sb      t3, 0x0003(t0)          // store team
+        lb      t3, 0x0002(t2)          // t3 = type
+        sb      t3, 0x0003(t1)          // store type
 
         _doubles:
-        li 		t0, Global.vs.teams     // ~
-        lb 		t0, 0x0000(t0)          // t0 = teams
-        beqz 	t0, _singles            // if (!teams), skip
+        li      t0, Global.vs.teams     // ~
+        lb      t0, 0x0000(t0)          // t0 = teams
+        beqz    t0, _singles            // if (!teams), skip
         nop
 
-        li 		t0, valid_teams         // t0 = valid_teams table
-        li 		t1, team_table          // t1 = team_table
-        lw 		t1, 0x0000(t1)          // t1 = teams
+        li      t0, valid_teams         // t0 = valid_teams table
+        li      t1, team_table          // t1 = team_table
+        lw      t1, 0x0000(t1)          // t1 = teams
         
         _doubles_loop:
-        lw 		t2, 0x0000(t0)          // t2 = team_setup
-        beqz 	t2, _panic              // exit if combo not found
+        lw      t2, 0x0000(t0)          // t2 = team_setup
+        beqz    t2, _panic              // exit if combo not found
         nop
-        bnel 	t1, t2, _doubles_loop   // if (not a match), skip
-        addiu 	t0, t0, 0x0008          // t0 = team_table++
-        add 	t0, t0, a0 	            // t0 = valid_team + playerOffset
-        lb 		a0, 0x0004(t0)          // a0 = update_player
-        b 		_load_spawn
+        bnel    t1, t2, _doubles_loop   // if (not a match), skip
+        addiu   t0, t0, 0x0008          // t0 = team_table++
+        add     t0, t0, a0              // t0 = valid_team + playerOffset
+        lb      a0, 0x0004(t0)          // a0 = update_player
+        b       _load_spawn
         nop
 
         _singles:
-        li 		t0, valid_singles       // t0 = valid_singles table
-        li 		t1, type_table          // t1 = type_table
-        lw 		t1, 0x0000(t1)          // t1 = teams
-        li 		t2, 0x02020202          // ~
-        and 	t1, t1, t2              // mask so 0 = 0, 1 = 0, 2 = 2 
+        li      t0, valid_singles       // t0 = valid_singles table
+        li      t1, type_table          // t1 = type_table
+        lw      t1, 0x0000(t1)          // t1 = teams
+        li      t2, 0x02020202          // ~
+        and     t1, t1, t2              // mask so 0 = 0, 1 = 0, 2 = 2 
 
         _singles_loop:
-        lw 		t2, 0x0000(t0)          // t2 = single_setup
-        beqz 	t2, _panic              // exit if combo not found
+        lw      t2, 0x0000(t0)          // t2 = single_setup
+        beqz    t2, _panic              // exit if combo not found
         nop
-        bnel 	t1, t2, _singles_loop   // ~
-        addiu 	t0, t0, 0x0008          // ~
-        add 	t0, t0, a0              // ~
-        lb 		a0, 0x0004(t0)          // a0 = updatedPlayer
+        bnel    t1, t2, _singles_loop   // ~
+        addiu   t0, t0, 0x0008          // ~
+        add     t0, t0, a0              // ~
+        lb      a0, 0x0004(t0)          // a0 = updatedPlayer
 
         _load_spawn:
-        li 		t0, neutral_table       // t0 = spawn table
-        li 		t1, Global.vs.stage     // ~
-        lb 		t1, 0x0000(t1) 	        // t1 = stageID
-        sll 	t1, t1, 0x0005          // t0 = stage offset
-        add 	t0, t0, t1              // t0 = table + stage offset
-        sll 	t1, a0, 0x0003          // t1 = palyer offset
-        add  	t0, t0, t1 	            // t1 = spawn to load address
+        li      t0, neutral_table       // t0 = spawn table
+        li      t1, Global.vs.stage     // ~
+        lb      t1, 0x0000(t1)          // t1 = stageID
+        sll     t1, t1, 0x0005          // t0 = stage offset
+        add     t0, t0, t1              // t0 = table + stage offset
+        sll     t1, a0, 0x0003          // t1 = palyer offset
+        add     t0, t0, t1              // t1 = spawn to load address
 
-        lw 		t1, 0x0000(t0)          // a0 = (int) xpos
-        sw 		t1, 0x0000(a1)          // update xpos
+        lw      t1, 0x0000(t0)          // a0 = (int) xpos
+        sw      t1, 0x0000(a1)          // update xpos
 
-        lw 		t1, 0x0004(t0)          // a0 = (int) xpos
-        sw 		t1, 0x0004(a1)          // update ypos
+        lw      t1, 0x0004(t0)          // a0 = (int) xpos
+        sw      t1, 0x0004(a1)          // update ypos
 
-        lw 		t0, 0x0004(sp)          // ~
-        lw 		t1, 0x0008(sp)          // ~
-        lw 		t2, 0x000C(sp)          // ~
-        lw 		t3, 0x0010(sp)          // ~
-        lw 		a0, 0x0014(sp)          // ~
-        lw 		v0, 0x0018(sp)          // ~
-        lw 		ra, 0x001C(sp)          // restore registers
-        addiu 	sp, sp, 0x0020          // deallocate stack space
-        jr 		ra                      // return
+        lw      t0, 0x0004(sp)          // ~
+        lw      t1, 0x0008(sp)          // ~
+        lw      t2, 0x000C(sp)          // ~
+        lw      t3, 0x0010(sp)          // ~
+        lw      a0, 0x0014(sp)          // ~
+        lw      v0, 0x0018(sp)          // ~
+        lw      ra, 0x001C(sp)          // restore registers
+        addiu   sp, sp, 0x0020          // deallocate stack space
+        jr      ra                      // return
         nop
 
         _panic:
-        lw 		t0, 0x0004(sp)          // ~
-        lw 		t1, 0x0008(sp)          // ~
-        lw 		t2, 0x000C(sp)          // ~
-        lw 		t3, 0x0010(sp)          // ~
-        lw 		a0, 0x0014(sp)          // ~
-        lw 		v0, 0x0018(sp)          // ~
-        lw 		ra, 0x001C(sp)          // restore registers
-        addiu 	sp, sp, 0x0020          // deallocate stack space
-        lui 	t6, 0x8013 	            // original line 1
-        lw 		t6, 0x1368(t6)          // original line 2
-        j 		_load_neutral_return    // return to original code flow
+        lw      t0, 0x0004(sp)          // ~
+        lw      t1, 0x0008(sp)          // ~
+        lw      t2, 0x000C(sp)          // ~
+        lw      t3, 0x0010(sp)          // ~
+        lw      a0, 0x0014(sp)          // ~
+        lw      v0, 0x0018(sp)          // ~
+        lw      ra, 0x001C(sp)          // restore registers
+        addiu   sp, sp, 0x0020          // deallocate stack space
+        lui     t6, 0x8013              // original line 1
+        lw      t6, 0x1368(t6)          // original line 2
+        j       _load_neutral_return    // return to original code flow
         nop
 
         team_table:

@@ -9,7 +9,7 @@ scope Camera {
     // This is not a function and should not be called.
     scope disable_cinematic_: {
         OS.patch_start(0x0008E250, 0x80112A50)
-        or 			v0, r0, r0
+        or      v0, r0, r0
         nop
         OS.patch_end()
     
