@@ -1,12 +1,12 @@
-FILENAME=19XX
+PROGRAM_NAME=19XX
 
 all:
 	# assemble rom
-	tools/_bass -o $(FILENAME).z64 $(FILENAME).asm -sym
+	tools/_bass -o $(PROGRAM_NAME).z64 $(PROGRAM_NAME).asm -sym
 	
 	# update checksum
-	tools/chksum64 $(FILENAME).z64 > chksum64.log
-	
+	tools/n64crc $(PROGRAM_NAME).z64
+
 	# show time stamp
 	date
 
@@ -33,13 +33,13 @@ debug:
 
 clean:
 	# remove roms
-	rm -rf $(FILENAME).z64
+	rm -rf $(PROGRAM_NAME).z64
 
 	# remove log files
 	rm -rf *.log
 	
 	# remove patch files
-	rm -rf $(FILENAME).patch
+	rm -rf $(PROGRAM_NAME).patch
 
 	# remove bass github repository
 	rm -rf tools/bass
