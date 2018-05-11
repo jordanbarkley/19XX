@@ -2,7 +2,7 @@ PROGRAM_NAME=19XX
 
 all:
 	# assemble rom
-	tools/_bass -o $(PROGRAM_NAME).z64 $(PROGRAM_NAME).asm -sym
+	tools/_bass -o $(PROGRAM_NAME).z64 $(PROGRAM_NAME).asm -sym bass.log
 	
 	# update checksum
 	tools/n64crc $(PROGRAM_NAME).z64
