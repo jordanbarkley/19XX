@@ -199,16 +199,11 @@ scope Stages {
         db 0x06                              // Dream Land Beta 1
         db 0x06                              // Dream Land Beta 2
         db 0x06                              // How to Play
-        db 0x00                              // Yoshi's Island (1P)
+        db 0x05                              // Yoshi's Island (1P)
         db 0x01                              // Metal Cavern
         db 0x01                              // Batlefield
         db 0xFF                              // Race to the Finish (Placeholder)
         db 0x01                              // Final Destination
-        
         OS.align(4)
-
-
-        
-    }    
-
+    }
 }
