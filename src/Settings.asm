@@ -47,7 +47,7 @@ scope Settings {
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack space
-        lw      t5, 0x0000(t0)              // original line 1
+        lw      t5, 0x0000(t1)              // original line 1
         lui     t6, 0x800A                  // original line 2
         j       _set_vs_settings_return     // retrun 
         nop
