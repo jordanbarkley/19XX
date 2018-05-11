@@ -18,6 +18,7 @@ origin  0x01000000
 base    0x80400000
 include "src/OS.asm"
 include "src/Global.asm"
+include "src/Settings.asm"
 //include "src/BGM.asm"
 //include "src/FGM.asm"
 //include "src/RCP.asm"

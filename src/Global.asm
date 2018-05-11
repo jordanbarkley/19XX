@@ -20,7 +20,7 @@ scope Global {
 
         // @ Description
         // Byte, 1 = time, 2 = stock, 3 = both
-        constant gamemode(0x800A4D0B)
+        constant game_mode(0x800A4D0B)
 
         // @ Description
         // Byte, 2 = 2 min, 100 = infinite
@@ -28,7 +28,7 @@ scope Global {
 
         // @ Description
         // Byte, 0 = 1 stock
-        constant stock(0x800A4D0F)
+        constant stocks(0x800A4D0F)
 
         // @ Description
         // Byte, 0 = off, 1 = on, 2 = auto
@@ -47,8 +47,8 @@ scope Global {
         constant damage(0x800A4D13)
 
         // @ Description
-        // Byte, 0 = none, 5 = high
-        constant item_appearance(0x800A4D24)
+        // Byte, 0 = none, 5 = high 						
+        constant item_frequency(0x800A4D24)
 
         // @ Description
         // Pointer to player structs on versus screen
