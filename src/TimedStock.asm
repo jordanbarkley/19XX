@@ -20,18 +20,11 @@ scope TimedStock {
     OS.patch_end()
 
     // @ Description
-    // This block originally used a bitwise and for time (mode & 1) but now checks against time.
-    OS.patch_start(0x001389FC, 0x8013A77C)
+    // This block originally used a bitwise and for time (mode & 1) but now checks against time to 
+    // determine whether or not to display stock_number of stock icons.
+    OS.patch_start(0x001389F8, 0x8013A778)
     lli     t6, 0x0001
     bnel    t6, t5, 0x8013A790
-    OS.patch_end()
-
-    // @ Description
-    // Changes sudden death check to only occur on timed/matches by comparing against a 1 instead of
-    // comparing against (mode & 1). 
-    OS.patch_start(0x0010A4F8, 0x8018D608)
-    lli     t7, 0x0001
-    beq     t7, t6, 0x8018D61C
     OS.patch_end()
 
     // @ Description
