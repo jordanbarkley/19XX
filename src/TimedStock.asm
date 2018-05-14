@@ -6,7 +6,6 @@
 // matches with timed stock matches.
 
 scope TimedStock {
-
     // @ Description
     // Enable TimedStock scoring for FFA (mode = 2 to mode = 3)
     OS.patch_start(0x001241A0, 0x801337F0)
@@ -27,11 +26,10 @@ scope TimedStock {
     bnel    t6, t5, 0x8013A790
     OS.patch_end()
 
-    // @ Description
+    // @ Descrip    tion
     // Correct scoring. The check usually checks against 0x02 (stock) but the mode will always be
     // 1 or 3. The simple fix is to change 2 to 3
     OS.patch_start(0x00156560, 0x801373C0)
     addiu   at, r0, 0x0003
     OS.patch_end()
-
 }
