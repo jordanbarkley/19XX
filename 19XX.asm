@@ -19,12 +19,11 @@ base    0x80400000
 include "src/OS.asm"
 include "src/Global.asm"
 include "src/Settings.asm"
-//include "src/BGM.asm"
+include "src/BGM.asm"
 //include "src/FGM.asm"
 //include "src/RCP.asm"
 include "src/Color.asm"
 //include "src/String.asm"
-//include "src/GFX.asm"
 //include "src/Font.asm"
 include "src/Cheats.asm"
 //include "src/Menu.asm"
@@ -39,7 +38,6 @@ include "src/FD.asm"
 include "src/TimedStock.asm"
 include "src/Stages.asm"
 include "src/Timeouts.asm"
-include "src/Graphics.asm"
 
 fill 	0x2000000 - origin() 	// Extend ROM to 32 MBs
 

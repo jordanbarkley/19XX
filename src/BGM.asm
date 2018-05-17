@@ -65,7 +65,7 @@ scope BGM {
         constant CONTINUE(31)
         constant GAME_OVER(32)
         constant INTRO(33)
-        constant 1P(35)
+        constant SINGLEPLAYER(35)
         constant GAME_COMPLETE(38)
         constant CREDITS(39)
         constant SECRET(40)
