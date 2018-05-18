@@ -1,4 +1,4 @@
-# 19XX - The Premiere Super Smash Bros. 64 Hack by Cyjorg
+# 19XX - The Premier and Premiere Super Smash Bros. 64 Hack by Cyjorg
 
 ## Features
 (TODO)
