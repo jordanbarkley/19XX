@@ -1,11 +1,14 @@
-// Timeouts.asm
-// by Cyjorg and bit
+// Timeouts.asm (additional timeouts found by bit)
+if !{defined __TIMEOUTS__} {
+define __TIMEOUTS__()
 
 // @ Description
 // The following patches disable a conditional check with each screen frame counter. Typically,
 // the number of frames ran on the current screen is compared with 18000 frames (5 minutes). Then,
 // a conditional branch to a function that changes screens is called. The conditional branch (bne)
 // been replaced by a branch always (b) so that the change screen function is never called.
+
+include "OS.asm"
 
 scope Timeouts {
 
@@ -63,4 +66,6 @@ scope Timeouts {
     OS.patch_start(0x0014F928, 0x80133DB8)
     b 0x80133DE0
     OS.patch_end()
+}
+
 }

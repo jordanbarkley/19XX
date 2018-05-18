@@ -1,5 +1,6 @@
-// Pause.asm
-// original by Fray
+// Pause.asm (original by Fray)
+if !{defined __PAUSE__} {
+define __PAUSE__()
 
 scope Pause {
 
@@ -55,5 +56,7 @@ scope Pause {
         db 0x00                             // p3
         db 0x00                             // p4
     }
+
+}
 
 }

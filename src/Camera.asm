@@ -1,4 +1,8 @@
 // Camera.asm
+if !{defined __CAMERA__} {
+define __CAMERA__()
+
+include "OS.asm"
 
 scope Camera {
 
@@ -17,4 +21,4 @@ scope Camera {
     }
 }
 
-
+}

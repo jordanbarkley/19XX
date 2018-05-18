@@ -1,4 +1,8 @@
 // Settings.asm
+if !{defined __SETTINGS__} {
+define __SETTINGS__()
+
+include "OS.asm"
 
 scope Settings {
     // @ TODO Save VS. Settings
@@ -52,4 +56,6 @@ scope Settings {
         j       _set_vs_settings_return     // retrun 
         nop
     }
+}
+
 }

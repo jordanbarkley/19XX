@@ -1,4 +1,9 @@
 // Shield.asm
+if !{defined __SHIELD__} {
+define __SHIELD__()
+
+include "OS.asm"
+include "Global.asm"
 
 scope Shield {
 
@@ -77,5 +82,7 @@ scope Shield {
         dw (0xFFFFFF00 & Color.high.YELLOW) // p3
         dw (0xFFFFFF00 & Color.high.GREEN)  // p4
     }
+
+}
 
 }

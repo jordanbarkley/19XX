@@ -1,5 +1,8 @@
-// TimedStock.asm
-// original by Danny_SsB and Mada0
+// TimedStock.asm (original by Danny_SsB and Mada0)
+if !{defined __TIMED_STOCK__} {
+define __TIMED_STOCK__()
+
+include "OS.asm"
 
 // SSB uses a bitwise behavior for time and stock so (mode 1 = time, mode 2 = stock, 1 & 2 = both).
 // Timed stock matches were likely planned but cut during development. This file replaces stock
@@ -32,4 +35,6 @@ scope TimedStock {
     OS.patch_start(0x00156560, 0x801373C0)
     addiu   at, r0, 0x0003
     OS.patch_end()
+}
+
 }

@@ -1,4 +1,6 @@
 // Spawn.asm
+if !{defined __SPAWN__} {
+define __SPAWN__()
 
 scope Spawn {
 
@@ -440,4 +442,6 @@ scope Spawn {
     float32  1800,  0005
     float32 -0900,  0005
     float32  0900,  0005
+}
+
 }

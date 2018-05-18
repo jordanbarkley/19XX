@@ -1,4 +1,6 @@
 // Global.asm
+if !{defined __GLOBAL__} {
+define __GLOBAL__()
 
 scope Global {
     // @ Description
@@ -66,4 +68,6 @@ scope Global {
     // @ Description
     // player struct list head
     constant p_struct_head(0x80130D84)
+}
+
 }

@@ -1,4 +1,8 @@
 // Costumes.asm
+if !{defined __COSTUMES__} {
+define __COSTUMES__()
+
+include "OS.asm"
 
 scope Costumes {
 
@@ -13,7 +17,6 @@ scope Costumes {
         nop
         _select_return:
         OS.patch_end()
-
 
         // a0 holds character id (until original line 2)
         // a1 holds direction pressed (up = 0, right = 1, down = 2, left = 3)
@@ -139,6 +142,13 @@ scope Costumes {
         OS.patch_end()
     }
 
-
+    // @ Description
+    // Updates costume based on player struct
+    // @ Arguments
+    // a0 - 0x00008(player struct), ???
+    // a1 - costume_id
+    // a2 - shade_id
     constant update_(0x800E9248)
+}
+
 }

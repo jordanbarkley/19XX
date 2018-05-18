@@ -1,4 +1,6 @@
 // BGM.asm
+if !{defined __BGM__} {
+define __BGM__()
 
 scope BGM {
 
@@ -10,14 +12,14 @@ scope BGM {
     constant play_(0x80020AB4)
 
     // @ Description
-    // this function is not yet documented.
+    // This function is not yet documented.
     constant stop_(0x00000000)
 
     scope stage {
         constant DREAM_LAND(0)
         constant PLANET_ZEBES(1)
-        constant MK(2)
-        constant MK_FAST(3)
+        constant MUSHROOM_KINGDOM(2)
+        constant MUSHROOM_KINGDOM_FAST(3)
         constant SECTOR_Z(4)
         constant CONGO_JUNGLE(5)
         constant PEACHS_CASTLE(6)
@@ -80,5 +82,7 @@ scope BGM {
         constant HAMMER(45)
         constant INVINCIBLE(46)
     }
+
+}
 
 }

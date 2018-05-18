@@ -1,4 +1,6 @@
 // Stages.asm
+if !{defined __STAGES__} {
+define __STAGES__()
 
 scope Stages {
     //macro Stage(id, preview, type, franchise, name)
@@ -206,4 +208,6 @@ scope Stages {
         db 0x01                              // Final Destination
         OS.align(4)
     }
+}
+
 }
