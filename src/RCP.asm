@@ -14,12 +14,10 @@ include "OS.asm"
 scope RCP {
 
     // macros
-    macro display_list_info(variable address, variable size, variable modes) {
+    macro display_list_info(variable address, variable size) {
         dw address                          // 0x0000 - display list start address
         dw address                          // 0x0004 - display list current address
         dw size                             // 0x0008 - display list size 
-        dd modes                            // 0x000C - other modes high 
-                                            // 0x0010 - other modes low
     } 
 
     // commands
@@ -91,8 +89,8 @@ scope RCP {
     constant G_IM_SIZ_16b(0x02)
     constant G_IM_SIZ_32b(0x03)
 
-    // uninitialized display list
-    display_list_info:
+    // uninitialized display list info pointer
+    display_list_info_p:
     dw 0x00000000
 
     // display list builder
@@ -109,7 +107,7 @@ scope RCP {
         sw      t2, 0x000C(sp)              // ~
         sw      t3, 0x0010(sp)              // save registers
 
-        li      t0, display_list_info       // ~
+        li      t0, display_list_info_p      // ~
         lw      t0, 0x0000(t0)              // ~
         lw      t1, 0x0000(t0)              // t1 = start address
         lw      t2, 0x0004(t0)              // t2 = curr address
@@ -117,10 +115,10 @@ scope RCP {
         addu    t1, t1, t3                  // t1 = start address + size
         beq     t1, t2, _break              // if (curr address == max address), break execution
         nop
-        sw      a1, 0x0000(t2)              // store upper half 
-        sw      a2, 0x0004(t2)              // store lower half
+        sw      a0, 0x0000(t2)              // store upper half 
+        sw      a1, 0x0004(t2)              // store lower half
         addiu   t2, t2, 0x0008              // t2 = curr address++
-        sw      t2, 0x0000(t0)              // store new current address
+        sw      t2, 0x0004(t0)              // store new current address
 
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
@@ -171,7 +169,7 @@ scope RCP {
     // @ Bytefield
     // DF000000 00000000
     scope end_list_: {
-        lui     a0, (G_DL << 8)             // a0 = upper
+        lui     a0, (G_ENDDL << 8)          // a0 = upper
         lui     a1, 0x0000                  // a1 = lower
         j       append_                     // append dlist
         nop
@@ -318,6 +316,20 @@ scope RCP {
         j       append_                     // append dlist 
         nop
         break                               // execution not should return here
+    }
+
+    scope set_other_modes_fill_: {
+        li      a0, 0x00300000              // ~
+        lli     a1, 0x0000                  // ~
+        j       set_other_modes_            // set other modes fill
+        nop
+    }
+
+    scope set_other_modes_copy_: {
+        li      a0, 0x00200000              // ~
+        lli     a1, 0x0000                  // ~
+        j       set_other_modes_            // set other modes copy
+        nop
     }
 
     // @ Description
