@@ -2,6 +2,11 @@
 if !{defined __STAGES__} {
 define __STAGES__()
 
+// @ Descirption
+// This file replaces some stages in favor of more tournament viable stages.
+
+include "OS.asm"
+
 scope Stages {
     //macro Stage(id, preview, type, franchise, name)
 

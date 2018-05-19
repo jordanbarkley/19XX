@@ -2,6 +2,9 @@
 if !{defined __SETTINGS__} {
 define __SETTINGS__()
 
+// @ Description
+// This file is used for loading default tournament settings on boot.
+
 include "OS.asm"
 
 scope Settings {

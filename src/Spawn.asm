@@ -2,11 +2,16 @@
 if !{defined __SPAWN__} {
 define __SPAWN__()
 
+// @ Description
+// This file alters spawn position for different circumstances such as Neutral Spawns.
+
+include "OS.asm"
+
 scope Spawn {
 
-    scope loadRespawnPoint_: {
+    scope load_respawn_point_: {
         OS.patch_start(0x00000000, 0x800FC8B0)
-        //j         Spawn.loadInitialSpawnPoint_
+        //j         Spawn.load_initial_respawn_point_
         //nop
         OS.patch_end()
     }

@@ -2,6 +2,9 @@
 if !{defined __BGM__} {
 define __BGM__()
 
+// @ Description
+// This file allows BGM (background music) to be played and stopped.
+
 scope BGM {
 
     // @ Description

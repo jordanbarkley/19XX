@@ -2,6 +2,9 @@
 if !{defined __SHIELD__} {
 define __SHIELD__()
 
+// @ Description
+// Thise file changes shield colors to match port colors.
+
 include "OS.asm"
 include "Global.asm"
 

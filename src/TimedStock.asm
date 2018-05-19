@@ -2,11 +2,12 @@
 if !{defined __TIMED_STOCK__} {
 define __TIMED_STOCK__()
 
-include "OS.asm"
-
+// @ Description
 // SSB uses a bitwise behavior for time and stock so (mode 1 = time, mode 2 = stock, 1 & 2 = both).
 // Timed stock matches were likely planned but cut during development. This file replaces stock
 // matches with timed stock matches.
+
+include "OS.asm"
 
 scope TimedStock {
     // @ Description

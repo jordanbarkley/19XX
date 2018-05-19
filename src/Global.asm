@@ -2,6 +2,8 @@
 if !{defined __GLOBAL__} {
 define __GLOBAL__()
 
+// This file enumerates several of SSB's global variables.
+
 scope Global {
     // @ Description
     // Original SSB function. It move nBytes from the given ROM address to the given RAM address

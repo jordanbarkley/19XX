@@ -2,6 +2,9 @@
 if !{defined __FD__} {
 define __FD__()
 
+// @ Description
+// This file makes Final Destination playable in VS. mode.
+
 include "OS.asm"
 scope FD {
 

@@ -2,6 +2,10 @@
 if !{defined __OS__} {
 define __OS__()
 
+// @ Description
+// This file is where bass setup occurs and must be included in all bass projects. It also contains
+// useful macros and functions to make assembly easier.
+
 // general setup
 arch    n64.cpu
 endian  msb

@@ -2,6 +2,9 @@
 if !{defined __CAMERA__} {
 define __CAMERA__()
 
+// @ Description
+// This file disables the cinematic introduction before VS. matches.
+
 include "OS.asm"
 
 scope Camera {

@@ -2,6 +2,9 @@
 if !{defined __COLOR__} {
 define __COLOR__()
 
+// @ Description
+// This file contains color constants.
+
 scope Color {
 
     constant RED(0xF801)

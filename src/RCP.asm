@@ -2,9 +2,11 @@
 if !{defined __RCP__} {
 define __RCP__()
 
+// @ Description
 // for use with f3dex2
 // https://wiki.cloudmodding.com/oot/F3DZEX/Opcode_Details
 // https://dragonminded.com/n64dev/Reality%20Coprocessor.pdf
+// @ Note
 // constants in this file do no follow the style guide
 
 include "OS.asm"

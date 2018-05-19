@@ -2,6 +2,9 @@
 if !{defined __BOOT__} {
 define __BOOT__()
 
+// @ Description
+// This file loads 19XX data into expansion RAM.
+
 include "OS.asm"
 include "Global.asm"
 

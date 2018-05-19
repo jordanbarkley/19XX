@@ -2,6 +2,9 @@
 if !{defined __COSTUMES__} {
 define __COSTUMES__()
 
+// @ Description
+// This file makes all SSB costumes usable in versus.
+
 include "OS.asm"
 
 scope Costumes {
