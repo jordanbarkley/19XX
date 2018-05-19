@@ -16,9 +16,9 @@ scope Cheats {
 
     // @ Description
     // Nintendo 64 logo exits to character select screen because t1 contains screen ID 0x0010
-    // instead of 0x0004
+    // instead of 0x001C
     OS.patch_start(0x0017EE54, 0x80131C94)
-    ori     t1, r0, 0x001C
+    ori     t1, r0, 0x0010
     OS.patch_end()
 
     // @ Descritpion
