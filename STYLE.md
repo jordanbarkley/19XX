@@ -30,7 +30,7 @@ Bass constants can only be declared once and cannot be changed during the assemb
 serve three purposes for 19XX developers.
 
 ### Purpose 1: Standard Programming Constants
-Remember, `DREAM_LAND_STAGE_ID` is significantly more informative than `6`f. Use constants in your code.
+Remember, `DREAM_LAND_STAGE_ID` is significantly more informative than `6`. Use constants in your code.
 
 **Rules**
 1. Constants use `UPPERCASE_NOTATION`.
@@ -71,7 +71,7 @@ Bass macros can do many things such as create c structs, advance the program cou
 **Rules**
 1. Follow the rules of variables.
 2. Document heavily at declaration. Include usage, pc/base changes, etc.
-3. Always ensure that the result of a macro is 32 bit aligned (achieved using OS.align(4)).
+3. Always ensure that the result of a macro is 32 bit aligned (achieved using `OS.align(4)`).
 
 **Acceptable**
 ```
@@ -97,7 +97,7 @@ macro _alignPc(size) {
 ```
 
 ## Section IV: Bass Defines (C Header Guards)
-It is possible to test if a bass define has been declared or not by using this special syntax: *{defined name}*. 19XX developer will take advantage of this feature to avoid including a source file multiple times.
+It is possible to test if a bass define has been declared or not by using this special syntax: `{defined name}`. 19XX developers will take advantage of this feature to avoid including a source file multiple times.
 
 **Example Header Guard**
 ```
