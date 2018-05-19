@@ -2,6 +2,7 @@
 if !{defined __GLOBAL__} {
 define __GLOBAL__()
 
+// @ Description
 // This file enumerates several of SSB's global variables.
 
 scope Global {
