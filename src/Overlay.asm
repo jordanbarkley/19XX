@@ -18,6 +18,11 @@ scope Overlay {
         dw pc() + 4                         // 0x0008 - pointer to image data
     }
 
+    test_string:
+    db "Cyjorg, you have outdone yourself."
+    db 0x00
+    OS.align(4)
+
     texture_battlefield:
     texture(48, 36)
     insert "../textures/battlefield.rgba5551"
@@ -25,6 +30,10 @@ scope Overlay {
     texture_background:
     texture(320, 240)
     insert "../textures/background.rgba5551"
+
+    texture_font:
+    texture(8, 8)
+    insert "../textures/font.rgba5551"
 
 
     scope test_: {
@@ -67,24 +76,38 @@ scope Overlay {
         jal     draw_texture_big_           // draw big texture
         nop
 
-
         // draw rectangle
         li      a0, (Color.low.RED << 16) | (Color.low.RED)
         jal     RCP.set_fill_color_         // set fill color to red
         nop
-        li      a0, 10
-        li      a1, 10
-        li      a2, 40
-        li      a3, 40
+        li      a0, 10                      // a0 - ulx
+        li      a1, 10                      // a1 - uly
+        li      a2, 40                      // a2 - width
+        li      a3, 40                      // a3 - height
         jal     draw_rectangle_             // draw rectangle
         nop
 
         // draw texture
         li      a0, 10                      // a0 - ulx
-        li      a1, 60                      // a1 - uly
+        li      a1, 50                      // a1 - uly
         li      a2, texture_battlefield     // a2 - address of texture struct 
         jal     draw_texture_
         nop
+
+        // draw char
+        li      a0, 10                      // a0 - ulx
+        li      a1, 100                     // a1 - uly
+        li      a2, 'J'                     // a2 - char
+        jal     draw_char_                  // draw char
+        nop
+
+        // draw string
+        li      a0, 10                      // a0 - ulx
+        li      a1, 140                     // a1 - uly
+        li      a2, test_string             // a2 - address of string
+        jal     draw_string_                // draw string
+        nop
+
 
         // finish
         jal     end_                        // end display list
@@ -297,6 +320,80 @@ scope Overlay {
     }
 
     // @ Description
+    // Adds f3dex2 to draw characters.
+    // @ Arguments
+    // a0 - ulx
+    // a1 - uly
+    // a2 - char
+    scope draw_char_: {
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      a2, 0x000C(sp)              // ~
+        sw      ra, 0x0010(sp)              // save registers
+
+        li      t0, texture_font            // ~
+        lw      t0, 0x0008(t0)              // t0 = address of image_data
+        sll     t1, a2, 0x0007              // t1 = char * width * height * 2 (or char * 128)
+        addu    t0, t0, t1                  // t0 = address of char_data
+        li      t1, texture                 // ~
+        sw      t0, 0x0008(t1)              // texture.data = char_data
+//      or      a0, a0, r0                  // a0 - ulx
+//      or      a1, a1, r0                  // a2 - uly
+        li      a2, texture                 // a2 - texture data
+        jal     draw_texture_
+        nop
+
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      a2, 0x000C(sp)              // ~
+        lw      ra, 0x0010(sp)              // restore registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        jr      ra                          // return
+        nop
+
+        texture:
+        texture(8, 8)
+    }
+
+    // @ Description
+    // Draws a null terminated string.
+    // @ Arguments
+    // a0 - ulx
+    // a1 - uly
+    // a2 - address of string
+    scope draw_string_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      s2, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        or      s2, a2, r0                  // s2 = copy of a2 (address of string)
+
+        _loop:
+        lb      t0, 0x0000(s2)              // t0 = char
+        beq     t0, r0, _end                // if (t0 == 0x00), end
+        nop
+//      or      a0, a0, r0                  // ulx
+//      or      a1, a1, r0                  // uly
+        or      a2, t0, 0x000               // a2 = char
+        jal     draw_char_                  // draw character
+        nop
+        addiu   s2, s2, 0x0001              // s2++
+        addiu   a0, a0, 0x0008              // a0 = (ulx + 8)
+        b       _loop                       // draw next char
+        nop
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      s2, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
+
+    // @ Description
     // Adds f3dex2 to end a display list.
     scope end_: {
         addiu   sp, sp, -0x0008             // allocate stack space
@@ -310,6 +407,7 @@ scope Overlay {
         jr      ra                          // return
         nop
     }
+
 
 
     // @ Description

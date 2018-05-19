@@ -319,15 +319,15 @@ scope RCP {
     }
 
     scope set_other_modes_fill_: {
-        li      a0, 0x00300000              // ~
+        lui     a0, 0x0030                  // cycle type = fil
         lli     a1, 0x0000                  // ~
         j       set_other_modes_            // set other modes fill
         nop
     }
 
     scope set_other_modes_copy_: {
-        li      a0, 0x00200000              // ~
-        lli     a1, 0x0000                  // ~
+        lui     a0, 0x0020                  // cycle type = copy
+        lli     a1, 0x0001                  // alpha compare enabled
         j       set_other_modes_            // set other modes copy
         nop
     }
