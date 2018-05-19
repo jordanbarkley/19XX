@@ -60,22 +60,14 @@ scope Overlay {
         li      t0, display_list            // ~ 
         sw      t0, 0x0004(v0)              // highjack ssb display list
 
-        // draw big texture
-        li      a0, 0                       // a0 - ulx
-        li      a1, 0                       // a1 - uly
-        li      a2, texture_background      // a2 - address of texture struct 
-        jal     draw_texture_big_           // draw big texture
-        nop
-
-
         // draw rectangle
         li      a0, (Color.low.RED << 16) | (Color.low.RED)
         jal     RCP.set_fill_color_         // set fill color to red
         nop
-        li      a0, 10
-        li      a1, 10
-        li      a2, 40
-        li      a3, 40
+        li      a0, 00
+        li      a1, 00
+        li      a2, 320
+        li      a3, 240
         jal     draw_rectangle_             // draw rectangle
         nop
 
@@ -220,79 +212,6 @@ scope Overlay {
         addiu   sp, sp, 0x0028              // deallocate stack space
         jr      ra                          // return
         nop
-    }
-
-    // @ Description
-    // Adds f3dex2 to draw multiple textured rectangles (for one texture) to the framebuffer.
-    // @ Arguments
-    // a0 - ulx
-    // a1 - uly
-    // a2 - address of texture struct 
-    scope draw_texture_big_: {
-        addiu   sp, sp,-0x0028              // allocate stack space
-        sw      at, 0x0004(sp)              // ~
-        sw      t0, 0x0008(sp)              // ~
-        sw      t1, 0x000C(sp)              // ~
-        sw      t2, 0x0010(sp)              // ~
-        sw      t3, 0x0014(sp)              // ~
-        sw      t4, 0x0018(sp)              // ~
-        sw      at, 0x0020(sp)              // ~
-        sw      ra, 0x0024(sp)              // save registers
-
-        li      t0, texture                 // t0 = address of local texture struct
-        lw      t1, 0x0000(a2)              // ~
-        sw      t1, 0x0000(t0)              // copy width to local texture struct
-        lw      t2, 0x0008(a2)              // ~
-        sw      t2, 0x0008(t0)              // copy data_pointer to local texture struct
-        lw      t3, 0x0004(a2)              // t3 = toatal_height (height_left)
-        li      a2, texture                 // a2 - address of local texture struct 
-
-        _loop:
-        sltiu   at, t3, 0x0005              // if (t3 < 5), at = 1
-        bne     at, r0, _draw_last          // ...and draw rectangle with height of 4 or less
-        nop
-        lli     t4, 0x0005                  // t4 = 5
-        sw      t4, 0x0004(t0)              // texture.height = 0
-
-        _draw:
-//      or      a0, a0, r0                  // a0 = ulx 
-//      or      a1, a1, r0                  // a1 = uly
-        li      a2, texture                 // a2 - address of local texture struct 
-        jal     draw_texture_               // draw chunk
-        nop
-
-        _increment:
-        addiu   a1, a1, 0x0005              // increment uly by 5
-        mult    t1, t4                      // ~
-        mflo    at                          // at = width * 5
-        addu    t2, t2, at                  // t2 = data_pointer + offset
-        sw      t2, 0x0008(t0)              // store new data_pointer to local texture struct
-        addiu   t3, t3,-0x0005              // t3 = height_left - 5
-        b       _loop                       // prepart to draw next chunk
-        nop
-
-        _draw_last:
-        sw      t3, 0x0004(t0)              // store height_left to local to local texture struct
-//      or      a0, a0, r0                  // a0 = ulx 
-//      or      a1, a1, r0                  // a1 = uly
-//      li      a2, texture                 // a2 - address of local texture struct         
-        jal     draw_texture_               // draw last chunk
-        nop
-
-        lw      at, 0x0004(sp)              // ~
-        lw      t0, 0x0008(sp)              // ~
-        lw      t1, 0x000C(sp)              // ~
-        lw      t2, 0x0010(sp)              // ~
-        lw      t3, 0x0014(sp)              // ~
-        lw      t4, 0x0018(sp)              // ~
-        lw      at, 0x0020(sp)              // ~
-        lw      ra, 0x0024(sp)              // restore registers
-        addiu   sp, sp, 0x0028              // deallocate stack space 
-        jr      ra                          // return
-        nop
-
-        texture:
-        texture(0, 0)                       // blank texture struct
     }
 
     // @ Description
