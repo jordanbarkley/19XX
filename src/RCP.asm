@@ -399,6 +399,8 @@ scope RCP {
     // a3 - int lry [y]
     // @ Bytefield
     // F6xxxyyy 00XXXYYY
+    // @ Note
+    // The fill_rectangle_wh_ variant uses (a2 = width) and (a3 = height) to caculate lrx and lry
     scope fill_rectangle_: {
         addiu   sp, sp,-0x0018              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -431,6 +433,13 @@ scope RCP {
         lw      ra, 0x0014(sp)              // retstore registers
         addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra
+        nop
+    }
+
+    scope fill_rectangle_wh_:{
+        add     a2, a0, a2                  // calculate lrx
+        add     a3, a1, a3                  // calculate lry
+        j       fill_rectangle_             // run regular fill_rectangle_
         nop
     }
 
