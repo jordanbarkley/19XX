@@ -288,7 +288,7 @@ scope int_to_float_: {
 **Rules**
 1. Indent using 4 spaces. Do not use tabs.
 2. Avoid duplicate code. Create functions.
-3. Avoid unnecessary redundancy. (prefer Math.add_ over Math.add_numbers_).
+3. Avoid unnecessary redundancy. (prefer `Math.add_` over `Math.add_numbers_`).
 4. Be consistent.
 5. Delete unused code.
 
@@ -301,9 +301,9 @@ The following rules are even more arbitrary than the above. Please stick with th
 3. Avoid `li` for bytes and halfwords. Use `lli` and `ori` instead.
 4. Always use 6 digits for numbers (hex uses `0x` prefix, dec uses `00` prefix).
 5. While several MIPS conventions are not followed, 19XX developers will follow these.
-    1. Registers a0, a1, a2, and a3 will be used for arguments
-    2. Registers v0 and v1 will be used for return values.
-    3. The stack pointer (sp) must always be 64 bit aligned.
+    1. Registers `a0`, `a1`, `a2`, and `a3` will be used for arguments
+    2. Registers `v0` and `v1` will be used for return values.
+    3. The stack pointer (s`p`) must always be 64 bit aligned.
 
 **Spacing Example**
 ```
