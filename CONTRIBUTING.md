@@ -1,5 +1,5 @@
 # Contributing
-Here a few things you can do to help 19XX.
+Here are a few things you can do to help 19XX.
 
 ## Play and Share
 Sit down and enjoy some games. If you like 19XX, recommend it to a friend, encourage your local TO to use 19XX at tournaments, etc.
