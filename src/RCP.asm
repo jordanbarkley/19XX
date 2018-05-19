@@ -186,8 +186,8 @@ scope RCP {
     // texture index [i] = 0
     // s coodrdinate [s] = 0
     // t coodrdinate [t] = 0
-    // dsdx [d] = 4
-    // dtdy [e] = 1
+    // dsdx [d] = 1 (why?)
+    // dtdy [e] = 4 (why?)
     // @ Bytefield
     // E4xxxyyy 0iXXXYYY
     // E1000000 sssstttt
@@ -222,13 +222,13 @@ scope RCP {
 
         _second:
         lui     a0, 0xE100                  // upper = 0xE1000000
-        lli     a0, 0x0000                  // lower = 0x00000000
+        lli     a1, 0x0000                  // lower = 0x00000000
         jal     append_                     // add to display list
         nop
 
         _third:
-        li      t2, 0x00400100              // dsdx = 4, dtdy = 1
-        sw      t2, 0x0014(t1)              // add to display list
+        lui     a0, 0xF100                  // upper = 0xE1000000
+        li      a1, 0x00100400              // dsdx = 1, dtdy = 4
         jal     append_                     // add to display list
         nop
 
@@ -335,48 +335,42 @@ scope RCP {
     // @ Description
     // Sets the size of the texture for tile descriptor tile.
     // @ Arguments
-    // a0 - int uls [S]
-    // a1 - int ult [T]
-    // a2 - int lrs [s]
-    // a3 - int lrs [t]
+    // a0 - width
+    // a1 - height
+    // int lrs [s] = width - 1
+    // int lrs [t] = height - 1
+    // int uls [S] = 0
+    // int ult [T] = 0
     // dsdx [d] = 4
     // dtdy [e] = 1
     // @ Bytefield
     // E4sssttt 0iSSSTTT
     scope set_tile_size_: {
-        addiu   sp, sp,-0x0018              // allocate stack space
+        addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      t2, 0x000C(sp)              // ~
-        sw      t3, 0x0010(sp)              // ~
-        sw      ra, 0x0014(sp)              // save registers
-        or      t0, a0, r0                  // t0 = uls
-        or      t1, a1, r0                  // t1 = ult
+        sw      ra, 0x000C(sp)              // save registers
+        or      t0, a0, r0                  // t0 = width
+        or      t1, a1, r0                  // t1 = height
 
         lui     a0, (G_SETTILESIZE << 8)    // a0 = opcode
-        sll     t2, a2, 0x0002              // t2 = (10.2) lrs
-        sll     t2, t2, 0x000C              // t2 = ((10.2) lrs) << 12
-        or      a0, a0, t2                  // a0 = opcode | lrs
-        sll     t2, a3, 0x0002              // t2 = (10.2) lrt
-        or      a0, a0, t2                  // t2 = opcode | lrs | lrt
-        or      a1, r0, r0                  // a1 = 0
-        sll     t2, t0, 0x0002              // t2 = (10.2) uls
-        sll     t2, t2, 0x000C              // t2 = ((10.2) uls) << 12
-        or      a1, a1, t2                  // a1 = uls
-        sll     t2, t1, 0x0002              // t2 = (10.2) ult
-        or      a1, a1, t2                  // a1 = uls | ult
+        lli     a1, 0                       // a1 = 0
+        addiu   t0, t0,-0x0001              // t0 = width - 1 = lrs
+        sll     t0, t0, 0x0002              // t0 = (10.2) lrs
+        sll     t0, t0, 0x000C              // t0 = ((10.2) lrs) << 12
+        or      a1, a1, t0                  // a0 = opcode | lrs
+        addiu   t1, t1,-0x0001              // t1 = height - 1 = lrt
+        sll     t1, t1, 0x0002              // t2 = (10.2) lrt
+        or      a1, a1, t1                  // t2 = opcode | lrs | lrt
         jal     append_                     // append dlist
         nop
 
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      t2, 0x000C(sp)              // ~
-        lw      t3, 0x0010(sp)              // ~ 
-        lw      ra, 0x0014(sp)              // retstore registers
-        addiu   sp, sp, 0x0018              // deallocate stack space
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // return
         nop
-
     }
 
     // @ Description
@@ -502,6 +496,7 @@ scope RCP {
         lui     a0, (G_SETTILE << 8)        // a0 = opcode
         sll     a1, a1, 000053              // shift format
         sll     a2, a2, 000051              // shift size
+        sll     t0, t0, 000041              // shift tls
         or      a0, a0, a1                  // a0 = opcode | format
         or      a0, a0, a2                  // a0 = opcode | format | size
         or      a0, a0, t0                  // a0 = opcode | format | size | tls 

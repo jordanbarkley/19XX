@@ -5,17 +5,22 @@ define __OVERLAY__()
 // @ Description
 // The framebuffer overlay is implemented in this file.
 // @ Note
-// 80005550 - line that writes the last sync full instruction
+// This file only support rgba5551
 
 include "OS.asm"
 include "RCP.asm"
 
 scope Overlay {
-    macro rgba5551(variable width, variable height, variable type) {
+
+    macro texture(variable width, variable height) {
         dw width                            // 0x0000 - width of texture
         dw height                           // 0x0004 - height of texture
         dw pc() + 4                         // 0x0008 - pointer to image data
     }
+
+    texture_battlefield:
+    texture(48, 36)
+    insert "../textures/battlefield.rgba5551"
 
 
     scope test_: {
@@ -62,6 +67,13 @@ scope Overlay {
         jal     draw_rectangle_             // draw rectangle
         nop
 
+        // draw texture
+        li      a0, 10                      // a0 - ulx
+        li      a1, 60                      // a1 - uly
+        li      a2, texture_battlefield     // a2 - address of texture struct 
+        jal     draw_texture_
+        nop
+
         // finish
         jal     end_                        // end display list
         nop
@@ -81,7 +93,7 @@ scope Overlay {
     }
 
     // @ Description
-    // Adds f3dex2 to draw a solid rectangle on the screen (of current fill color).
+    // Adds f3dex2 to draw a solid rectangle to the framebuffer (of current fill color).
     // @ Arguments
     // a0 - ulx
     // a1 - uly
@@ -100,6 +112,96 @@ scope Overlay {
         addiu   sp, sp, 0x0008              // deallocate stack space
         jr      ra                          // return
         nop
+    }
+
+    // @ Description
+    // Adds f3dex2 to draw a textured rectangle to the framebuffer.
+    // @ Arguments
+    // a0 - ulx
+    // a1 - uly
+    // a2 - address of texture struct 
+    scope draw_texture_: {
+        // order from SSB
+        // 1. set other modes copy
+        // 2. set texture image
+        // 3. set tile
+        // 4. load sync
+        // 5. load block 
+        // 6. pipe sync
+        // 7. set tile
+        // 8. set tile size
+        // 9. texture rectangle
+        // 0. pipe sync
+
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      s0, 0x0004(sp)              // ~
+        sw      s1, 0x0008(sp)              // ~
+        sw      s2, 0x000C(sp)              // ~
+        sw      ra, 0x0010(sp)              // save registers
+
+        or      s0, a0, r0                  // s0 = copy of a0
+        or      s1, a1, r0                  // s1 = copy of a1
+        or      s2, a2, r0                  // s2 = copy of a2
+
+        jal     RCP.set_other_modes_copy_   // append dlist
+        nop
+
+        lw      a0, 0x0008(s2)              // a0 - RAM address [a]
+        li      a1, RCP.G_IM_FMT_RGBA       // a1 - color format [f]
+        li      a2, RCP.G_IM_SIZ_16b        // a2 - color size [s]
+        jal     RCP.set_texture_image_      // append dlist
+        nop
+
+        lw      a0, 0x0000(s2)              // a0 = width 
+        li      a1, RCP.G_IM_FMT_RGBA       // a1 - color format [f]
+        li      a2, RCP.G_IM_SIZ_16b        // a2 - color size [s]
+        jal     RCP.set_tile_               // append dlist
+        nop
+
+        jal     RCP.load_sync_              // append dlist
+        nop
+
+        lw      a0, 0x0000(s2)              // a0 - width
+        lw      a1, 0x0004(s2)              // a1 - height
+        jal     RCP.load_block_             // append dlist
+        nop
+
+        jal     RCP.pipe_sync_              // append dlist
+        nop
+
+        lw      a0, 0x0000(s2)              // a0 = width 
+        li      a1, RCP.G_IM_FMT_RGBA       // a1 - color format [f]
+        li      a2, RCP.G_IM_SIZ_16b        // a2 - color size [s]
+        jal     RCP.set_tile_               // append dlist
+        nop
+
+        lw      a0, 0x0000(s2)              // a0 - width
+        lw      a1, 0x0004(s2)              // a1 - height
+        jal     RCP.set_tile_size_          // append dlist
+        nop
+
+        or      a0, s0, r0                  // a0 - ulx
+        or      a1, s1, r0                  // a1 - uly
+        lw      a2, 0x0000(s2)              // a2 - width
+        lw      a3, 0x0004(s2)              // a3 - height
+        jal     RCP.texture_rectangle_wh_    // append dlist
+        nop
+
+        jal     RCP.pipe_sync_              // sync
+        nop
+
+        lw      s0, 0x0004(sp)              // ~
+        lw      s1, 0x0008(sp)              // ~
+        lw      s2, 0x000C(sp)              // ~
+        lw      ra, 0x0010(sp)              // save registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
+
+    // 
+    scope draw_subtexture_: {
+
     }
 
     // @ Description
