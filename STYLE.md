@@ -27,7 +27,7 @@ variable numeric_example0(0)    // 0 not preceded  with underscore
 
 ## Section II: Bass Constants 
 Bass constants can only be declared once and cannot be changed during the assembly process. They
-serve two purposes for 19XX developers.
+serve three purposes for 19XX developers.
 
 ### Purpose 1: Standard Programming Constants
 Remember, DREAM_LAND_STAGE_ID is significantly more informative than 5. Use constants in your code.
@@ -65,6 +65,7 @@ While this is an atypical use of constants, it makes code easy to read.
 1. Follow the rules of the given type (variable or function). 
 2. Include documentation (discussed below).
 
+
 ## Section III: Bass Macros
 Bass macros can do many things such as create c structs, advance the program counter for alignment, simple conversions, etc. Due to their versatility, usage will not be defined here.
 
@@ -96,7 +97,34 @@ macro _alignPc(size) {
 // undocumented, does not follow rules of variable
 ```
 
-## Section 5: Outer Scopes (Pseudo Classes)
+## Section IV: Bass Defines (C Header Guards)
+It is possible to test if a bass define has been declared or not by using this special syntax: *{defined name}*. 19XX developer will take advantage of this feature to avoid including a source file multiple times.
+
+**Example Header Guard**
+```
+// Graphics.asm
+if !{defined __GRAPHICS__} {
+define __GRAPHICS__()
+
+// contents of Graphics.asm here
+
+}
+```
+
+**Rules**
+1. Header guards will be preceded by `// FileName.asm`
+2. Header guards use __THIS_NOTATION__ (two underscore before and after UPPERCASE_NOTATION).
+3. Header guards will use the name of the file.
+
+**Acceptable**
+if !{defined __GRAPHICS__} {
+if !{defined __TIMED_STOCK__} {
+
+**Unaccptable**
+if !{defined reusable_constant_or_variable_name} {
+if !{defined __NOT_THE_FILE_NAME_} {
+
+## Section V: Outer Scopes (Pseudo Classes)
 Scoping in Bass allows macros, defines, variables and constants with common named such as "loop" to be reused. 19XX developers will capitalize on this functionality to develop a pseudo class system for easy organization.
 
 **Rules**
@@ -121,7 +149,7 @@ scope MoreThanTwoWords {}   // too many words
 ```
 
 
-## Section V: Nested Scopes as Functions
+## Section VI: Nested Scopes as Functions
 Bass allows for scopes within scopes.
 
 ```
@@ -187,7 +215,7 @@ scope Math {
 }
 ```
 
-# Section VI: Labels Within Functions
+# Section VII: Labels Within Functions
 To control the flow of execution, assembly programmers use labels.
 
 **Rules**
@@ -220,7 +248,7 @@ scope label_example_: {
 }
 ```
 
-## Section VI: Documentation
+## Section VIII: Documentation
 Comment and document all of your code. The worst thing a developer can do to an open source project (outside of break functionality) is keep information in their own head.
 
 **Rules**
@@ -253,8 +281,7 @@ scope int_to_float_: {
 }
 ```
 
-
-## Section VII: Miscellaneous
+## Section IX: Miscellaneous
 **Rules**
 1. Indent using 4 spaces. Do not use tabs.
 2. Avoid duplicate code. Create functions.
@@ -262,14 +289,14 @@ scope int_to_float_: {
 4. Be consistent.
 5. Delete unused code.
 
-## Section IX: MIPS
+## Section X: MIPS
 The following rules are even more arbitrary than the above. Please stick with them.
 
 **Rules**
 1. MIPS instructions lower case.
 2. Use the 4 space tab following the longest MIPS instruction, `addiu`, for spacing.
 3. Avoid `li` for bytes and halfwords. Use `lli` and `ori` instead.
-4. Always use 6 digits for numbers (dec uses 00 prefix, hex uses 0x).
+4. Always use 6 digits for numbers (hex uses `0x` prefix, dec uses `00` prefix).
 5. While several MIPS conventions are not followed, 19XX developers will follow these.
     1. Registers a0, a1, a2, and a3 will be used for arguments
     2. Registers v0 and v1 will be used for return values.
