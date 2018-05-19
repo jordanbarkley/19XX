@@ -5,8 +5,8 @@ The purpose of this file is to define a general set of coding standards for myse
 Bass variables can only be declared once but can be changed during the assembly process. Bass variables allow for if/then statements during the assembly process among other things that make assembly easy.
 
 **Rules**
-1. Variables use underscore_casing.
-2. Variables start with letters
+1. Variables use `underscore_casing`.
+2. Variables start with letters.
 3. Numbers at the end of variables should be preceded by an underscore.
 
 **Good**
@@ -30,10 +30,10 @@ Bass constants can only be declared once and cannot be changed during the assemb
 serve three purposes for 19XX developers.
 
 ### Purpose 1: Standard Programming Constants
-Remember, DREAM_LAND_STAGE_ID is significantly more informative than 5. Use constants in your code.
+Remember, `DREAM_LAND_STAGE_ID` is significantly more informative than `6`f. Use constants in your code.
 
 **Rules**
-1. Constants use UPPERCASE_NOTATION.
+1. Constants use `UPPERCASE_NOTATION`.
 2. Constants start with letters.
 3. Numbers at the end of constants should be preceded  by an underscore.
 4. Constants may contain common acronyms although this is discouraged.
@@ -44,16 +44,16 @@ Remember, DREAM_LAND_STAGE_ID is significantly more informative than 5. Use cons
 constant TRUE(1)
 constant FALSE(0)
 constant NULL(0)
-constant DREAM_LAND_STAGE_ID(5)
+constant DREAM_LAND_STAGE_ID(6)
 constant DEBUG_MODE(0)
 constant RCP_CONSTANT_0(0)
 ```
 
 **Unacceptable**
 ```
-constant dream_land_stage_id(5)     // wrong case
-constant DREAMLANDSTAGEID(5)        // not separated by underscore
-constant DreamLandStageID(5)        // ^
+constant dream_land_stage_id(6)     // wrong case
+constant DREAMLANDSTAGEID(6)        // not separated by underscore
+constant DreamLandStageID(6)        // ^
 constant RCPCOSNTANT0(0)            // ^
 constant _NOT_A_CONSTANT(0)         // starts with an underscore
 ```
@@ -64,7 +64,6 @@ While this is an atypical use of constants, it makes code easy to read.
 **Rules**
 1. Follow the rules of the given type (variable or function). 
 2. Include documentation (discussed below).
-
 
 ## Section III: Bass Macros
 Bass macros can do many things such as create c structs, advance the program counter for alignment, simple conversions, etc. Due to their versatility, usage will not be defined here.
@@ -113,23 +112,27 @@ define __GRAPHICS__()
 
 **Rules**
 1. Header guards will be preceded by `// FileName.asm`
-2. Header guards use __THIS_NOTATION__ (two underscore before and after UPPERCASE_NOTATION).
+2. Header guards use `__HEADER_NOTATION__` (two underscore before and after `UPPERCASE_NOTATION`).
 3. Header guards will use the name of the file.
 
 **Acceptable**
+```
 if !{defined __GRAPHICS__} {
 if !{defined __TIMED_STOCK__} {
+```
 
 **Unaccptable**
+```
 if !{defined reusable_constant_or_variable_name} {
 if !{defined __NOT_THE_FILE_NAME_} {
+```
 
 ## Section V: Outer Scopes (Pseudo Classes)
-Scoping in Bass allows macros, defines, variables and constants with common named such as "loop" to be reused. 19XX developers will capitalize on this functionality to develop a pseudo class system for easy organization.
+Scoping in Bass allows macros, defines, variables and constants with common names such as `_loop` to be reused. 19XX developers will capitalize on this functionality to develop a pseudo class system for easy organization.
 
 **Rules**
-1. Outer scope names use ProperCamelCasing.
-2. Outer scope names may also be common acronyms such as RCP although this is discouraged.
+1. Outer scope names use `ProperCamelCasing`.
+2. Outer scope names may also be common acronyms such as `RCP` although this is discouraged.
 3. Outer scope names using more than two words are discouraged.
 4. File name and scope name are to be equivalent.
 
@@ -193,9 +196,9 @@ scope Example {
 ```
 
 **Rules**
-1. Function names use this_underscore_casing_
+1. Function names use `this_underscore_casing_`.
 2. Function names start with letters.
-3. Function names end with underscores. (Followed by semicolon)
+3. Function names end with underscores (followed by a semicolon).
 4. Function names should be concise. 
 
 **Acceptable**
@@ -219,7 +222,7 @@ scope Math {
 To control the flow of execution, assembly programmers use labels.
 
 **Rules**
-1. Label names use _that_underscore_casing
+1. Label names use `_that_underscore_casing`.
 2. Label names start with underscores.
 3. Numbers at the end of labels should be preceded  by an underscore (this is discouraged).
 4. Label names should be concise. 
@@ -253,7 +256,7 @@ Comment and document all of your code. The worst thing a developer can do to an 
 
 **Rules**
 1. Document every function, macro, and Super Smash Bros. constant.
-2. Comment every line of assembly code. If multiple lines do one thing, a tilde (~) should be placed in the above lines.
+2. Comment every line of assembly code. If multiple lines do one thing, a `~` is used in place of a comment.
 
 **Function Example**
 ```
