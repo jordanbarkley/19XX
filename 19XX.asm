@@ -32,6 +32,7 @@ include "src/Timeouts.asm"
 
 fill 	0x2000000 - origin() 	// Extend ROM to 32 MBs
 
+include "src/OS.asm"
 // disable menu init on debug screen 80371414
 base    0x80369D78
 origin  0x001AC1E8

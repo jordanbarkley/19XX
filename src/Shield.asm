@@ -7,6 +7,7 @@ define __SHIELD__()
 
 include "OS.asm"
 include "Global.asm"
+include "Color.asm"
 
 scope Shield {
 

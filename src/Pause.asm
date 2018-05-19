@@ -5,6 +5,8 @@ define __PAUSE__()
 // @ Description
 // Hold to pause is implemented in this file.
 
+include "OS.asm"
+
 scope Pause {
 
     // @ Description

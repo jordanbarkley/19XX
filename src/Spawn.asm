@@ -6,6 +6,7 @@ define __SPAWN__()
 // This file alters spawn position for different circumstances such as Neutral Spawns.
 
 include "OS.asm"
+include "Global.asm"
 
 scope Spawn {
 

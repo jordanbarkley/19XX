@@ -6,6 +6,7 @@ define __SETTINGS__()
 // This file is used for loading default tournament settings on boot.
 
 include "OS.asm"
+include "Global.asm"
 
 scope Settings {
     // @ TODO Save VS. Settings
