@@ -211,6 +211,7 @@ scope RCP {
         or      a0, a0, t2                  // a0 = opcode | lrx
         sll     t2, a3, 0x0002              // t2 = (10.2) lry
         or      a0, a0, t2                  // t2 = opcode | lrx | lry
+        
         or      a1, r0, r0                  // a1 = 0
         sll     t2, t0, 0x0002              // t2 = (10.2) ulx
         sll     t2, t2, 0x000C              // t2 = ((10.2) ulx) << 12

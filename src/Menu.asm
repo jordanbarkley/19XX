@@ -9,15 +9,8 @@ include "Overlay.asm"
 
 scope Menu {
 
-    constant ROW_HEIGHT(000010)
-
-    texture_background:
-    Overlay.texture(320, 240)
-    insert "../textures/background.rgba5551"
-
-    selection:
-    dw 0x00000000
-
+    // @ Description
+    // Struct for menu entries
     macro entry(title, next) {
         dw 0x00000000                       // 0x0000 - is_enabled
         dw {next}                           // 0x0004 - next_entry
@@ -25,7 +18,9 @@ scope Menu {
         OS.align(4)
     }
 
-    macro toggle_guard(entry_address) {
+    // @ Description
+    // Allows function 
+    macro toggle_guard(entry_address, exit_address) {
         addiu   sp, sp,-0x0008              // allocate stack space
         sw      at, 0x0004(sp)              // save at
         li      at, {entry_address}         // ~
@@ -36,7 +31,13 @@ scope Menu {
         // _end:
         lw      at, 0x0004(sp)              // restore at
         addiu   sp, sp, 0x0008              // deallocate stack space
-        jr      ra
+
+        // foor hook vs. function
+        if ({exit_address} == 0x00000000) {
+            jr      ra
+        } else {
+            j       {exit_address}
+        }
         nop
 
         // _continue:
@@ -92,8 +93,12 @@ scope Menu {
         jal     Overlay.draw_texture_big_
         nop
 
+        // update menu
+        jal     update_
+        nop
+
         // draw menu
-        li      a0, entry_disable_cinematic_camera
+        li      a0, head                    // a0 - menu head
         jal     draw_menu_                  // draw menu
         nop
 
@@ -102,15 +107,6 @@ scope Menu {
         jal     Joypad.was_pressed_         // check if B pressed
         nop 
         beqz    v0, _end                    // nop
-        nop
-        lli     a0, Color.low.RED           // a0 = rgba5551 red
-        jal     Overlay.set_color_
-        nop
-        lli     a0, 100                     // a0 - ulx
-        lli     a1, 100                     // a1 - uly
-        lli     a2, 20                      // a2 - width 
-        lli     a3, 20                      // a3 - hgith
-        jal     Overlay.draw_rectangle_
         nop
         lli     a0, 0x0010                  // a0 - screen_id
         jal     change_screen_
@@ -152,7 +148,7 @@ scope Menu {
         nop
 
         _off:
-        lli     a0, 000266                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
+        lli     a0, 000276                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
         or      a1, s1, r0                  // a1 - uly
         li      a2, off                     // a0 - address of string
         jal     Overlay.draw_string_
@@ -239,7 +235,129 @@ scope Menu {
         nop
     }
 
+    // @ Description
+    // Checks for various button presses and updates the menu accordingly
+    scope update_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
 
+        _down:
+        lli     a0, Joypad.CD               // a0 - button_mask
+        lli     a1, 0x0000                  // a1 - player
+        jal     Joypad.turbo_               // check if c-down pressed
+        nop
+        beqz    v0, _up                     // if not pressed, check c-up
+        nop
+        li      t0, selection               // t0 = adress of selection
+        lw      t1, 0x0000(t0)              // t1 = selection
+        addiu   t1, t1, 0x0001              // t1 = selection++
+        sw      t1, 0x0000(t0)              // update selection
+        b       _end                        // only allow one update
+        nop
+
+        _up:
+        lli     a0, Joypad.CU               // a0 - button_mask
+        lli     a1, 0x0000                  // a1 - player
+        jal     Joypad.turbo_               // check if c-up pressed
+        nop
+        beqz    v0, _right                  // if not pressed, check right
+        nop
+        li      t0, selection               // t0 = adress of selection
+        lw      t1, 0x0000(t0)              // t1 = selection
+        addiu   t1, t1,-0x0001              // t1 = selection--
+        sw      t1, 0x0000(t0)              // update selection
+        b       _end                        // only allow one update
+        nop
+
+        _right:
+        lli     a0, Joypad.CR               // a0 - button_mask
+        lli     a1, 0x0000                  // a1 - player
+        jal     Joypad.was_pressed_         // check if c right pressed
+        nop
+        beqz    v0, _left                   // if not pressed, check left
+        nop
+        li      a0, head                    // a0 - head
+        jal     get_selected_entry_         // duh?
+        nop
+        lli     t0, OS.TRUE                 // t0 = true
+        sw      t0, 0x0000(v0)              // selection.is_enabled = true
+        b       _end                        // only allow one update
+        nop
+
+        _left:
+        lli     a0, Joypad.CL               // a0 - button_mask
+        lli     a1, 0x0000                  // a1 - player
+        jal     Joypad.was_pressed_         // check if c-left pressed
+        nop
+        beqz    v0, _end                    // if not pressed, end
+        nop
+        li      a0, head                    // a0 - head
+        jal     get_selected_entry_         // duh?
+        nop
+        lli     t0, OS.FALSE                 // t0 = true
+        sw      t0, 0x0000(v0)              // selection.is_enabled = false
+        b       _end                        // only allow one update
+        nop
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
+
+    // @ Description
+    // Gets an entry based on selection. Helper function
+    // @ Arguments
+    // a0 - head
+    // @ Returns
+    // v0 - address of entry
+    scope get_selected_entry_: {
+        addiu   sp, sp,-0x0010              // alloc stack space
+        sw      at, 0x0004(sp)              // ~
+        sw      t0, 0x0008(sp)              // save registers
+
+        // init
+        lli     at, 0x0000                  // at = i = 0
+        li      t0, selection               // ~
+        lw      t0, 0x0000(t0)              // t0 = selection
+
+        _loop:
+        beqz    a0, _fail
+        nop
+        beq     at, t0, _end                // if (i == selection), end loop
+        nop
+        lw      a0, 0x0004(a0)              // a0 = entry->next
+        addiu   at, at, 0x0001              // increment i 
+        b       _loop                       // check again
+        nop
+
+        _end:
+        lw      at, 0x0004(sp)              // ~
+        lw      t0, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        or      v0, a0, r0                  // v0 = ret = entry
+        jr      ra                          // return
+        nop
+
+        _fail:
+        break                               // halt execution
+    }
+
+    constant ROW_HEIGHT(000010)
+
+    texture_background:
+    Overlay.texture(320, 240)
+    insert "../textures/background.rgba5551"
+
+    selection:
+    dw 0x00000000
+
+    head:
     entry_disable_cinematic_camera:
     entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel)
 

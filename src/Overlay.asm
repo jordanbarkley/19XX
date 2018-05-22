@@ -62,7 +62,7 @@ scope Overlay {
         // HOOKS GO HERE
         li      t0, Global.current_screen   // ~
         lb      t0, 0x0000(t0)              // t0 = screen id
-        lli     t1, 0x0002                  // t1 = vs options screen id
+        lli     t1, 0x0002                  // t1 = empty debug screen
         bne     t0, t1, _finish             // if (screen_id != 0x08), skip
         nop
         jal     Menu.run_

@@ -13,9 +13,9 @@ scope Joypad {
     constant DD(0x0400)
     constant DL(0x0200)
     constant DR(0x0100)
-    constant CU(0x0008)
     constant L(0x0020)
     constant R(0x0010)
+    constant CU(0x0008)
     constant CD(0x0004)
     constant CL(0x0002)
     constant CR(0x0001)
@@ -95,6 +95,19 @@ scope Joypad {
     // v0 - bool
     scope was_pressed_: {
         lli     a2, PRESSED
+        j       check_buttons_
+        nop
+    }
+
+    // @ Description
+    // Determine if a button was held (on/off turbo)
+    // @ Arguments
+    // a0 - button_mask
+    // a1 - player (p1 = 0, p4 = 3)
+    // @  Returns
+    // v0 - bool
+    scope turbo_: {
+        lli     a2, TURBO
         j       check_buttons_
         nop
     }
