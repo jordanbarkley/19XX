@@ -291,6 +291,7 @@ scope int_to_float_: {
 3. Avoid unnecessary redundancy. (prefer `Math.add_` over `Math.add_numbers_`).
 4. Be consistent.
 5. Delete unused code.
+6. Prefer readability over optimization. Saving 5 clock cycles by overusing the MIPS delay slot is almost always unnecessary.
 
 ## Section X: MIPS
 The following rules are even more arbitrary than the above. Please stick with them.
