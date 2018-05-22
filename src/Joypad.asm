@@ -24,23 +24,31 @@ scope Joypad {
     // @ Description
     // This is the controller struct that game reads from. It's 10 bytes in size (per player)
     // @ Fields
-    // 0x0000 - half - is_held    - is_held
-    // 0x0002 - half - pressed(?) - !is_held -> is_held
-    // 0x0004 - half - pressed(?) - !is_held -> is_held
-    // 0x0006 - half - released   - is_held -> !is_held
+    // 0x0000 - half - is_held  - check for is_held
+    // 0x0002 - half - pressed  - check for !is_held -> is_held
+    // 0x0004 - half - turbo    - is_held but continually goes on and off
+    // 0x0006 - half - released - check for is_held -> !is_held
     // 0x0008 - byte - xpos
     // 0x0009 - byte - ypos
     // what is the difference between 0x0004 and 0x0006?
     constant struct(0x80045228)
 
     // @ Description
-    // Determine whether a button or button combination is held or not
+    // Types
+    constant HELD(0x0000)
+    constant PRESSED(0x0002)
+    constant TURBO(0x0004)
+    constant RELEASED(0x0006)
+
+    // @ Description
+    // Determine whether a button or button combination (type) or not.
     // @ Arguments
     // a0 - button_mask
     // a1 - player (p1 = 0, p4 = 3)
+    // a2 - type
     // @ Returns
     // v0 - bool
-    scope is_held_: {
+    scope check_buttons_: {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // save registers
@@ -50,7 +58,8 @@ scope Joypad {
         mflo    at                          // at = offset
         li      t0, struct                  // t0 = struct
         addu    t0, t0, at                  // t0 = struct + offset
-        lhu     t0, 0x0000(t0)              // t0 = is_held
+        addu    t0, t0, a2                  // t0 = struct + offset + type
+        lhu     t0, 0x0000(t0)              // t0 = type
         lli     v0, OS.FALSE                // v0 = false
         bne     t0, a0, _end                // if (mask != button_mask), skip
         nop
@@ -63,6 +72,48 @@ scope Joypad {
         jr      ra                          // return
         nop
     }
+
+    // @ Description
+    // Determine if a button is held or not
+    // @ Arguments
+    // a0 - button_mask
+    // a1 - player (p1 = 0, p4 = 3)
+    // @  Returns
+    // v0 - bool
+    scope is_held_: {
+        lli     a2, HELD
+        j       check_buttons_
+        nop
+    }
+
+    // @ Description
+    // Determine if a button was pressed
+    // @ Arguments
+    // a0 - button_mask
+    // a1 - player (p1 = 0, p4 = 3)
+    // @  Returns
+    // v0 - bool
+    scope was_pressed_: {
+        lli     a2, PRESSED
+        j       check_buttons_
+        nop
+    }
+
+    // @ Description
+    // Determines if a button was released
+    // @ Arguments
+    // a0 - button_mask
+    // a1 - player (p1 = 0, p4 = 3)
+    // @  Returns
+    // v0 - bool
+    scope was_released_: {
+        lli     a2, RELEASED
+        j       check_buttons_
+        nop
+    }
+
+
+
 
 
 
