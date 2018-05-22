@@ -9,9 +9,14 @@ include "Overlay.asm"
 
 scope Menu {
 
+    constant ROW_HEIGHT(000010)
+
     texture_background:
     Overlay.texture(320, 240)
     insert "../textures/background.rgba5551"
+
+    selection:
+    dw 0x00000000
 
     macro entry(title, next) {
         dw 0x00000000                       // 0x0000 - is_enabled
@@ -80,8 +85,15 @@ scope Menu {
         addiu   sp, sp,-0x0008              // allocate stack space
         sw      ra, 0x0004(sp)              // save ra
 
+        // draw background
+        lli     a0, 0x0000                  // a0 - ulx
+        lli     a1, 0x0000                  // a1 - uly
+        li      a2, texture_background      // a2 - address of texture struct 
+        jal     Overlay.draw_texture_big_
+        nop
+
         // draw menu
-        li      a0, entry_flash_on_z_cancel // a0 - head entry
+        li      a0, entry_disable_cinematic_camera
         jal     draw_menu_                  // draw menu
         nop
 
@@ -149,7 +161,7 @@ scope Menu {
         nop
 
         _on:
-        lli     a0, 000266                  // a0 - ulx = 320 - 20 - (2 * 8) = 284
+        lli     a0, 000284                  // a0 - ulx = 320 - 20 - (2 * 8) = 284
         or      a1, s1, r0                  // a1 - uly
         li      a2, on                      // a0 - address of string
         jal     Overlay.draw_string_
@@ -172,8 +184,8 @@ scope Menu {
         off:
         db "OFF", 0x00
         OS.align(4)
-
     }
+
     // @ Description
     // Draw linked list of menu entries
     // @ Arguments
@@ -184,17 +196,19 @@ scope Menu {
         sw      t0, 0x0008(sp)              // ~
         sw      ra, 0x000C(sp)              // save registers
 
+        // draw first entry
         or      s0, a0, r0                  // s0 = copy of a0
         lli     t0, 20                      // t0 = uly
         or      a2, t0, r0                  // a2 = uly
         jal     draw_entry_                 // draw first entry
         nop
-        
+
+        // draw following entries
         _loop:
         lw      s0, 0x0004(s0)              // s0 = entry->next
         beqz    s0, _end                    // if (entry->next == NULL), end
         nop
-        addiu   t0, t0, 000010              // increment height
+        addiu   t0, t0, ROW_HEIGHT          // increment height
         or      a0, s0, r0                  // a0 = entry
         or      a2, t0, r0                  // a2 = uly
         jal     draw_entry_
@@ -203,6 +217,20 @@ scope Menu {
         nop
 
         _end:
+        // draw ">"
+        li      t0, selection               // ~
+        lw      t0, 0x0000(t0)              // t0 = selection
+        addiu   t0, t0, 0x0002              // t0 = selection + 2
+        lli     s0, ROW_HEIGHT              // ~
+        mult    t0, s0                      // ~
+        mflo    a1                          // s0 = height of row
+
+        lli     a0, 000020                  // a0 - ulx
+//      or      a1, a1, r0                  // a1 - uly
+        lli     a2, '>'                     // a2 - char
+        jal     Overlay.draw_char_          // draw '>'
+        nop
+
         lw      s0, 0x0004(sp)              // ~
         lw      t0, 0x0008(sp)              // ~
         lw      ra, 0x000C(sp)              // restore registers
