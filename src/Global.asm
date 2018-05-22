@@ -14,6 +14,18 @@ scope Global {
     // a2 - nBytes 
     constant dma_copy_(0x80002CA0)
 
+    // @ Description
+    // Writing 0x00000001 to this word will load the screen at current_screen.
+    constant screen_interrupt(0x800465d0)
+
+    // @ Description
+    // Byte, Current screen value is here (CSS = 0x10, Debug = 0x03/0x04)
+    constant current_screen(0x800A4AD0)
+
+    // @ Description
+    // Byte, previous screen value is here
+    constant previous_screen(0x800A4AD1)
+
     scope vs {
         // @ Description
         // Byte, contains the versus stage stage id

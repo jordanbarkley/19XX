@@ -18,29 +18,19 @@ scope Overlay {
         dw pc() + 4                         // 0x0008 - pointer to image data
     }
 
-    test_string:
-    db "Cyjorg, you have outdone yourself."
-    db 0x00
-    OS.align(4)
-
-    texture_battlefield:
-    texture(48, 36)
-    insert "../textures/battlefield.rgba5551"
-
-    texture_background:
-    texture(320, 240)
-    insert "../textures/background.rgba5551"
-
     texture_font:
     texture(8, 8)
     insert "../textures/font.rgba5551"
 
-
-    scope test_: {
+    // @ Description
+    // This function highjacks the SSB display list right before the full sync occurs. This allows
+    // devolpers to overlay their own display list built using Overlay.draw_* functions in this
+    // file. Insert functions below "HOOKS GO HERE."
+    scope highjack_: {
         OS.patch_start(0x00006150, 0x80005550)
-        j       test_
+        j       highjack_
         nop
-        _test_return:
+        _highjack_return:
         OS.patch_end()
 
         addiu   sp, sp,-0x0020              // allocate stack space
@@ -69,47 +59,16 @@ scope Overlay {
         li      t0, display_list            // ~ 
         sw      t0, 0x0004(v0)              // highjack ssb display list
 
-        // draw big texture
-        li      a0, 0                       // a0 - ulx
-        li      a1, 0                       // a1 - uly
-        li      a2, texture_background      // a2 - address of texture struct 
-        jal     draw_texture_big_           // draw big texture
+        // HOOKS GO HERE
+        li      t0, Global.current_screen   // ~
+        lb      t0, 0x0000(t0)              // t0 = screen id
+        lli     t1, 0x0002                  // t1 = vs options screen id
+        bne     t0, t1, _finish             // if (screen_id != 0x08), skip
+        nop
+        jal     Menu.run_
         nop
 
-        // draw rectangle
-        li      a0, (Color.low.RED << 16) | (Color.low.RED)
-        jal     RCP.set_fill_color_         // set fill color to red
-        nop
-        li      a0, 10                      // a0 - ulx
-        li      a1, 10                      // a1 - uly
-        li      a2, 40                      // a2 - width
-        li      a3, 40                      // a3 - height
-        jal     draw_rectangle_             // draw rectangle
-        nop
-
-        // draw texture
-        li      a0, 10                      // a0 - ulx
-        li      a1, 50                      // a1 - uly
-        li      a2, texture_battlefield     // a2 - address of texture struct 
-        jal     draw_texture_
-        nop
-
-        // draw char
-        li      a0, 10                      // a0 - ulx
-        li      a1, 100                     // a1 - uly
-        li      a2, 'J'                     // a2 - char
-        jal     draw_char_                  // draw char
-        nop
-
-        // draw string
-        li      a0, 10                      // a0 - ulx
-        li      a1, 140                     // a1 - uly
-        li      a2, test_string             // a2 - address of string
-        jal     draw_string_                // draw string
-        nop
-
-
-        // finish
+        _finish:
         jal     end_                        // end display list
         nop
 
@@ -123,7 +82,7 @@ scope Overlay {
         addiu   sp, sp, 0x0020              // deallocate stack space
 //      sw      t3, 0x0000(v0)              // original line 1
         lw      v0, 0x0000(s0)              // original line 2
-        j       _test_return                // return
+        j       _highjack_return            // return
         nop
     }
 
@@ -135,16 +94,35 @@ scope Overlay {
     // a2 - width 
     // a3 - height
     scope draw_rectangle_: {
-        addiu   sp, sp, -0x0008             // allocate stack space
-        sw      ra, 0x0004(sp)              // save ra
+        addiu   sp, sp, -0x0018             // allocate stack space
+        sw      ra, 0x0004(sp)              // ~
+        sw      s0, 0x0008(sp)              // ~
+        sw      s1, 0x000C(sp)              // ~
+        sw      s2, 0x0010(sp)              // ~
+        sw      s3, 0x0014(sp)              // save registers
+
+        or      s0, a0, r0                  // ~
+        or      s1, a1, r0                  // ~
+        or      s2, a2, r0                  // ~
+        or      s3, a3, r0                  // sx = ax
+
         jal     RCP.set_other_modes_fill_   // cycle type = fill
         nop
+        or      a0, s0, r0                  // a0 - ulx
+        or      a1, s1, r0                  // a1 - uly
+        or      a2, s2, r0                  // a2 - width 
+        or      a3, s3, r0                  // a3 - height
         jal     RCP.fill_rectangle_wh_      // draw rectangle
         nop
         jal     RCP.pipe_sync_              // sync
         nop
-        lw      ra, 0x0004(sp)              // restore ra
-        addiu   sp, sp, 0x0008              // deallocate stack space
+
+        lw      ra, 0x0004(sp)              // ~
+        lw      s0, 0x0008(sp)              // ~
+        lw      s1, 0x000C(sp)              // ~
+        lw      s2, 0x0010(sp)              // ~
+        lw      s3, 0x0014(sp)              // save registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra                          // return
         nop
     }
@@ -403,6 +381,26 @@ scope Overlay {
         jal     RCP.end_list_               // end list
         nop
         lw      ra, 0x0004(sp)              // restore ra
+        addiu   sp, sp, 0x0008              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
+
+    // @ Description
+    // Sets fill color
+    // @ Arguments
+    // a0 - rgba5551 color
+    scope set_color_: {
+        addiu   sp, sp,-0x0008              // allocate stack space
+        sw      at, 0x0004(sp)              // ~
+        sw      ra, 0x0008(sp)              // save registers
+        or      at, a0, r0                  // ~
+        sll     a0, a0, 000016              // ~
+        or      a0, a0, at                  // a0 = packed color
+        jal     RCP.set_fill_color_         // set fill color
+        nop
+        lw      at, 0x0004(sp)              // ~
+        lw      ra, 0x0008(sp)              // save registers
         addiu   sp, sp, 0x0008              // deallocate stack space
         jr      ra                          // return
         nop
