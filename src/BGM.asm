@@ -5,6 +5,10 @@ define __BGM__()
 // @ Description
 // This file allows BGM (background music) to be played and stopped.
 
+include "Global.asm"
+include "Menu.asm"
+include "OS.asm"
+
 scope BGM {
 
     // @ Description
@@ -18,6 +22,66 @@ scope BGM {
     // This function is not yet documented.
     constant stop_(0x00000000)
 
+    // @ Description
+    // a1 holds BGM_id. This function replaces a1 with a random id from the table
+    scope random_music_: {
+        OS.patch_start(0x000216F0, 0x80020AF4)
+        j       random_music_
+        nop
+        _random_music_return:
+        OS.patch_end()
+
+        constant TABLE_SIZE(13)
+
+        or      v0, a1, r0                  // original line 1
+        addu    t3, t1, t2                   // original line 2
+        Menu.toggle_guard(Menu.entry_random_music, _random_music_return)
+
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      a0, 0x0004(sp)              // ~
+        sw      t0, 0x0008(sp)              // ~
+        sw      v0, 0x000C(sp)              // ~
+        sw      ra, 0x0010(sp)              // save registers 
+
+        li      t0, Global.current_screen   // ~
+        lb      t0, 0x0000(t0)              // t0 = current_screen
+        lli     v0, 0x0016                  // v0 = FIGHT_SCREEN
+        bne     t0, v0, _end                // if not fight screen, end
+        nop
+
+        lli     a0, TABLE_SIZE              // ~
+        jal     Global.get_random_int_      // v0 = table offset
+        nop
+        li      t0, table                   // t0 = table
+        addu    t0, t0, v0                  // t0 = table + offset
+        lb      a1, 0x0000(t0)              // a1 = new_song
+
+        _end:
+        lw      a0, 0x0004(sp)              // ~
+        lw      t0, 0x0008(sp)              // ~
+        lw      v0, 0x000C(sp)              // ~
+        lw      ra, 0x0010(sp)              // restore registers 
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        j       _random_music_return        // return
+        nop
+
+        table:
+        db stage.DREAM_LAND
+        db stage.PLANET_ZEBES
+        db stage.MUSHROOM_KINGDOM
+        db stage.SECTOR_Z
+        db stage.CONGO_JUNGLE
+        db stage.PEACHS_CASTLE
+        db stage.SAFFRON_CITY
+        db stage.HYRULE_CASTLE
+        db stage.FINAL_DESTINATION
+        db stage.HOW_TO_PLAY
+        db stage.BATTLEFIELD
+        db stage.METAL_CAVERN
+        db menu.DATA
+        OS.align(4)
+    }
+
     scope stage {
         constant DREAM_LAND(0)
         constant PLANET_ZEBES(1)
@@ -28,7 +92,7 @@ scope BGM {
         constant PEACHS_CASTLE(6)
         constant SAFFRON_CITY(7)
         constant YOSHIS_ISLAND(8)
-        constant HYRULE(9)
+        constant HYRULE_CASTLE(9)
         constant MASTER_HAND_0(23)
         constant MASTER_HAND_1(24)
         constant MASTER_HAND_2(25)
