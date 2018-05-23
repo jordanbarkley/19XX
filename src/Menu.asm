@@ -9,6 +9,9 @@ include "Overlay.asm"
 
 scope Menu {
 
+    // lazy
+    constant NUM_ENTRIES(12)
+
     // @ Description
     // Struct for menu entries
     macro entry(title, next) {
@@ -239,10 +242,11 @@ scope Menu {
     // @ Description
     // Checks for various button presses and updates the menu accordingly
     scope update_: {
-        addiu   sp, sp,-0x0010              // allocate stack space
+        addiu   sp, sp,-0x0018              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      ra, 0x000C(sp)              // ~ 
+        sw      at, 0x0010(sp)              // save registers
 
         _down:
         lli     a0, Joypad.CD               // a0 - button_mask
@@ -253,6 +257,9 @@ scope Menu {
         nop
         li      t0, selection               // t0 = adress of selection
         lw      t1, 0x0000(t0)              // t1 = selection
+        sltiu   at, t1, (NUM_ENTRIES - 1)   // ~
+        beqz    at, _end                    // if (selection == (NUM_ENTRIES - 1), skip
+        nop
         addiu   t1, t1, 0x0001              // t1 = selection++
         sw      t1, 0x0000(t0)              // update selection
         b       _end                        // only allow one update
@@ -267,6 +274,8 @@ scope Menu {
         nop
         li      t0, selection               // t0 = adress of selection
         lw      t1, 0x0000(t0)              // t1 = selection
+        beqz    t1, _end                    // if (selection == 0), skip
+        nop
         addiu   t1, t1,-0x0001              // t1 = selection--
         sw      t1, 0x0000(t0)              // update selection
         b       _end                        // only allow one update
@@ -305,8 +314,9 @@ scope Menu {
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
-        addiu   sp, sp, 0x0010              // deallocate stack space
+        lw      ra, 0x000C(sp)              // ~
+        lw      at, 0x0010(sp)              // restore registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra                          // return
         nop
     }
