@@ -30,7 +30,7 @@ scope TimedStock {
     bnel    t6, t5, 0x8013A790
     OS.patch_end()
 
-    // @ Descrip    tion
+    // @ Description
     // Correct scoring. The check usually checks against 0x02 (stock) but the mode will always be
     // 1 or 3. The simple fix is to change 2 to 3
     OS.patch_start(0x00156560, 0x801373C0)

@@ -61,12 +61,6 @@ scope Cheats {
     OS.patch_end()
 
     // @ Description
-    // This loads the character select screen id instead of the results screen id
-    OS.patch_start(0x0010B204, 0x8018E314)
-    // ori     t6, r0, 0x0010
-    OS.patch_end()
-
-    // @ Description
     // disable music by disable write
     OS.patch_start(0x000216FC, 0x80020AFC)
     // nop
