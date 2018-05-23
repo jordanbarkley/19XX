@@ -6,6 +6,8 @@ include "Global.asm"
 include "Menu.asm"
 include "OS.asm"
 
+// TODO: auto and AI fix
+
 scope Handicap {
 
     // @ Description
@@ -31,9 +33,11 @@ scope Handicap {
         lbu     t9, 0x0000(t9)              // at = handicap
         beqz    t9, _end                    // if handicap disabled, end
         nop
+
+
         lbu     t8, 0x0021(v1)              // t8 = handicap value = stocks (overwritten below)
         addiu   t8, t8,-0x0001              // off by 1 error
-        
+
         _end:
         lli     t9, 0x0009                  // original line 1 (handicap = 9)
         sb      t9, 0x0075(sp)              // original line 2
