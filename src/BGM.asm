@@ -23,6 +23,24 @@ scope BGM {
     constant stop_(0x00000000)
 
     // @ Description
+    // This function implements the mono/stero toggle (boolean stereo_enabled - 0x8003CB24)
+    scope get_type_: {
+        OS.patch_start(0x00020F1C, 0x8002031C)
+        j       get_type_
+        nop
+        _get_type_return:
+        OS.patch_end()
+
+        lw      t8, 0xCB24(t8)              // original line 1 (t8 = stereo_enabled, overwritten.)
+        mfhi    s3                          // original line 2
+
+        li      t8, Menu.entry_stereo_sound // ~
+        lw      t8, 0x0000(t8)              // t8 = custom stereo_enabled
+        j       _get_type_return            // return
+        nop
+    }
+
+    // @ Description
     // a1 holds BGM_id. This function replaces a1 with a random id from the table
     scope random_music_: {
         OS.patch_start(0x000216F0, 0x80020AF4)
