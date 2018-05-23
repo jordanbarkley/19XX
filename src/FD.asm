@@ -15,7 +15,6 @@ scope FD {
     nop                                     // jal 0x80192764
     OS.patch_end()
 
-
     // @ Description
     // Sets track to 0x18 (FD battle music)
     OS.patch_start(0x640CD2, 0x00000000)
