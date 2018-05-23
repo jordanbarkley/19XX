@@ -84,7 +84,18 @@ scope Global {
 
     // @ Description
     // list of files loaded in the game
+    // @ Fomrat
+    // 0x0000 - file
+    // 0x0004 - address
     constant files_loaded(0x800D6300)
+
+    // @ Description
+    // Puts a flashing overlay on a player (found by [bit])
+    // @ Arguments
+    // a0 - address of player struct
+    // a1 - flash_id
+    // a2 - 0 (?)
+    constant flash_(0x800E9814)
 
     // @ Description
     // player struct list head

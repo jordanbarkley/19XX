@@ -35,6 +35,7 @@ include "src/Spawn.asm"
 include "src/Stages.asm"
 include "src/TimedStock.asm"
 include "src/Timeouts.asm"
+include "src/Training.asm"
 
 // Extend ROM to 32 MBs
 fill    0x2000000 - origin()
