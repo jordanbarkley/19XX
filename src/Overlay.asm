@@ -7,6 +7,7 @@ define __OVERLAY__()
 // @ Note
 // This file only support rgba5551
 
+include "Global.asm"
 include "OS.asm"
 include "RCP.asm"
 

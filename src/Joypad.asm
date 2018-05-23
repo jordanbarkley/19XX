@@ -2,6 +2,8 @@
 if !{defined __JOYPAD__} {
 define __JOYPAD__()
 
+include "OS.asm"
+
 scope Joypad {
     // @ Description
     // Button masks

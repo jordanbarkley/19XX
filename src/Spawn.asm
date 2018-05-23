@@ -7,6 +7,7 @@ define __SPAWN__()
 
 include "OS.asm"
 include "Global.asm"
+include "Menu.asm"
 
 scope Spawn {
 
@@ -47,6 +48,10 @@ scope Spawn {
         nop
         _load_neutral_return:
         OS.patch_end()
+
+        lui     t6, 0x8013              // original line 1
+        lw      t6, 0x1368(t6)          // original line 2
+        Menu.toggle_guard(Menu.entry_neutral_spawns, _load_neutral_return)
 
         addiu   sp, sp,-0x0020          // allocate stack space
         sw      t0, 0x0004(sp)          // ~

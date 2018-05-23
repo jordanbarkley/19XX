@@ -53,9 +53,9 @@ scope Menu {
     OS.patch_end()
 
     // @ Description
-    // This patch changes  the VS. Options screen from loading to the "Exit\n<Stage>" Debug Screen 
-    OS.patch_start(0x0012471C, 0x80133D6C)
-    lli     t4, 0x0002                      // original - lli t4, 0x000A
+    // This patch changes  the OPTION screen from loading to the "Exit\n<Stage>" Debug Screen 
+    OS.patch_start(0x0011D700, 0x80132770)
+    lli     t9, 0x0002                      // original - lli t9, 0x0039
     OS.patch_end()
 
     // @ Description
@@ -102,13 +102,14 @@ scope Menu {
         jal     draw_menu_                  // draw menu
         nop
 
+        // check for exit
         lli     a0, Joypad.B                // a0 - button_mask
         lli     a1, 0x0000                  // a1 - player
         jal     Joypad.was_pressed_         // check if B pressed
         nop 
         beqz    v0, _end                    // nop
         nop
-        lli     a0, 0x0010                  // a0 - screen_id
+        lli     a0, 0x0007                  // a0 - screen_id (main menu)
         jal     change_screen_
         nop
 
@@ -380,7 +381,10 @@ scope Menu {
     entry("RANDOM MUSIC", entry_skip_results_screen)
 
     entry_skip_results_screen:
-    entry("SKIP RESULTS SCREEN", entry_stock_handicap)
+    entry("SKIP RESULTS SCREEN", entry_stereo_sound)
+
+    entry_stereo_sound:
+    entry("STEREO SOUND", entry_stock_handicap)
 
     entry_stock_handicap:
     entry("STOCK HANDICAP", entry_salty_runback)

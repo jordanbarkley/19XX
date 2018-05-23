@@ -5,6 +5,7 @@ define __PAUSE__()
 // @ Description
 // Hold to pause is implemented in this file.
 
+include "Menu.asm"
 include "OS.asm"
 
 scope Pause {
@@ -27,6 +28,10 @@ scope Pause {
         // s3 holds port number checking for pause
         // t7 needs to hold 0 at the end of this function to prevent pause
 
+        lhu     t6, 0x0002(s1)              // original line 1
+        andi    t7, t6, 0x1000              // original line 2
+        Menu.toggle_guard(Menu.entry_hold_to_pause, _hold_return)
+
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
@@ -36,7 +41,7 @@ scope Pause {
         add     t0, t0, s3                  // t0 = input_table + offset
         lhu     t6, 0x0000(s1)              // original line 1 (modified)
         andi    t7, t6, 0x1000              // original line 2
-        beqz    t7,_end                    // return
+        beqz    t7 ,_end                    // return
         or      t1, r0, r0                  // t1 = pX_frames = 0
 
         _held:
