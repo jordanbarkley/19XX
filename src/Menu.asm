@@ -400,15 +400,7 @@ scope Menu {
     entry("STOCK HANDICAP", entry_salty_runback)
 
     entry_salty_runback:
-    entry("SALTY RUNBACK", entry_widescreen)
-
-    entry_widescreen:
-    entry("WIDESCREEN", OS.NULL)
-
-
-
-
-
+    entry("SALTY RUNBACK", OS.NULL)
 
 }
 
