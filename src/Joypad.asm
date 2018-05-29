@@ -24,6 +24,14 @@ scope Joypad {
     constant NONE(0x0000)
 
     // @ Description
+    // Frame cooldown for stick checks
+    constant COOLDOWN(10)
+
+    // @ Description
+    // Deadzones for menu left/right/up/down
+    constant MENU_DEADZONE(20)
+
+    // @ Description
     // This is the controller struct that game reads from. It's 10 bytes in size (per player)
     // @ Fields
     // 0x0000 - half - is_held  - check for is_held
@@ -127,10 +135,186 @@ scope Joypad {
         nop
     }
 
+    // @ Arguments
+    // a0 - min coordinate (deadzone)
+    // a1 - enum left/right
+    // @ Returns
+    // v0 - boolean
+    constant check_stick_x_(0x8039089C)
+
+    // @ Arguments
+    // a0 - min coordinate (deadzone)
+    // @ Returns
+    // boolean
+    scope check_stick_left_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        li      t0, cooldown                // ~
+        lw      t1, 0x0000(t0)              // t1 = cooldown
+        beqz    t1, _run                    // if (cooldown == 0), check
+        nop
+        addiu   t1, t1,-0x0001              // ~
+        sw      t1, 0x0000(t0)              // decrement cooldown
+        lli     v0, OS.FALSE                // v0 = false
+        b       _end                        // skip check this time
+        nop
+
+        _run:
+        lli     a1, 0x0000                  // a1 = left
+        jal     check_stick_x_              // check stick x
+        nop
+        beqz    v0, _end                    // if (ret == 0), skip
+        nop
+        lli     t1, COOLDOWN                // ~
+        sw      t1, 0x0000(t0)              // update cooldown
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
+        nop
+
+        cooldown:
+        dw      0x00000000
+    }
+
+    // @ Arguments
+    // a0 - min coordinate (deadzone)
+    // @ Returns
+    // boolean
+    scope check_stick_right_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        li      t0, cooldown                // ~
+        lw      t1, 0x0000(t0)              // t1 = cooldown
+        beqz    t1, _run                    // if (cooldown == 0), check
+        nop
+        addiu   t1, t1,-0x0001              // ~
+        sw      t1, 0x0000(t0)              // decrement cooldown
+        lli     v0, OS.FALSE                // v0 = false
+        b       _end                        // skip check this time
+        nop
+
+        _run:
+        lli     a1, 0x0001                  // a1 = right
+        jal     check_stick_x_              // check stick x
+        nop
+        beqz    v0, _end                    // if (ret == 0), skip
+        nop
+        lli     t1, COOLDOWN                // ~
+        sw      t1, 0x0000(t0)              // update cooldown
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
+        nop
+
+        cooldown:
+        dw      0x00000000
+    }
+
+    // @ Arguments
+    // a0 - min coordinate (deadzone)
+    // a1 -enum down/up
+    // @ Returns
+    // v0 - boolean
+    constant check_stick_y_(0x80390950)
 
 
+    // @ Arguments
+    // a0 - min coordinate (deadzone)
+    // a1 -enum down/up
+    // @ Returns
+    // v0 - boolean
+    scope check_stick_down_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        li      t0, cooldown                // ~
+        lw      t1, 0x0000(t0)              // t1 = cooldown
+        beqz    t1, _run                    // if (cooldown == 0), check
+        nop
+        addiu   t1, t1,-0x0001              // ~
+        sw      t1, 0x0000(t0)              // decrement cooldown
+        lli     v0, OS.FALSE                // v0 = false
+        b       _end                        // skip check this time
+        nop
+
+        _run:
+        lli     a1, 0x0000                  // a1 = down
+        jal     check_stick_y_              // check stick y 
+        nop
+        beqz    v0, _end                    // if (ret == 0), skip
+        nop
+        lli     t1, COOLDOWN                // ~
+        sw      t1, 0x0000(t0)              // update cooldown
 
 
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
+        nop
+
+        cooldown:
+        dw      0x00000000
+    }
+
+    // @ Arguments
+    // a0 - min coordinate (deadzone)
+    // @ Returns
+    // boolean
+    scope check_stick_up_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        li      t0, cooldown                // ~
+        lw      t1, 0x0000(t0)              // t1 = cooldown
+        beqz    t1, _run                    // if (cooldown == 0), check
+        nop
+        addiu   t1, t1,-0x0001              // ~
+        sw      t1, 0x0000(t0)              // decrement cooldown
+        lli     v0, OS.FALSE                // v0 = false
+        b       _end                        // skip check this time
+        nop
+
+        _run:
+        lli     a1, 0x0001                  // a1 = up
+        jal     check_stick_y_              // check stick y 
+        nop
+        beqz    v0, _end                    // if (ret == 0), skip
+        nop
+        lli     t1, COOLDOWN                // ~
+        sw      t1, 0x0000(t0)              // update cooldown
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
+        nop
+
+        cooldown:
+        dw      0x00000000
+    }
 
 }
 

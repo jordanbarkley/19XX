@@ -9,8 +9,16 @@ include "Overlay.asm"
 
 scope Menu {
 
-    // lazy
-    constant NUM_ENTRIES(12)
+    constant NUM_ENTRIES(000011)
+    constant ROW_HEIGHT(000010)
+    constant DEADZONE(000020)
+
+    texture_background:
+    Overlay.texture(320, 240)
+    insert "../textures/background.rgba5551"
+
+    selection:
+    dw 0x00000000
 
     // @ Description
     // Struct for menu entries
@@ -249,9 +257,8 @@ scope Menu {
         sw      at, 0x0010(sp)              // save registers
 
         _down:
-        lli     a0, Joypad.CD               // a0 - button_mask
-        lli     a1, 0x0000                  // a1 - player
-        jal     Joypad.turbo_               // check if c-down pressed
+        lli     a1, -DEADZONE               // a1 - min coordinate (deadzone)
+        jal     Joypad.check_stick_down_    // check if stick pressed down
         nop
         beqz    v0, _up                     // if not pressed, check c-up
         nop
@@ -266,9 +273,8 @@ scope Menu {
         nop
 
         _up:
-        lli     a0, Joypad.CU               // a0 - button_mask
-        lli     a1, 0x0000                  // a1 - player
-        jal     Joypad.turbo_               // check if c-up pressed
+        lli     a1, DEADZONE               // a1 - min coordinate (deadzone)
+        jal     Joypad.check_stick_up_      // check if stick pressed up
         nop
         beqz    v0, _right                  // if not pressed, check right
         nop
@@ -282,9 +288,8 @@ scope Menu {
         nop
 
         _right:
-        lli     a0, Joypad.CR               // a0 - button_mask
-        lli     a1, 0x0000                  // a1 - player
-        jal     Joypad.was_pressed_         // check if c right pressed
+        lli     a1, DEADZONE               // a1 - min coordinate (deadzone)
+        jal     Joypad.check_stick_right_ // check if stick pressed right
         nop
         beqz    v0, _left                   // if not pressed, check left
         nop
@@ -297,9 +302,8 @@ scope Menu {
         nop
 
         _left:
-        lli     a0, Joypad.CL               // a0 - button_mask
-        lli     a1, 0x0000                  // a1 - player
-        jal     Joypad.was_pressed_         // check if c-left pressed
+        lli     a1, -DEADZONE               // a1 - min coordinate (deadzone)
+        jal     Joypad.check_stick_left_    // check if stick pressed left
         nop
         beqz    v0, _end                    // if not pressed, end
         nop
@@ -358,16 +362,7 @@ scope Menu {
         _fail:
         break                               // halt execution
     }
-
-    constant ROW_HEIGHT(000010)
-
-    texture_background:
-    Overlay.texture(320, 240)
-    insert "../textures/background.rgba5551"
-
-    selection:
-    dw 0x00000000
-
+3
     head:
     entry_disable_cinematic_camera:
     entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel)
