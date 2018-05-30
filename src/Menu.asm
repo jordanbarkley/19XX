@@ -257,7 +257,7 @@ scope Menu {
         sw      at, 0x0010(sp)              // save registers
 
         _down:
-        lli     a1, -DEADZONE               // a1 - min coordinate (deadzone)
+        lli     a0, -DEADZONE               // a0 - min coordinate (deadzone)
         jal     Joypad.check_stick_down_    // check if stick pressed down
         nop
         beqz    v0, _up                     // if not pressed, check c-up
@@ -273,7 +273,7 @@ scope Menu {
         nop
 
         _up:
-        lli     a1, DEADZONE               // a1 - min coordinate (deadzone)
+        lli     a0, DEADZONE               // a0 - min coordinate (deadzone)
         jal     Joypad.check_stick_up_      // check if stick pressed up
         nop
         beqz    v0, _right                  // if not pressed, check right
@@ -288,7 +288,7 @@ scope Menu {
         nop
 
         _right:
-        lli     a1, DEADZONE               // a1 - min coordinate (deadzone)
+        lli     a0, DEADZONE               // a0 - min coordinate (deadzone)
         jal     Joypad.check_stick_right_ // check if stick pressed right
         nop
         beqz    v0, _left                   // if not pressed, check left
@@ -302,7 +302,7 @@ scope Menu {
         nop
 
         _left:
-        lli     a1, -DEADZONE               // a1 - min coordinate (deadzone)
+        lli     a0, -DEADZONE               // a0 - min coordinate (deadzone)
         jal     Joypad.check_stick_left_    // check if stick pressed left
         nop
         beqz    v0, _end                    // if not pressed, end
