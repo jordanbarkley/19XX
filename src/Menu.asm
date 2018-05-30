@@ -22,8 +22,8 @@ scope Menu {
 
     // @ Description
     // Struct for menu entries
-    macro entry(title, next) {
-        dw 0x00000000                       // 0x0000 - is_enabled
+    macro entry(title, next, is_enabled) {
+        dw {is_enabled}                     // 0x0000 - is_enabled
         dw {next}                           // 0x0004 - next_entry
         db {title}                          // 0x0008 - title
         OS.align(4)
@@ -365,37 +365,37 @@ scope Menu {
 3
     head:
     entry_disable_cinematic_camera:
-    entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel)
+    entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel, OS.FALSE)
 
     entry_flash_on_z_cancel:
-    entry("FLASH ON Z CANCEL", entry_hold_to_pause)
+    entry("FLASH ON Z CANCEL", entry_hold_to_pause, OS.FALSE)
 
     entry_hold_to_pause:
-    entry("HOLD TO PAUSE", entry_improved_combo_meter)
+    entry("HOLD TO PAUSE", entry_improved_combo_meter, OS.TRUE)
 
     entry_improved_combo_meter:
-    entry("IMPROVED COMBO METER", entry_improved_ai)
+    entry("IMPROVED COMBO METER", entry_improved_ai, OS.TRUE)
 
     entry_improved_ai:
-    entry("IMPROVED AI", entry_neutral_spawns)
+    entry("IMPROVED AI", entry_neutral_spawns, OS.FALSE)
 
     entry_neutral_spawns:
-    entry("NEUTRAL SPAWNS", entry_random_music)
+    entry("NEUTRAL SPAWNS", entry_random_music, OS.TRUE)
 
     entry_random_music:
-    entry("RANDOM MUSIC", entry_skip_results_screen)
+    entry("RANDOM MUSIC", entry_skip_results_screen, OS.FALSE)
 
     entry_skip_results_screen:
-    entry("SKIP RESULTS SCREEN", entry_stereo_sound)
+    entry("SKIP RESULTS SCREEN", entry_stereo_sound, OS.FALSE)
 
     entry_stereo_sound:
-    entry("STEREO SOUND", entry_stock_handicap)
+    entry("STEREO SOUND", entry_stock_handicap, OS.TRUE)
 
     entry_stock_handicap:
-    entry("STOCK HANDICAP", entry_salty_runback)
+    entry("STOCK HANDICAP", entry_salty_runback, OS.FALSE)
 
     entry_salty_runback:
-    entry("SALTY RUNBACK", OS.NULL)
+    entry("SALTY RUNBACK", OS.NULL, OS.TRUE)
 
 }
 
