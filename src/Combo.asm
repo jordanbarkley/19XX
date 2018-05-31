@@ -50,14 +50,14 @@ scope Combo {
         nop
 
         _exit_loop:
-        // The current knockback value (which is tracked in the player struct) can be used to check 
-        // if the player is in hitstun the value will always represent the current knockback value 
-        // being applied to the character, even after a wall bounce. This means that if the value is 
-        // not equal to 0, the character can be considered as being in hitstun
-        lw      t2, 0x07EC(a2)              // t2 = current knockback value
+        // together, the knockback value and hitstun counter which are tracked in the player struct
+        // provide enough information to determine if the player is in hitstun, including wall bounces
+        lw      t2, 0x07EC(a2)              // t2 = knockback value
         beq     t2, r0, _skip               // if the knockback value = 0, player is not in hitstun
         nop
-
+        lhu     t2, 0x0B1A(a2)              // t2 = hitstun counter
+        beq     t2, r0, _skip               // if hitstun counter = 0, player is not in hitstun
+        nop
         _overwrite_flag:
         //overwrites the hitstun flag with 1 for this frame, causing the combo meter to not reset
         lli     t9, 0x0001                  // overwrite hitstun flag
@@ -78,6 +78,7 @@ scope Combo {
         dh 0x00B5                           // action value: "cargo grabbed"
         dh 0x00B8                           // action value: "cargo held"
         dh 0x00BA                           // action value: "thrown"
+        dh 0x00BB                           // action value: "thrown 2"
         dh 0x003C                           // action value: "tornado"
         dh 0x0000                           // end table    
     }
