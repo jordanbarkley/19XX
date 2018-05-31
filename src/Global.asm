@@ -32,6 +32,7 @@ scope Global {
     // Byte, previous screen value is here
     constant previous_screen(0x800A4AD1)
 
+    // @ Description
     scope vs {
         // @ Description
         // Byte, contains the versus stage stage id
@@ -70,16 +71,23 @@ scope Global {
         constant damage(0x800A4D13)
 
         // @ Description
-        // Byte, 0 = none, 5 = high 						
+        // Byte, 0 = none, 5 = high
         constant item_frequency(0x800A4D24)
 
         // @ Description
         // Pointer to player structs on versus screen
+        constant p_offset(0x20)
+        constant p_difference(0x74)
         constant p1(0x800A4D28)
         constant p2(0x800A4D9C)
         constant p3(0x800A4E10)
         constant p4(0x800A4E84)
     }
+
+    // @ Description
+    // Pointer to match setting. For versus, (0x0000(this) == 0x800A4D08) which is the address of
+    // the above vs scope.
+    constant match_info(0x800A50E8)
 
 
     // @ Description
