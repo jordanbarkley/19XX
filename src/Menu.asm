@@ -364,6 +364,9 @@ scope Menu {
     }
 3
     head:
+    entry_practice_overlay:
+    entry("COLOUR OVERLAYS", entry_disable_cinematic_camera, OS.TRUE)
+
     entry_disable_cinematic_camera:
     entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel, OS.FALSE)
 
