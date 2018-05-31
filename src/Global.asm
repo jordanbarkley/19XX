@@ -76,8 +76,8 @@ scope Global {
 
         // @ Description
         // Pointer to player structs on versus screen
-        constant p_offset(0x20)
-        constant p_difference(0x74)
+        constant P_OFFSET(0x20)
+        constant P_DIFF(0x74)
         constant p1(0x800A4D28)
         constant p2(0x800A4D9C)
         constant p3(0x800A4E10)
