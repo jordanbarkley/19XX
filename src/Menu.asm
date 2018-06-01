@@ -368,7 +368,7 @@ scope Menu {
     entry("COLOUR OVERLAYS", entry_disable_cinematic_camera, OS.FALSE)
 
     entry_disable_cinematic_camera:
-    entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel, OS.FALSE)
+    entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel, OS.TRUE)
 
     entry_flash_on_z_cancel:
     entry("FLASH ON Z CANCEL", entry_hold_to_pause, OS.FALSE)
@@ -380,7 +380,7 @@ scope Menu {
     entry("IMPROVED COMBO METER", entry_improved_ai, OS.TRUE)
 
     entry_improved_ai:
-    entry("IMPROVED AI", entry_neutral_spawns, OS.FALSE)
+    entry("IMPROVED AI", entry_neutral_spawns, OS.TRUE)
 
     entry_neutral_spawns:
     entry("NEUTRAL SPAWNS", entry_random_music, OS.TRUE)
