@@ -136,6 +136,7 @@ scope AI {
         _fail:
         move    a0, s0                       // a0 - player struct
         jal     tech_fail_                  // don't tech
+        nop
         b       _end
         nop
         
