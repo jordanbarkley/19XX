@@ -17,6 +17,10 @@ scope Menu {
     Overlay.texture(320, 240)
     insert "../textures/background.rgba5551"
 
+    texture_fd:
+    Overlay.texture(48, 36)
+    insert "../textures/background.rgba5551"
+
     selection:
     dw 0x00000000
 
@@ -98,8 +102,8 @@ scope Menu {
         sw      ra, 0x0004(sp)              // save ra
 
         // draw background
-        lli     a0, 0x0000                  // a0 - ulx
-        lli     a1, 0x0000                  // a1 - uly
+        lli     a0, 000000                  // a0 - ulx
+        lli     a1, 000000                  // a1 - uly
         li      a2, texture_background      // a2 - address of texture struct 
         jal     Overlay.draw_texture_big_
         nop

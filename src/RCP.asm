@@ -201,6 +201,7 @@ scope RCP {
         sw      t2, 0x000C(sp)              // ~
         sw      t3, 0x0010(sp)              // ~
         sw      ra, 0x0014(sp)              // save registers
+
         or      t0, a0, r0                  // t0 = ulx
         or      t1, a1, r0                  // t1 = uly
 
@@ -229,7 +230,7 @@ scope RCP {
 
         _third:
         lui     a0, 0xF100                  // upper = 0xE1000000
-        li      a1, 0x00100400              // dsdx = 1, dtdy = 4
+        li      a1, 0x10000400              // dsdx = 1, dtdy = 4
         jal     append_                     // add to display list
         nop
 
@@ -244,8 +245,10 @@ scope RCP {
     }
 
     scope texture_rectangle_wh_: {
-        add     a2, a0, a2                  // calculate lrx
-        add     a3, a1, a3                  // calculate lry
+        add     a2, a0, a2                  // ~
+        addiu   a2, a2,-0x0001              // calculate lrx
+        add     a3, a1, a3                  // ~
+        addiu   a3, a3,-0x0001              // calculate lry
         j       texture_rectangle_          // run regular texture_rectangle_
         nop
     }
