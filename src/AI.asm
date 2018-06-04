@@ -87,7 +87,7 @@ scope AI {
         
         _loop:
         lw      t1, 0x0058(t0)              // t0 = px struct
-        beq     t1, a0, _cpu_check          // if (px = p_teched), continue (compare player structs)
+        beq     t1, s0, _cpu_check          // if (px = p_teched), continue (compare player structs)
         nop
         addiu   t0, t0, Global.vs.P_DIFF    // else, increment pointer and loop
         b       _loop
