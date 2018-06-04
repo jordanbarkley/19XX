@@ -19,6 +19,7 @@ scope Overlay {
         dw pc() + 4                         // 0x0008 - pointer to image data
     }
 
+    OS.align(16)
     texture_font:
     texture(8, 8)
     insert "../textures/font.rgba5551"
