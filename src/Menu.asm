@@ -2,6 +2,7 @@
 if !{defined __MENU__} {
 define __MENU__()
 
+include "Color.asm"
 include "Global.asm"
 include "Joypad.asm"
 include "OS.asm"
@@ -95,6 +96,17 @@ scope Menu {
     scope run_: {
         addiu   sp, sp,-0x0008              // allocate stack space
         sw      ra, 0x0004(sp)              // save ra
+
+        lli     a0, Color.low.BLACK         // a0 - color
+        jal     Overlay.set_color_          // set fill color to black
+        nop
+
+        lli     a0, 000000                  // a0 - ulx
+        lli     a1, 000000                  // a1 - uly
+        lli     a2, 000320                  // a2 - width
+        lli     a3, 000240                  // a3 - height
+        jal     Overlay.draw_rectangle_     // draw black rectangle for background
+        nop
 
         // update menu
         jal     update_

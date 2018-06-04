@@ -447,8 +447,10 @@ scope RCP {
     }
 
     scope fill_rectangle_wh_: {
-        add     a2, a0, a2                  // calculate lrx
-        add     a3, a1, a3                  // calculate lry
+        add     a2, a0, a2                  // ~
+        addiu   a2, a2,-0x0001              // calculate lrx
+        add     a3, a1, a3                  // ~
+        addiu   a3, a3,-0x0001              // calculate lry 
         j       fill_rectangle_             // run regular fill_rectangle_
         nop
     }
