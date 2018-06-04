@@ -11,7 +11,8 @@ db  0x00
 
 // extended asm
 origin  0x01000000
-base    0x80400000
+base    0x80380000
+variable start(pc())
 include "src/AI.asm"
 include "src/Boot.asm"
 include "src/BGM.asm"
@@ -37,6 +38,21 @@ include "src/Stages.asm"
 include "src/TimedStock.asm"
 include "src/Timeouts.asm"
 include "src/Training.asm"
+variable end(pc())
+variable size(end - start)
+
+
+if size > 65536 {
+    // 0x10000 = 65536
+    print "needed RAM space "
+    print size
+    print " is greater than max RAM space (65536)\n"
+    warning "not enough RAM space"
+} else {
+    print "RAM space used: "
+    print size
+    print "\n"
+}
 
 // Extend ROM to 32 MBs
 fill    0x2000000 - origin()

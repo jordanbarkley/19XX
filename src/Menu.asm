@@ -9,17 +9,9 @@ include "Overlay.asm"
 
 scope Menu {
 
-    constant NUM_ENTRIES(000011)
+    constant NUM_ENTRIES(000012)
     constant ROW_HEIGHT(000010)
     constant DEADZONE(000020)
-
-    texture_background:
-    Overlay.texture(320, 240)
-    insert "../textures/background.rgba5551"
-
-    texture_fd:
-    Overlay.texture(48, 36)
-    insert "../textures/background.rgba5551"
 
     selection:
     dw 0x00000000
@@ -60,17 +52,20 @@ scope Menu {
         addiu   sp, sp, 0x0008              // deallocate stack space
     }
 
-    // @ Description 
-    // This patch disables the menu init on the debug screen 80371414
-    OS.patch_start(0x001AC1E8, 0x80369D78)    
+    // @ Description
+    // This patch disables functionality on the OPTION screen.
+    OS.patch_start(0x001205FC, 0x80132E4C)
     jr      ra
     nop
     OS.patch_end()
 
     // @ Description
-    // This patch changes  the OPTION screen from loading to the "Exit\n<Stage>" Debug Screen 
-    OS.patch_start(0x0011D700, 0x80132770)
-    lli     t9, 0x0002                      // original - lli t9, 0x0039
+    // This patch disables back (press B) on Main Menu
+    OS.patch_start(0x0011D768, 0x801327D8)
+    nop
+    nop
+    nop
+    nop
     OS.patch_end()
 
     // @ Description
@@ -100,13 +95,6 @@ scope Menu {
     scope run_: {
         addiu   sp, sp,-0x0008              // allocate stack space
         sw      ra, 0x0004(sp)              // save ra
-
-        // draw background
-        lli     a0, 000000                  // a0 - ulx
-        lli     a1, 000000                  // a1 - uly
-        li      a2, texture_background      // a2 - address of texture struct 
-        jal     Overlay.draw_texture_big_
-        nop
 
         // update menu
         jal     update_

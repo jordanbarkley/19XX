@@ -63,7 +63,7 @@ scope Overlay {
         // HOOKS GO HERE
         li      t0, Global.current_screen   // ~
         lb      t0, 0x0000(t0)              // t0 = screen id
-        lli     t1, 0x0002                  // t1 = empty debug screen
+        lli     t1, 0x0039                  // t1 = OPTION screen
         bne     t0, t1, _finish             // if (screen_id != 0x08), skip
         nop
         jal     Menu.run_
@@ -407,16 +407,14 @@ scope Overlay {
         nop
     }
 
-
-
     // @ Description
     // Custom display list goes here.
     OS.align(16)
     display_list:
-    fill 0x10000
+    fill 0x8000
 
     display_list_info:
-    RCP.display_list_info(display_list, 0x10000)
+    RCP.display_list_info(display_list, 0x8000)
 
 
 }
