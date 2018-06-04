@@ -80,7 +80,9 @@ scope Combo {
         dh 0x00BA                           // action value: "thrown"
         dh 0x00BB                           // action value: "thrown 2"
         dh 0x003C                           // action value: "tornado"
-        dh 0x0000                           // end table    
+        dh 0x0000                           // end table
+
+        OS.align(4)
     }
 }
 
