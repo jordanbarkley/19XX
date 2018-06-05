@@ -1,4 +1,5 @@
 PROGRAM_NAME=19XX
+DATE=`date +%m%d%Y`
 
 all:
 	# assemble rom
@@ -10,8 +11,10 @@ all:
 	tools/n64crc roms/$(PROGRAM_NAME)TE.z64
 
 	# create patch files
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)CE.z64 patches/$(PROGRAM_NAME)CE.xdelta
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)TE.z64 patches/$(PROGRAM_NAME)TE.xdelta
+	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)CE.z64 patches/$(PROGRAM_NAME)CE_$(DATE).xdelta
+	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)TE.z64 patches/$(PROGRAM_NAME)TE_$(DATE).xdelta
+
+	echo $(DATE)
 
 	# show time stamp
 	date
