@@ -175,7 +175,14 @@ scope AI {
         OS.patch_start(0x000CB478, 0x80150A38)
         jal     z_cancel_
         nop
+        _z_cancel_return:
         OS.patch_end()
+
+        _original:
+        lw      t6, 0x0160(v1)              // original line 1
+        slti    at, t6, 0x000B              // original line 2
+
+        Menu.toggle_guard(Menu.entry_improved_ai, _z_cancel_return)
 
         addiu   sp, sp,-0x0020              // allocate stack space
         sw      ra, 0x001C(sp)              // ~
@@ -183,7 +190,6 @@ scope AI {
         sw      v1, 0x0014(sp)              // ~
         sw      a0, 0x0018(sp)              // save registers
 
-        Menu.toggle_guard(Menu.entry_improved_ai, z_cancel__orginal_)
 
         li      t0, Global.match_info       // ~
         lw      t0, 0x0000(t0)              // t0 = address of match_info (0x800A4D08 in VS.)
@@ -217,11 +223,7 @@ scope AI {
         lli     at, OS.FALSE                // set false
         b       _end                        // end
         nop
-        
-        _original:
-        lw      t6, 0x0160(v1)              // original line 1
-        slti    at, t6, 0x000B              // original line 2
-        
+
         _end:
         lw      ra, 0x001C(sp)              // ~
         lw      v0, 0x0010(sp)              // ~
