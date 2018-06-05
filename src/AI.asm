@@ -134,7 +134,7 @@ scope AI {
         nop
         
         _fail:
-        move    a0, s0                       // a0 - player struct
+        move    a0, s0                      // a0 - player struct
         jal     tech_fail_                  // don't tech
         nop
         b       _end
@@ -161,14 +161,6 @@ scope AI {
     }
 
     // @ Description
-    // Helper for toggle guard
-    scope z_cancel__orginal_: {
-        j       z_cancel_._original
-        nop
-        
-    }
-
-    // @ Description
     // Usually, this function checks for a z-cancel press with 10 frames. At the end of this, at
     // holds a boolean for successful z-cancel. This function has been modified to make sure that
     // boolean is true for CPUs (Z_CANCEL_CHANCE)% of the time. [bit]
@@ -176,14 +168,13 @@ scope AI {
         OS.patch_start(0x000CB478, 0x80150A38)
         jal     z_cancel_
         nop
-        _z_cancel_return:
         OS.patch_end()
 
         _original:
         lw      t6, 0x0160(v1)              // original line 1
         slti    at, t6, 0x000B              // original line 2
 
-        Menu.toggle_guard(Menu.entry_improved_ai, _z_cancel_return)
+        Menu.toggle_guard(Menu.entry_improved_ai, OS.NULL)
 
         addiu   sp, sp,-0x0020              // allocate stack space
         sw      ra, 0x001C(sp)              // ~
@@ -206,7 +197,7 @@ scope AI {
         
         _cpu_check:
         lbu     t2, 0x0002(t0)              // t2 = enum (man, cpu, none)
-        beqz    t2, _original               // if (t2 == man), skip
+        beqz    t2, _end                    // if (t2 == man), skip
         nop
         lli     a0, 000100                  // ~
         jal     Global.get_random_int_      // v0 = (0-99)
