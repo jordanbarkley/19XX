@@ -3,7 +3,10 @@ DATE=`date +%m%d%Y`
 
 all:
 	# apply texture patch
-	xdelta3 -d -f -s roms/original.z64 textures/textures.xdelta roms/original_textured.z64
+	# xdelta3 -d -f -s roms/original.z64 textures/textures.xdelta roms/original_textured.z64
+
+	# temporary
+	cp roms/original.z64 roms/original_textured.z64
 
 	# assemble rom
 	tools/_bass -o roms/$(PROGRAM_NAME)CE.z64 $(PROGRAM_NAME)CE.asm -sym bass.log
@@ -12,10 +15,6 @@ all:
 	# update checksum
 	tools/n64crc roms/$(PROGRAM_NAME)CE.z64
 	tools/n64crc roms/$(PROGRAM_NAME)TE.z64
-
-	# create patch files
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)CE.z64 patches/$(PROGRAM_NAME)CE_$(DATE).xdelta
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)TE.z64 patches/$(PROGRAM_NAME)TE_$(DATE).xdelta
 
 	# remove original_textured
 	rm -rf roms/original_textured.z64
@@ -68,3 +67,8 @@ clean:
 
 	# remove patches
 	make scrub
+
+release:
+	# create patch files
+	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)CE.z64 patches/$(PROGRAM_NAME)CE_$(DATE).xdelta
+	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)TE.z64 patches/$(PROGRAM_NAME)TE_$(DATE).xdelta
