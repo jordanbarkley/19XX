@@ -1,10 +1,10 @@
 # Building
 
-0. Requires `make` and `xdelta3`
+0. Requires `gcc`, `git`, `make` and `xdelta3`
 1. In a terminal of your choice, navigate to your desired path.
 2. Clone this repository.
 ```
-$   git clone https://github.com/jordanbarkley
+$   git clone https://github.com/jordanbarkley/19XX
 ```
 3. Change direcotories.
 ```
