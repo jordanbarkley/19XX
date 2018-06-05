@@ -131,7 +131,6 @@ scope Costumes {
         dw _right
         dw _down
         dw _left
-
     }
 
     // @ Description

@@ -1,4 +1,4 @@
-// 19XX.asm
+// 19XXCE.asm
 
 // copy fresh rom
 origin  0x00000000
@@ -6,7 +6,7 @@ insert  "roms/original.z64"
 
 // change ROM name
 origin  0x00000020
-db  "19XX"
+db  "19XXCE"
 db  0x00
 
 // extended asm
@@ -54,5 +54,5 @@ if size > 65536 {
     print "\n"
 }
 
-// Extend ROM to 32 MBs
+// extend ROM to 32 MBs
 fill    0x2000000 - origin()

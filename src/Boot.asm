@@ -10,6 +10,20 @@ include "Global.asm"
 
 scope Boot {
     // @ Description
+    // Nintendo 64 logo exits to character select screen because t1 contains screen ID 0x0010
+    // instead of 0x001C
+    OS.patch_start(0x0017EE54, 0x80131C94)
+    ori     t1, r0, 0x0010
+    OS.patch_end()
+
+    // @ Descritpion
+    // Nintendo 64 logo cannot be skipped.
+    // Instead of checking for a button press, the check has been disabled.
+    OS.patch_start(0x0017EE18, 0x80131C58)
+    beq     r0, r0, 0x80131C80
+    OS.patch_end()
+
+    // @ Description
     // Originally, this instruction performed one DMA as part of the boot sequence. It now branches
     // to unsused space in the boot sequence and transfers 0x10000 bytes to 0x80380000
     OS.patch_start(0x00001234, 0x80000634)

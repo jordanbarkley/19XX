@@ -15,20 +15,6 @@ scope Cheats {
     OS.patch_end()
 
     // @ Description
-    // Nintendo 64 logo exits to character select screen because t1 contains screen ID 0x0010
-    // instead of 0x001C
-    OS.patch_start(0x0017EE54, 0x80131C94)
-    ori     t1, r0, 0x0010
-    OS.patch_end()
-
-    // @ Descritpion
-    // Nintendo 64 logo cannot be skipped.
-    // Instead of checking for a button press, the check has been disabled.
-    OS.patch_start(0x0017EE18, 0x80131C58)
-    beq     r0, r0, 0x80131C80
-    OS.patch_end()
-
-    // @ Description
     // This alters an f3dex2 display list builder function to disable anti-aliasing.
     OS.patch_start(0x000337F8, 0x80032BF8)
     // ori     t2, r0, 0x0212
