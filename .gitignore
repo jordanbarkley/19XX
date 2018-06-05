@@ -1,6 +1,7 @@
 # ROMs
 *.z64
 *.log
+*.xdelta
 
 # Tools
 tools/*
