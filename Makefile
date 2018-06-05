@@ -9,8 +9,8 @@ all:
 	cp roms/original.z64 roms/original_textured.z64
 
 	# assemble rom
-	tools/_bass -o roms/$(PROGRAM_NAME)CE.z64 $(PROGRAM_NAME)CE.asm -sym bass.log
-	tools/_bass -o roms/$(PROGRAM_NAME)TE.z64 $(PROGRAM_NAME)TE.asm -sym bass.log
+	tools/_bass -o roms/$(PROGRAM_NAME)CE.z64 $(PROGRAM_NAME)CE.asm -sym CE.log
+	tools/_bass -o roms/$(PROGRAM_NAME)TE.z64 $(PROGRAM_NAME)TE.asm -sym TE.log
 
 	# update checksum
 	tools/n64crc roms/$(PROGRAM_NAME)CE.z64
@@ -38,7 +38,7 @@ debug:
 	make
 
 	# display file
-	cat bass.log
+	cat CE.log
 
 	# show timestamp
 	date
