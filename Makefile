@@ -44,6 +44,10 @@ debug:
 	# show timestamp
 	date
 
+scrub:
+	# remove patches
+	rm -rf patches/*.xdelta
+
 clean:
 	# remove roms
 	rm -rf roms/$(PROGRAM_NAME)*.z64
@@ -62,6 +66,5 @@ clean:
 	rm -rf tools/_bass
 	rm -rf tools/n64crc
 
-scrub:
 	# remove patches
-	rm -rf patches/*.xdelta
+	make scrub
