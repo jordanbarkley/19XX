@@ -16,7 +16,8 @@ scope Overlay {
     macro texture(variable width, variable height) {
         dw width                            // 0x0000 - width of texture
         dw height                           // 0x0004 - height of texture
-        dw pc() + 4                         // 0x0008 - pointer to image data
+        dw pc() + 8                         // 0x0008 - pointer to image data
+        dw base()                           // 0x000C - ROM address
     }
 
     OS.align(16)
