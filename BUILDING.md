@@ -30,11 +30,11 @@
 
 # Getting Prerequisites
 ## `gcc`, `git`, and `make`
-For Linux and MacOSX, these are built-in (`clang` is fine for `gcc`). To install for windows, see [Cygwin](https://www.cygwin.com/) or [MinGW](http://www.mingw.org/)
+For Linux and Mac OSX, these are built-in (`clang` is fine for `gcc`). To install for windows, see [Cygwin](https://www.cygwin.com/) or [MinGW](http://www.mingw.org/)
 ## ARM9's Modified `bass` Assembler
 The latest version (`v14`) of ARM9's N64-modified `bass` is required to assemble 19XX.
 
-Vist https://github.com/ARM9/bass and follow build instructions to install
+Visit https://github.com/ARM9/bass and follow build instructions to install
 ## `xdelta3`
 The easiest way to install `xdelta3` is to use your package manager:
 ```
