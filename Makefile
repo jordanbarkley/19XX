@@ -32,16 +32,6 @@ build:
 	# remove bass git repository
 	rm -rf tools/bass
 
-debug:
-	# make
-	make
-
-	# display file
-	cat CE.log
-
-	# show timestamp
-	date
-
 scrub:
 	# remove patches
 	rm -rf patches/*.xdelta
