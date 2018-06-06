@@ -1,6 +1,6 @@
 # Building 19XX
 
-0. Requires `gcc`, `git`, `make`, `bass`, and `xdelta3`
+0. Have `gcc`, `git`, `make`, `bass`, and `xdelta3` installed and available in your `PATH` variable. See **Getting Prerequisites** section below for help.
 1. In a terminal of your choice, navigate to your desired path.
 2. Clone this repository.
    ```
@@ -23,7 +23,10 @@
    $   make
    ```
    This will create both `19XXTE.z64` and `19XXCE.z64` versions of the hack, and place them into the created `build/` subdirectory.
-   If you want to create `xdelta` patches for other people to apply, run `make release`.
+
+   If you only want to make one version of the hack, run `make CE` or `make TE` as desired.
+
+   If you want to create `xdelta` patches for other people to apply, run `make release`. The patches will also be placed into the `build/` subdirectory.
 
 # Getting Prerequisites
 ## `gcc`, `git`, and `make`
