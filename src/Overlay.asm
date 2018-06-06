@@ -10,19 +10,13 @@ define __OVERLAY__()
 include "Global.asm"
 include "OS.asm"
 include "RCP.asm"
+include "Texture.asm"
 
 scope Overlay {
 
-    macro texture(variable width, variable height) {
-        dw width                            // 0x0000 - width of texture
-        dw height                           // 0x0004 - height of texture
-        dw pc() + 8                         // 0x0008 - pointer to image data
-        dw base()                           // 0x000C - ROM address
-    }
-
     OS.align(16)
     texture_font:
-    texture(8, 8)
+    Texture.info(8, 8)
     insert "../textures/font.rgba5551"
 
     // @ Description
@@ -297,7 +291,7 @@ scope Overlay {
         nop
 
         texture:
-        texture(0, 0)                       // blank texture struct
+        Texture.info(0, 0)                  // blank texture struct
     }
 
     // @ Description
@@ -334,7 +328,7 @@ scope Overlay {
         nop
 
         texture:
-        texture(8, 8)
+        Texture.info(8, 8)
     }
 
     // @ Description
