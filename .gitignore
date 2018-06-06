@@ -2,8 +2,6 @@
 *.z64
 *.log
 
-# Tools
-tools/*
 
 # Windows image file caches
 Thumbs.db
