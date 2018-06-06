@@ -1,63 +1,70 @@
-PROGRAM_NAME=19XX
+############ Targets and Source Files ############
+BUILD_DIR := build
 
-all:
-	# apply texture patch
-	# xdelta3 -d -f -s roms/original.z64 textures/textures.xdelta roms/original_textured.z64
+PROGRAM_BASE_NAME := 19XX
+TE := $(PROGRAM_BASE_NAME)TE
+TE_MAIN := $(TE).asm
+TE_ROM  := $(BUILD_DIR)/$(TE).z64
 
-	# temporary
-	cp roms/original.z64 roms/original_textured.z64
+CE := $(PROGRAM_BASE_NAME)CE
+CE_MAIN := $(CE).asm
+CE_ROM  := $(BUILD_DIR)/$(CE).z64
 
-	# assemble rom
-	tools/_bass -o roms/$(PROGRAM_NAME)CE.z64 $(PROGRAM_NAME)CE.asm -sym CE.log
-	tools/_bass -o roms/$(PROGRAM_NAME)TE.z64 $(PROGRAM_NAME)TE.asm -sym TE.log
+ASM_DIRS := src
+ASM_FILES := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.asm))
 
-	# update checksum
-	tools/n64crc roms/$(PROGRAM_NAME)CE.z64
-	tools/n64crc roms/$(PROGRAM_NAME)TE.z64
+# Eventually, this patch should be generated from the input textures
+TEX_DIR := textures
+TEX_PATCH := $(TEX_DIR)/textures.xdelta
+TEXTURED_ROM := $(BUILD_DIR)/textured_temp.z64
 
-	# remove original_textured
-	rm -rf roms/original_textured.z64
+############ Initial ROM Info ############
+ROM_DIR := roms
+ORG_ROM := $(ROM_DIR)/original.z64
 
-	# show time stamp
-	date
+############ Assembler Options ############
+AS := bass
+ASFLAGS := -create
 
-build:
-	# clean
-	make clean
+############ Patcher Options ############
+PATCHER := xdelta3
+PATCHFLAGS := -f
 
-	# build tools
-	cd tools; make
-	cp tools/bass/bass/bass tools/_bass
+############ Other Tools ############
+TOOLS_DIR := tools
+N64CRC := $(TOOLS_DIR)/n64crc
 
-	# remove bass git repository
-	rm -rf tools/bass
+default: all
 
-scrub:
-	# remove patches
-	rm -rf patches/*.xdelta
+all: CE TE
+
+release: all
+	$(PATCHER) -e $(PATCHFLAGS) -s $(ORG_ROM) $(CE_ROM) $(CE_ROM:.z64=.xdelta)
+	$(PATCHER) -e $(PATCHFLAGS) -s $(ORG_ROM) $(TE_ROM) $(TE_ROM:.z64=.xdelta)
+
+CE: $(CE_ROM)
+
+TE: $(TE_ROM)
 
 clean:
-	# remove roms
-	rm -rf roms/$(PROGRAM_NAME)*.z64
+	$(RM) -r $(BUILD_DIR)
 
-	# remove patches
-	rm -rf patches/$(PROGRAM_NAME)*.xdelta
+# remove patches only
+scrub:
+	$(RM) $(CE_ROM:.z64=.xdelta) $(TE_ROM:.z64=.xdelta)
 
-	# remove log files
-	rm -rf *.log
+$(CE_ROM): $(TEXTURED_ROM) $(CE_MAIN) $(ASM_FILES)
+	$(AS) $(ASFLAGS) $(CE_MAIN) -o $(CE_ROM) -d __BASEROM="$(TEXTURED_ROM)" -sym $(CE_ROM:.z64=.log)
+	$(N64CRC) $(CE_ROM)
 
-	# remove bass github repository
-	rm -rf tools/bass
+$(TE_ROM): $(TEXTURED_ROM) $(TE_MAIN) $(ASM_FILES)
+	$(AS) $(ASFLAGS) $(TE_MAIN) -o $(TE_ROM) -d __BASEROM="$(TEXTURED_ROM)" -sym $(TE_ROM:.z64=.log)
+	$(N64CRC) $(TE_ROM)
 
-	# remove executables
-	rm -rf tools/*.exe
-	rm -rf tools/_bass
-	rm -rf tools/n64crc
+$(TEXTURED_ROM): $(TEX_PATCH) $(ORG_ROM) | $(BUILD_DIR) 
+	$(PATCHER) -d $(PATCH_FLAGS) -s $(ORG_ROM) $(TEX_PATCH) $(TEXTURED_ROM)
 
-	# remove patches
-	make scrub
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR)
 
-release:
-	# create patch files
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)CE.z64 patches/$(PROGRAM_NAME)CE.xdelta
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)TE.z64 patches/$(PROGRAM_NAME)TE.xdelta
+.PHONY: default all release CE TE clean scrub
