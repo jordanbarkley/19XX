@@ -13,7 +13,7 @@ CE_ROM  := $(BUILD_DIR)/$(CE).z64
 ASM_DIRS := src
 ASM_FILES := $(foreach dir,$(ASM_DIRS),$(wildcard $(dir)/*.asm))
 
-# Eventually, this patch should be generated from the input textures
+# Eventually, the texture-patched ROM should be generated from the input textures...
 TEX_DIR := textures
 TEX_PATCH := $(TEX_DIR)/textures.xdelta
 TEXTURED_ROM := $(BUILD_DIR)/textured_temp.z64
@@ -34,6 +34,8 @@ PATCHFLAGS := -f
 TOOLS_DIR := tools
 N64CRC := $(TOOLS_DIR)/n64crc
 
+
+############ Recipes ############
 default: all
 
 all: CE TE
