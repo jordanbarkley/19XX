@@ -7,7 +7,7 @@ n64crc_SOURCES := n64crc.c
 all: $(PROGRAMS)
 
 clean: 
-	$(RM) $(PROGRAMS)
+	$(RM) $(PROGRAMS) *.exe
 
 .PHONY: all clean
 
