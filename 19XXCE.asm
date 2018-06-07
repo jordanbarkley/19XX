@@ -2,7 +2,7 @@
 
 // copy fresh rom
 origin  0x00000000
-insert  "roms/original_textured.z64"
+insert  "roms/original.z64"
 
 // change ROM name
 origin  0x00000020
