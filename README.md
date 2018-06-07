@@ -4,7 +4,7 @@
 (TODO)
 
 ## Authors
-See [AUTHORS.md](https://github.com/jordanbarkley/19XX/blob/master/AUTHROS.md)
+See [AUTHORS.md](https://github.com/jordanbarkley/19XX/blob/master/AUTHORS.md)
 
 ## Building
 See [BUILDING.md](https://github.com/jordanbarkley/19XX/blob/master/BUILDING.md)
