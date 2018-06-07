@@ -2,8 +2,8 @@
 *.z64
 *.log
 
-# Tools
-tools/*
+# Build Directory
+build/
 
 # Windows image file caches
 Thumbs.db
