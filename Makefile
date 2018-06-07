@@ -6,8 +6,8 @@ all:
 	tools/_bass -o roms/$(PROGRAM_NAME)TE.z64 $(PROGRAM_NAME)TE.asm -sym TE.log
 
 	# update checksum
-	tools/n64crc roms/$(PROGRAM_NAME)CE.z64
-	tools/n64crc roms/$(PROGRAM_NAME)TE.z64
+	tools/n64crc roms/$(PROGRAM_NAME)CE.z64 > /dev/null
+	tools/n64crc roms/$(PROGRAM_NAME)TE.z64 > /dev/null
 
 
 build:
