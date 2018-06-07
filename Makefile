@@ -1,12 +1,6 @@
-PROGRAM_NAME=19XX
+PROGRAM_NAME := 19XX
 
 all:
-	# apply texture patch
-	# xdelta3 -d -f -s roms/original.z64 textures/textures.xdelta roms/original_textured.z64
-
-	# temporary
-	cp roms/original.z64 roms/original_textured.z64
-
 	# assemble rom
 	tools/_bass -o roms/$(PROGRAM_NAME)CE.z64 $(PROGRAM_NAME)CE.asm -sym CE.log
 	tools/_bass -o roms/$(PROGRAM_NAME)TE.z64 $(PROGRAM_NAME)TE.asm -sym TE.log
@@ -15,11 +9,6 @@ all:
 	tools/n64crc roms/$(PROGRAM_NAME)CE.z64
 	tools/n64crc roms/$(PROGRAM_NAME)TE.z64
 
-	# remove original_textured
-	rm -rf roms/original_textured.z64
-
-	# show time stamp
-	date
 
 build:
 	# clean
