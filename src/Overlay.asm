@@ -59,10 +59,19 @@ scope Overlay {
         // HOOKS GO HERE
         li      t0, Global.current_screen   // ~
         lb      t0, 0x0000(t0)              // t0 = screen id
+
+        // OPTION screen
         lli     t1, 0x0039                  // t1 = OPTION screen
-        bne     t0, t1, _finish             // if (screen_id != 0x08), skip
+        bne     t0, t1, _sss                // if (screen_id != OPTION), skip
         nop
         jal     Menu.run_
+        nop
+
+        _sss:
+        lli     t1, 0x0015                  // t1 = stage select screen
+        bne     t0, t1, _finish             // if (screen_id != stage_select), skip
+        nop
+        jal     Stages.draw_cursor_
         nop
 
         _finish:

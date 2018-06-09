@@ -2,35 +2,169 @@
 if !{defined __STAGES__} {
 define __STAGES__()
 
+include "Color.asm"
+include "OS.asm"
+include "Overlay.asm"
+
 // @ Descirption
-// This file replaces some stages in favor of more tournament viable stages.
+// This file expands the stage select screen to 18 stages.
+
+// PAGE 1
+// [00] [01] [02] [03] [04]
+// [05] [06] [07] [08] [RR]
+
+// PAGE 2
+// [09] [0A] [0B] [0C] [0D]
+// [0E] [0F] [10] [11] [RR]
+
+// Viable Stage (Most Viable at the Top)
+// 00 - Dream Land
+// 01 - Battlefielld
+// 02 - Pokemon Stadium (Dream Land Beta 1)
+// 03 - Smashville (How to Play)
+// 04 - Final Destination
+
+// Somewhat Viable Stages (Most Viable at the Top)
+// 05 - Hyrule Castle
+// 06 - Peach's Castle
+// 07 - Metal Cavern
+// 08 - Yoshi's Island (Cloudless)
+
+// Alphabetical
+// 09 - Congo Jungle
+// 0A - Dream Land Beta 2
+// 0B - Planet Zebes
+// 0C - Mushroom Kingdom
+// 0D - Saffron City
+// 0E - Sector Z
+// 0F - Yoshi's Island
+// 10 - 
+// 11 - 
 
 include "OS.asm"
 
 scope Stages {
-    //macro Stage(id, preview, type, franchise, name)
 
-    scope getPreview_: {
-    //  OS.pat
-
+    // @ Descirption
+    // Stage ID's. Used in various loading sequences.
+    scope id {
+        constant PEACHS_CASTLE(0x00)
+        constant SECTOR_Z(0x01)
+        constant CONGO_JUNGLE(0x02)
+        constant PLANET_ZEBES(0x03)
+        constant HYRULE_CASTLE(0x04)
+        constant YOSHIS_ISLAND(0x05)
+        constant DREAM_LAND(0x06)
+        constant SAFFRON_CITY(0x07)
+        constant MUSHROOM_KINGDOM(0x08)
+        constant DREAM_LAND_BETA_1(0x09)
+        constant DREAM_LAND_BETA_2(0x0A)
+        constant HOW_TO_PLAY(0x0B)
+        constant YOSHIS_ISLAND_CLOUDLESS(0x0C)
+        constant METAL_CAVERN(0x0D)
+        constant BATTLEFIELD(0x0E)
+        constant RACE_TO_THE_FINISH(0x0F)
+        constant FINAL_DESTINATION(0x10)
     }
 
-    // preview
-    //SSS2
-    //.org    0x14E704                ; @ 80132B94
+    // @ Descirption
+    // type controls a branch that executes code for single player modes when 0x00 or skips that 
+    // entirely for 0x14. This branch can be found at 0x(TODO). (pulled from table @ 0xA7D20)
+    scope type {
+        constant PEACHS_CASTLE(0x14)
+        constant SECTOR_Z(0x14)
+        constant CONGO_JUNGLE(0x14)
+        constant PLANET_ZEBES(0x14)
+        constant HYRULE_CASTLE(0x14)
+        constant YOSHIS_ISLAND(0x14)
+        constant DREAM_LAND(0x14)
+        constant SAFFRON_CITY(0x14)
+        constant MUSHROOM_KINGDOM(0x14)
+        constant DREAM_LAND_BETA_1(0x14)
+        constant DREAM_LAND_BETA_2(0x14)
+        constant HOW_TO_PLAY(0x00)
+        constant YOSHIS_ISLAND_CLOUDLESS(0x14)
+        constant METAL_CAVERN(0x14)
+        constant BATTLEFIELD(0x14)
+        constant RACE_TO_THE_FINISH(0x00)
+        constant FINAL_DESTINATION(0x00)
+    }
 
-    // type (0x00 or 0x14)
-    //SSS3
-    //.org    0x14E71C                ; @ 80132BAC
+    // @ Descirption
+    // File id for each stage (pulled from table @ 0xA7D20)
+    scope file {
+        constant PEACHS_CASTLE(0x0103)
+        constant SECTOR_Z(0x0106)
+        constant CONGO_JUNGLE(0x0105)
+        constant PLANET_ZEBES(0x0101)
+        constant HYRULE_CASTLE(0x0109)
+        constant YOSHIS_ISLAND(0x0107)
+        constant DREAM_LAND(0x00FF)
+        constant SAFFRON_CITY(0x0108)
+        constant MUSHROOM_KINGDOM(0x104)
+        constant DREAM_LAND_BETA_1(0x0100)
+        constant DREAM_LAND_BETA_2(0x0102)
+        constant HOW_TO_PLAY(0x010B)
+        constant YOSHIS_ISLAND_CLOUDLESS(0x010E)
+        constant METAL_CAVERN(0x10D)
+        constant BATTLEFIELD(0x010C)
+        constant RACE_TO_THE_FINISH(0x0127)
+        constant FINAL_DESTINATION(0x010A)
+    }
 
-    // franchise
-    //SSS4
-    //.org    0x14E4C0                ; @ 80132950
+    position_table:
+    // row1
 
-    // stage name
-    //SSS5
-    //.org    0x14E2F8                ; @ 80132788
+    // row2
 
+    // @ Descirption
+    // Draw stage icons to the screen
+    scope draw_icons_: {
+        
+
+        // sorted by stage id
+        image_table:
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+        dw 0x00000000
+    }
+
+    scope get_preview_: {
+        OS.patch_start(0x0014E704, 0x80132B94)
+
+        OS.patch_end()
+    }
+
+    scope get_type_: {
+        OS.patch_start(0x0014E704, 0x80132B94)
+
+        OS.patch_end()
+    }
+
+    scope get_franchise_: {
+        OS.patch_start(0x0014E4C0, 0x80132950)
+
+        OS.patch_end()
+    }
+
+    scope get_name_: {
+        OS.patch_start(0x0014E2F8, 0x80132788)
+
+        OS.patch_end()
+    }
 
     // SSS Start
     // a0 = stage id
@@ -40,7 +174,7 @@ scope Stages {
     // OLD
     // @ Description
     // The following patches modify the stage loading instructions to allow for stage not usually
-    // in versus to be loaded. 
+    // in versus to be loaded.
     // @ TODO
     // Update this...
     OS.patch_start(0x0014F77C, 0x80130D0C)
@@ -95,12 +229,12 @@ scope Stages {
     OS.patch_end()
 
     // @ Description
-    // This 
+    // This
     OS.patch_start(0x001501B4, 0x00000000)
-    dw 0x00000000 
-    dw 0x02000002 
-    dw 0x04000004 
-    dw 0x0D000003 
+    dw 0x00000000
+    dw 0x02000002
+    dw 0x04000004
+    dw 0x0D000003
     dw 0x10000008
     dw 0x0C000005
     dw 0x06000006
@@ -109,8 +243,7 @@ scope Stages {
     OS.patch_end()
 
     // @ Description
-    // This table includes <stage_file_id> and <type> where type controls a branch that
-    // executes code for single player modes when 0x00 or skips that entirely for 0x14.
+    // This table includes <stage_file_id> and <type> where 
     OS.patch_start(0x00150054, 0x00000000)
     dw 0x00000103, 0x00000014
     dw 0x0000010C, 0x00000014
@@ -139,18 +272,16 @@ scope Stages {
     float32 0.5
     OS.patch_end()
 
-    OS.patch_start(0x001503E8, 0x00000000) 
+    OS.patch_start(0x001503E8, 0x00000000)
     float32 0.5
     OS.patch_end()
 
     // @ Description
     // This function fixes a bug that does not allow single player stages to be loaded in training.
-    // SSB typically uses *0x800A50E8 to get the stage id. The stage id is then used to find the bg 
-    // file. This function switches gets a working stage id based on *0x800A50E8 and stores it in 
+    // SSB typically uses *0x800A50E8 to get the stage id. The stage id is then used to find the bg
+    // file. This function switches gets a working stage id based on *0x800A50E8 and stores it in
     // expansion memory. That value is read from in two places
-
     scope training_id_fix_: {
-
         OS.patch_start(0x001145D0, 0x8018DDB0)
         addiu   sp, sp, 0xFFE8              // original line 3
         sw      ra, 0x0014(sp)              // original line 4
@@ -158,14 +289,13 @@ scope Stages {
         nop
         OS.patch_end()
 
-        OS.patch_start(0x0011462C, 0x8018DE0C)        
+        OS.patch_start(0x0011462C, 0x8018DE0C)
         jal     training_id_fix_
         nop
         lui     t5, 0x8019                  // original line 3
         lui     t7, 0x8019                  // original line 4
         lbu     t3, 0x0001(t6)              // original line 5 modified
         OS.patch_end()
-
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -178,7 +308,7 @@ scope Stages {
         li      t1, table                   // t1 = stage id table (offset)
         addu    t1, t1, t0                  // t1 = stage id table + offset
         lbu     t0, 0x0000(t1)              // t0 = new working stage id
-        li      t2, id                      // t2 = id 
+        li      t2, id                      // t2 = id
         sb      t0, 0x0000(t2)              // update stage id to working stage id
 
         lw      t0, 0x0004(sp)              // ~
@@ -194,23 +324,23 @@ scope Stages {
         OS.align(4)
 
         table:
-        db 0x00                              // Peach's Castle
-        db 0x01                              // Sector Z
-        db 0x02                              // Kongo Jungle
-        db 0x03                              // Planet Zebes
-        db 0x04                              // Hyrule Castle
-        db 0x05                              // Yoshi's Island
-        db 0x06                              // Dream Land
-        db 0x07                              // Saffron City
-        db 0x08                              // Mushroom Kingdom
-        db 0x06                              // Dream Land Beta 1
-        db 0x06                              // Dream Land Beta 2
-        db 0x06                              // How to Play
-        db 0x05                              // Yoshi's Island (1P)
-        db 0x01                              // Metal Cavern
-        db 0x01                              // Batlefield
-        db 0xFF                              // Race to the Finish (Placeholder)
-        db 0x01                              // Final Destination
+        db id.PEACHS_CASTLE                 // Peach's Castle
+        db id.SECTOR_Z                      // Sector Z
+        db id.CONGO_JUNGLE                  // Congo Jungle
+        db id.PLANET_ZEBES                  // Planet Zebes
+        db id.HYRULE_CASTLE                 // Hyrule Castle
+        db id.YOSHIS_ISLAND                 // Yoshi's Island
+        db id.DREAM_LAND                    // Dream Land
+        db id.SAFFRON_CITY                  // Saffron City
+        db id.MUSHROOM_KINGDOM              // Mushroom Kingdom
+        db id.DREAM_LAND                    // Dream Land Beta 1
+        db id.DREAM_LAND                    // Dream Land Beta 2
+        db id.DREAM_LAND                    // How to Play
+        db id.YOSHIS_ISLAND                 // Yoshi's Island (1P)
+        db id.SECTOR_Z                      // Metal Cavern
+        db id.SECTOR_Z                      // Batlefield
+        db 0xFF                             // Race to the Finish (Placeholder)
+        db id.SECTOR_Z                      // Final Destination
         OS.align(4)
     }
 }
