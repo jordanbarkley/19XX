@@ -9,7 +9,7 @@ origin  0x00000020
 db  "19XXCE"
 db  0x00
 
-// extended asm
+// static
 origin  0x01000000
 base    0x80380000
 variable start(pc())
@@ -42,7 +42,6 @@ include "src/Timeouts.asm"
 include "src/Training.asm"
 variable end(pc())
 variable size(end - start)
-
 
 if size > 65536 {
     // 0x10000 = 65536
