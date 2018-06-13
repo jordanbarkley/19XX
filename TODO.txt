@@ -1,0 +1,4 @@
+// TODO.txt
+
+1. Change CE/TE to use a define. When __CE__ is defined, include CE specific features.
+2. Change CE.asm to just "define __CE__; include 19XXTE.asm"
