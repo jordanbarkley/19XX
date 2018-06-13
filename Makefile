@@ -1,14 +1,11 @@
-PROGRAM_NAME := 19XX
-
 all:
 	# assemble rom
-	tools/_bass -o roms/$(PROGRAM_NAME)CE.z64 $(PROGRAM_NAME)CE.asm -sym CE.log
-	tools/_bass -o roms/$(PROGRAM_NAME)TE.z64 $(PROGRAM_NAME)TE.asm -sym TE.log
+	tools/_bass -o roms/19XXCE.z64 19XXCE.asm -sym CE.log
+	tools/_bass -o roms/19XXTE.z64 19XXTE.asm -sym TE.log
 
 	# update checksum
-	tools/n64crc roms/$(PROGRAM_NAME)CE.z64 > /dev/null
-	tools/n64crc roms/$(PROGRAM_NAME)TE.z64 > /dev/null
-
+	tools/n64crc roms/19XXCE.z64 > /dev/null
+	tools/n64crc roms/19XXTE.z64 > /dev/null
 
 build:
 	# clean
@@ -27,10 +24,10 @@ scrub:
 
 clean:
 	# remove roms
-	rm -rf roms/$(PROGRAM_NAME)*.z64
+	rm -rf roms/19XX*.z64
 
 	# remove patches
-	rm -rf patches/$(PROGRAM_NAME)*.xdelta
+	rm -rf patches/19XX*.xdelta
 
 	# remove log files
 	rm -rf *.log
@@ -48,5 +45,5 @@ clean:
 
 release:
 	# create patch files
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)CE.z64 patches/$(PROGRAM_NAME)CE.xdelta
-	xdelta3 -e -f -s roms/original.z64 roms/$(PROGRAM_NAME)TE.z64 patches/$(PROGRAM_NAME)TE.xdelta
+	xdelta3 -e -f -s roms/original.z64 roms/19XXCE.z64 patches/19XXCE.xdelta
+	xdelta3 -e -f -s roms/original.z64 roms/19XXTE.z64 patches/19XXTE.xdelta
