@@ -10,6 +10,10 @@ include "Texture.asm"
 
 scope Data {
 
+    pushvar origin
+    pushvar base
+    origin 0x01100000
+
     // SSS Textures
     icon_peachs_castle:
     Texture.info(48, 36)
@@ -74,6 +78,9 @@ scope Data {
     icon_final_destination:
     Texture.info(48, 36)
     insert "../textures/icon_final_destination.rgba5551"
+
+    pullvar base
+    pullvar origin
 }
 
 }
