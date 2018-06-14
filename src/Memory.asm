@@ -69,11 +69,12 @@ scope Memory {
         lli     v0, OS.NULL                 // v0 = ret = OS.NULL
 
         // copy adddress
+        li      t0, info                    // t0 = address of info
 //      move    a0, a0                      // a0 - ROM address | 0x00FFFFFF
         move    a2, a1                      // a2 - nBytes 
-        li      a1, info                    // ~ 
-        lw      a1, 0x0004(a1)              // a1 - RAM vAddress
+        lw      a1, 0x0004(t0)              // a1 - RAM vAddress
         move    v0, a1                      // v0 = ret = RAM address
+        sw      t1, 0x0004(t0)              // increment RAM address for next time
         jal     Global.dma_copy_            // copy contents
         nop
 
