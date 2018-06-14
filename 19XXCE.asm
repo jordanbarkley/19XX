@@ -56,4 +56,5 @@ if size > 65536 {
 }
 
 // extend ROM to 32 MBs
-fill    0x2000000 - origin()
+origin  0x1FFFFFF
+db 0x00
