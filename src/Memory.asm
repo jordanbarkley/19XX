@@ -30,17 +30,17 @@ scope Memory {
     // @ Description
     // Resets Info.curr to START
     scope reset_: {
-        addiu   sp, sp,-0x0008              // allocate stack space
-        sw      t0, 0x0000(sp)              // save t0
-        sw      t1, 0x0004(sp)              // save t1
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // save t0
+        sw      t1, 0x0008(sp)              // save t1
 
         li      t0, info                    // t0 = address of info struct
         li      t1, START                   // ~
         sw      t1, 0x0004(t0)              // current = start
 
-        lw      t0, 0x0000(sp)              // save t0
-        lw      t1, 0x0004(sp)              // save t1
-        addiu   sp, sp, 0x0008              // deallocate stack space
+        lw      t0, 0x0004(sp)              // save t0
+        lw      t1, 0x0008(sp)              // save t1
+        addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // restore
         nop
     }
@@ -53,11 +53,12 @@ scope Memory {
     // @ Returns
     // v0 - address or OS.NULL if there is not enough space
     scope allococate_rom_: {
-        addiu   sp, sp,-0x0010              // allocate stack space
-        sw      t0, 0x0000(sp)              // save t0
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      t0, 0x0014(sp)              // save t0
         sw      t1, 0x0004(sp)              // save t1
         sw      at, 0x0008(sp)              // save at
         sw      ra, 0x000C(sp)              // save ra
+//      sw      v0, 0x0010(sp)              // reserved for v0
 
         // check if there is enough space for the allocation
         li      t0, info                    // ~
@@ -74,16 +75,19 @@ scope Memory {
         move    a2, a1                      // a2 - nBytes 
         lw      a1, 0x0004(t0)              // a1 - RAM vAddress
         move    v0, a1                      // v0 = ret = RAM address
+        sw      v0, 0x0010(sp)              // save v0
         sw      t1, 0x0004(t0)              // increment RAM address for next time
         jal     Global.dma_copy_            // copy contents
         nop
+        lw      v0, 0x0010(sp)              // restore v0
 
         _return:
-        lw      t0, 0x0000(sp)              // restore t0
+        lw      t0, 0x0014(sp)              // restore t0
         lw      t1, 0x0004(sp)              // restore t1
         lw      at, 0x0008(sp)              // restore at
         lw      ra, 0x000C(sp)              // restore ra
-        addiu   sp, sp, 0x0010              // deallocate stack space
+//      lw      v0, 0x0010(sp)              // reserved for v0
+        addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra                          // return
         nop
     }
