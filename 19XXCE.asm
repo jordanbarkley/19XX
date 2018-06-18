@@ -52,7 +52,7 @@ if size > 65536 {
 } else {
     print "RAM space used: "
     print size
-    print "\n"
+    print "/65536\n"
 }
 
 // extend ROM to 32 MBs
