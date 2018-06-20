@@ -71,6 +71,8 @@ scope Overlay {
         lli     t1, 0x0015                  // t1 = stage select screen
         bne     t0, t1, _finish             // if (screen_id != stage_select), skip
         nop
+        jal     Stages.draw_cursor_         //
+        nop
         jal     Stages.draw_icons_
         nop
 

@@ -112,35 +112,63 @@ scope Stages {
     constant ICON_WIDTH(48)
     constant ICON_HEIGHT(36)
     constant NUM_ICONS(16)
+    constant NUM_ROWS(3)
+    constant NUM_COLUMNS(6)
+
+    row:
+    dw 0
+
+    column:
+    dw 0
+
+    // @ Descirption
+    // Stage IDs in order
+    // Viable Stage (Most Viable at the Top)
+    db id.DREAM_LAND                        // 00
+    db id.BATTLEFIELD                       // 01
+    db id.DREAM_LAND_BETA_1                 // 02
+    db id.HOW_TO_PLAY                       // 03
+    db id.FINAL_DESTINATION                 // 04
+    db id.DREAM_LAND_BETA_2                 // 05
+    db id.PEACHS_CASTLE                     // 06
+    db id.CONGO_JUNGLE                      // 07
+    db id.METAL_CAVERN                      // 08
+    db id.HYRULE_CASTLE                     // 09
+    db id.YOSHIS_ISLAND_CLOUDLESS           // 0A
+    db id.SAFFRON_CITY                      // 0B
+    db id.PLANET_ZEBES                      // 0C
+    db id.MUSHROOM_KINGDOM                  // 0D
+    db id.SECTOR_Z                          // 0E
+    db id.YOSHIS_ISLAND                     // 0F
+    OS.align(4)
 
     // @ Descirption
     // Coordinates of stage icons in vanilla Super Smash Bros.
     position_table:
     // row 0
-    dw 013, 117
-    dw 062, 117
-    dw 111, 117
-    dw 161, 117
-    dw 210, 117
-    dw 259, 117
+    dw 013, 117                             // 00
+    dw 062, 117                             // 01
+    dw 111, 117                             // 02
+    dw 161, 117                             // 03
+    dw 210, 117                             // 04
+    dw 259, 117                             // 05
 
     // row 1
-    dw 013, 154
-    dw 062, 154
-    dw 111, 154
-    dw 161, 154
-    dw 210, 154
-    dw 259, 154
+    dw 013, 154                             // 06
+    dw 062, 154                             // 07
+    dw 111, 154                             // 08
+    dw 161, 154                             // 09
+    dw 210, 154                             // 0A
+    dw 259, 154                             // 0B
 
     // row 2
-    // dw 013, 191
-    dw 062, 191
-    dw 111, 191
-    dw 161, 191
-    dw 210, 191
-    // dw 259, 191
-
-
+    dw 013, 191                             // RR
+    dw 062, 191                             // 0C
+    dw 111, 191                             // 0D
+    dw 161, 191                             // 0E
+    dw 210, 191                             // 0F
+    dw 259, 191                             // RR
+    
     // sorted by stage id
     icon_table:
     dw OS.NULL                              // 0x0000 - Peach's Castle
@@ -160,6 +188,66 @@ scope Stages {
     dw OS.NULL                              // 0x0038 - Battlefield
     dw OS.NULL                              // 0x003C - Race to the Finish (Placeholder)
     dw OS.NULL                              // 0x0040 - Final Deestination
+
+    // @ Descirption
+    // Disables the function that draw the preview model
+    OS.patch_start(0x0014EF24, 0x801333B4)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Prevents series logo from being drawn on wood circle
+    OS.patch_start(0x0014E418, 0x801328A8)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Prevents stage name text from being drawn.
+    OS.patch_start(0x0014E2A8, 0x80132738)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Prevents "Stage Select" texture from being drawn.
+    OS.patch_start(0x0014DDF8, 0x80132288)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Prevents the wooden circle from being drawn.
+    OS.patch_start(0x0014DBB8, 0x80132048)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Disable cursor texture
+    OS.patch_start(0x0014E64C, 0x80132ADC)
+    jr      ra
+    nop
+    OS.patch_end()
+
+    // @ Description
+    // Prevents the drawing of defaults icons and allocates our own instead
+    OS.patch_start(0x0014E098, 0x80132528)
+    addiu   sp, sp,-0x0008                  // allocate stack space
+    sw      ra, 0x0004(sp)                  // save ra
+
+    jal     Memory.reset_                   // reset memory
+    nop
+
+    jal     allocate_icons_
+    nop
+
+    lw      ra, 0x0004(sp)                  // restore ra
+    addiu   sp, sp, 0x0008                  // deallocate stack sapce
+    jr      ra                              // return
+    nop
+    OS.patch_end()
 
     // @ Descirption
     // Puts stage icons into RAM
@@ -291,24 +379,6 @@ scope Stages {
         nop
     }
 
-    // @ Description
-    // Prevents the drawing of defaults icons and allocates our own instead
-    OS.patch_start(0x0014E098, 0x80132528)
-    addiu   sp, sp,-0x0008                  // allocate stack space
-    sw      ra, 0x0004(sp)                  // save ra
-
-    jal     Memory.reset_                   // reset memory
-    nop
-
-    jal     allocate_icons_
-    nop
-
-    lw      ra, 0x0004(sp)                  // restore ra
-    addiu   sp, sp, 0x0008                  // deallocate stack sapce
-    jr      ra                              // return
-    nop
-    OS.patch_end()
-
     // @ Descirption
     // Draw stage icons to the screen
     scope draw_icons_: {
@@ -318,7 +388,6 @@ scope Stages {
         sw      t2, 0x000C(sp)              // ~
         sw      ra, 0x0010(sp)              // ~
         sw      at, 0x0014(sp)              // save registers
-
 
         _setup:
         lli     at, NUM_ICONS               // at = number of icons to draw
@@ -358,41 +427,98 @@ scope Stages {
     }
 
     // @ Descirption
-    // Disables the function that draw the preview model
-    scope disable_model_: {
-        OS.patch_start(0x0014EF24, 0x801333B4)
-        jr      ra                          // return immediately
-        nop
+    // This replaces the previous the original draw cursor function. The new function draws based on
+    // the Stages.row and Stages.column variables as well as the position_table. It also replaces
+    // the cursor itself with a filled rectangle
+    scope draw_cursor_: {
+        OS.patch_start(0x0014E5C8, 0x80132A58)
+        //j       draw_cursor_
+        //nop
         OS.patch_end()
+
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      ra, 0x0008(sp)              // save registesr
+
+        jal     get_index_                  // v0 = index
+        nop
+        sll     v0, v0, 0x0003              // v0 = index *= sizeof(position_table entry) = offset
+        li      t0, position_table          // ~
+        addu    t0, t0, v0                  // t0 = position_table + offset
+
+        lli     a0, Color.low.RED           // ~
+        jal     Overlay.set_color_          // fill color = RED
+        nop
+
+        lw      a0, 0x0000(t0)              // a0 - ulx
+        addiu   a0, a0,-0x0001              // decrement ulx
+        lw      a1, 0x0004(t0)              // a1 - uly
+        addiu   a1, a1,-0x0001              // decrement uly
+        lli     a2, ICON_WIDTH + 2          // a2 - width
+        lli     a3, ICON_HEIGHT + 2         // a3 - height
+        jal     Overlay.draw_rectangle_     // draw curso
+        nop
+
+        lw      t0, 0x0004(sp)              // ~
+        lw      ra, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack sapce
+        jr      ra                          // return
+        nop
     }
 
-    // @ Descirption
-    // Prevents series logo from being drawn on wood circle
-    OS.patch_start(0x0014E418, 0x801328A8)
-    jr      ra                          // return immediately
-    nop
-    OS.patch_end()
 
     // @ Descirption
-    // Prevents stage name text from being drawn.
-    OS.patch_start(0x0014E2A8, 0x80132738)
-    jr      ra                          // return immediately
-    nop
-    OS.patch_end()
+    // Returns an index based on column and row
+    // @ Returns
+    // v0 - index
+    scope get_index_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      t2, 0x000C(sp)              // save registers
 
-    // @ Descirption
-    // Prevents "Stage Select" texture from being drawn.
-    OS.patch_start(0x0014DDF8, 0x80132288)
-    jr      ra                          // return immediately
-    nop
-    OS.patch_end()
+        li      t0, row                     // ~
+        lw      t0, 0x0000(t0)              // t0 = row
+        li      t1, column                  // ~
+        lw      t1, 0x0000(t1)              // t1 = column
+        lli     t2, NUM_COLUMNS             // t2 = NUM_COLUMNS
+        multu   t0, t2                      // ~
+        mflo    v0                          // v0 = row * NUM_COLUMNS
+        addu    v0, v0, t1                  // v0 = row * NUM_COLUMNS + column
 
-    // @ Descirption
-    // Prevents the wooden circle from being drawn.
-    OS.patch_start(0x0014DBB8, 0x80132048)
-    jr      ra                          // return immediately
-    nop
-    OS.patch_end()
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      t2, 0x000C(sp)              // restre registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra
+        nop
+    }
+
+    scope run_: {
+        
+    }
+
+
+    // 0x2148(a0) - (float) x position
+    // 0x214C(a0) - (float) y position
+
+    // cursor position
+    // .org    0x14E5C8                ; @ 80132A58
+
+    // right
+    // .org    0x14Fd84                ; @ 80134214
+
+    // left
+    // .org    0x14FC80                ; @ 80134110
+
+    // up
+    // .org    0x14FAD0                ; @ 80133F60
+
+    // down
+    // .org    0x14FBA4                ; @ 80134034
+
+
+
 
 
     scope get_name_: {
