@@ -432,8 +432,7 @@ scope Stages {
     // the cursor itself with a filled rectangle
     scope draw_cursor_: {
         OS.patch_start(0x0014E5C8, 0x80132A58)
-        //j       draw_cursor_
-        //nop
+        // not used, for documentation only
         OS.patch_end()
 
         addiu   sp, sp,-0x0010              // allocate stack space
@@ -494,32 +493,190 @@ scope Stages {
         nop
     }
 
+    // @ Descirption
+    // This is what Overlay.HOOKS_GO_HERE_ calls. It is the main() of Stages.asm
     scope run_: {
-        
+        addiu   sp, sp,-0x0008              // allocate stack space
+        sw      ra, 0x0004(sp)              // save ra
+
+        jal     draw_cursor_                // draw selection cursor
+        nop
+
+        jal     draw_icons_                 // draw stage icons
+        nop
+
+        lw      ra, 0x0004(sp)              // restore ra
+        addiu   sp, sp, 0x0008              // deallocate stack space
+        jr      ra
+        nop
     }
 
+    // @ Descirption
+    // The following update_<direction>_ functions update Stages.row/Stages.column. Thee functions
+    // use in game hooks (play_sound_ is conserved).
+    scope update_right_: {
+        OS.patch_start(0x0014FD78, 0x80134208)
+        j       update_right_
+        nop
+        _update_right_return:
+        OS.patch_end()
 
-    // 0x2148(a0) - (float) x position
-    // 0x214C(a0) - (float) y position
+        lui     a1, 0x8013                  // original line 1
+        addiu   a1, a1, 0x4BD8              // original line 2
 
-    // cursor position
-    // .org    0x14E5C8                ; @ 80132A58
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
 
-    // right
-    // .org    0x14Fd84                ; @ 80134214
+        // check bounds
+        li      t0, column                  // ~
+        lw      t1, 0x0000(t0)              // t1 = column
+        slti    at, t1, NUM_COLUMNS - 1     // if (column < NUM_COLUMNS - 1)
+        bnez    at, _normal                 // then go to next colum
+        nop
 
-    // left
-    // .org    0x14FC80                ; @ 80134110
+        // update cursor (go to first column)
+        sw      r0, 0x0000(t0)              // else go to first column
+        b       _end                        // skip to end
+        nop
 
-    // up
-    // .org    0x14FAD0                ; @ 80133F60
+        // update cursor (go right one)
+        _normal:
+        addi    t1, t1, 0x0001              // t1 = column++
+        sw      t1, 0x0000(t0)              // update column
 
-    // down
-    // .org    0x14FBA4                ; @ 80134034
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack sapce
+        j       _update_right_return        // return
+        nop
+    }
 
+    scope update_left_: {
+        OS.patch_start(0x0014FC74, 0x80134104)
+        j       update_left_
+        nop
+        _update_left_return:
+        OS.patch_end()
 
+        lui     a1, 0x8013                  // original line 1
+        addiu   a1, a1, 0x4BD8              // original line 2
 
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
 
+        // check bounds
+        li      t0, column                  // ~
+        lw      t1, 0x0000(t0)              // t1 = column
+        bnez    t1, _normal                 // if (!first_column)
+        nop
+
+        // update cursor (go to last column)
+        lli     t1, NUM_COLUMNS - 1         // ~
+        sw      t1, 0x0000(t0)              // else go to last column
+        b       _end                        // skip to end
+        nop
+
+        // update cursor (go left one)
+        _normal:
+        addi    t1, t1,-0x0001              // t1 = column--
+        sw      t1, 0x0000(t0)              // update column
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack sapce
+        j       _update_left_return         // return
+        nop
+    }
+
+    scope update_down_: {
+        OS.patch_start(0x0014FBA4, 0x80134034)
+        j       update_down_
+        nop
+        _update_down_return:
+        OS.patch_end()
+
+        lui     v1, 0x8013                  // original line 1
+        lw      v1, 0x4BD8(v1)              // original line 2
+
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        // check bounds
+        li      t0, row                     // ~
+        lw      t1, 0x0000(t0)              // t1 = row
+        slti    at, t1, NUM_ROWS - 1        // if (row < NUM_ROWS - 1)
+        bnez    at, _normal                 // then go to next colum
+        nop
+
+        // update cursor (go to first row)
+        sw      r0, 0x0000(t0)              // else go to first column
+        b       _end                        // skip to end
+        nop
+
+        // update cursor (go down one)
+        _normal:
+        addi    t1, t1, 0x0001              // t1 = row++
+        sw      t1, 0x0000(t0)              // update row
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack sapce
+        j       _update_down_return         // return
+        nop
+    }
+
+    scope update_up_: {
+        OS.patch_start(0x0014FAD0, 0x80133F60)
+        j       update_up_
+        nop
+        _update_up_return:
+        OS.patch_end()
+
+        lui     v1, 0x8013                  // original line 1
+        lw      v1, 0x4BD8(v1)              // original line 2
+
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        // check bounds
+        li      t0, row                     // ~
+        lw      t1, 0x0000(t0)              // t1 = row
+        bnez    t1, _normal                 // if (!first_row)
+        nop
+
+        // update cursor (go to last row)
+        lli     t1, NUM_ROWS - 1            // ~
+        sw      t1, 0x0000(t0)              // else go to last row
+        b       _end                        // skip to end
+        nop
+
+        // update cursor (go up one)
+        _normal:
+        addi    t1, t1,-0x0001              // t1 = row--
+        sw      t1, 0x0000(t0)              // update row
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack sapce
+        j       _update_up_return           // return
+        nop
+    }
 
     scope get_name_: {
         OS.patch_start(0x0014E2F8, 0x80132788)
