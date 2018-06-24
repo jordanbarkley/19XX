@@ -62,6 +62,7 @@ scope Stages {
         constant BATTLEFIELD(0x0E)
         constant RACE_TO_THE_FINISH(0x0F)
         constant FINAL_DESTINATION(0x10)
+        constant RANDOM(0xDE)
     }
 
     // @ Descirption
@@ -111,10 +112,11 @@ scope Stages {
 
     constant ICON_WIDTH(48)
     constant ICON_HEIGHT(36)
-    constant NUM_ICONS(16)                  // not including RANDOM
+    constant NUM_ICONS(18)
     constant NUM_ROWS(3)
     constant NUM_COLUMNS(6)
-    constant LEFT_RANDOM_INDEX(12)             // used for skipping an icon to draw
+    constant LEFT_RANDOM_INDEX(12)
+    constant RIGHT_RANDOM_INDEX(17)
 
     row:
     dw 0
@@ -138,10 +140,12 @@ scope Stages {
     db id.HYRULE_CASTLE                     // 09
     db id.YOSHIS_ISLAND_CLOUDLESS           // 0A
     db id.SAFFRON_CITY                      // 0B
+    db id.RANDOM                            // RR
     db id.PLANET_ZEBES                      // 0C
     db id.MUSHROOM_KINGDOM                  // 0D
     db id.SECTOR_Z                          // 0E
     db id.YOSHIS_ISLAND                     // 0F
+    db id.RANDOM                            // RR
     OS.align(4)
 
     // @ Descirption
@@ -190,6 +194,9 @@ scope Stages {
     dw OS.NULL                              // 0x0038 - Battlefield
     dw OS.NULL                              // 0x003C - Race to the Finish (Placeholder)
     dw OS.NULL                              // 0x0040 - Final Deestination
+
+    icon_random:
+    dw OS.NULL
 
     // @ Descirption
     // Disables the function that draw the preview model
@@ -262,56 +269,56 @@ scope Stages {
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_peachs_castle // a2 - ROM
+        li      a2, Data.icon_peachs_castle // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0000(t0)              // store icon address
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_sector_z      // a0 - texture struct
+        li      a2, Data.icon_sector_z      // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0004(t0)              // store icon address
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_congo_jungle  // a0 - texture struct
+        li      a2, Data.icon_congo_jungle  // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0008(t0)              // store icon address
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_planet_zebes  // a0 - texture struct
+        li      a2, Data.icon_planet_zebes  // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x000C(t0)              // store icon address
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_hyrule_castle // a0 - texture struct
+        li      a2, Data.icon_hyrule_castle // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0010(t0)              // store icon address
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_yoshis_island // a0 - texture struct
+        li      a2, Data.icon_yoshis_island // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0014(t0)              // store icon address
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_dream_land    // a0 - texture struct
+        li      a2, Data.icon_dream_land    // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0018(t0)              // store icon address
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_saffron_city  // a0 - texture struct
+        li      a2, Data.icon_saffron_city  // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x001C(t0)              // store icon address
@@ -339,7 +346,7 @@ scope Stages {
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_how_to_play   // a0 - texture struct
+        li      a2, Data.icon_how_to_play   // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x002C(t0)              // store icon address
@@ -353,7 +360,7 @@ scope Stages {
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_metal_cavern  // a0 - texture struct
+        li      a2, Data.icon_metal_cavern  // a2 - ROM address
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0034(t0)              // store icon address
@@ -365,7 +372,7 @@ scope Stages {
         nop
         sw      v0, 0x0038(t0)              // store icon address
 
-        // Race to the Finish Not Included
+        // Race to the Finish not included
 
         lli     a0, ICON_WIDTH              // a0 - width
         lli     a1, ICON_HEIGHT             // a1 - height
@@ -373,6 +380,14 @@ scope Stages {
         jal     Texture.allocate_           // put icon into RAM
         nop
         sw      v0, 0x0040(t0)              // store icon address
+
+        lli     a0, ICON_WIDTH              // a0 - width
+        lli     a1, ICON_HEIGHT             // a1 - height
+        li      a2, Data.icon_random        // a2 - ROM address
+        jal     Texture.allocate_           // put icon into RAM
+        nop
+        li      t0, icon_random             // ~
+        sw      v0, 0x0000(t0)              // store icon address
 
         lw      t0, 0x0008(sp)              // restore t0
         lw      ra, 0x0004(sp)              // restore ra
@@ -402,25 +417,32 @@ scope Stages {
 
         _draw_icon:
         sltiu   at, t2, NUM_ICONS           // ~
-        beqz    at, _end                    // check to stop drawing
+        beqz    at, _draw_random            // check to stop drawing stage icons
         nop
         lw      a0, 0x0000(t1)              // a0 - ulx
         lw      a1, 0x0004(t1)              // a1 - uly
-        addu    t4, t3, t2                  // t4 = stage_table[index]
+        addu    t4, t3, t2                  // t4 = address of stage_table[index]
         lbu     t4, 0x0000(t4)              // t4 = stage_id
+
+        // this intereupts flow to check for random
+        lli     at, id.RANDOM               // at = id.RANDOM
+        bne     t4, at, _not_random         // if (stage_id != id.RANDOM), skip
+        nop
+        li      t4, icon_random             // ~
+        lw      t4, 0x0000(t4)              // t4 = icon_random image address
+        b       _continue
+        nop
+
+        _not_random:
         sll     t4, t4, 0x0002              // t4 = stage_id * 4 (aka stage_id * sizeof(void *))
         addu    t4, t0, t4                  // t4 = address of icon_table + offset
         lw      t4, 0x0000(t4)              // t4 = address of image data
+
+        _continue:
         li      a2, info                    // a2 - address of texture struct
         sw      t4, 0x00008(a2)             // update info image data
         jal     Overlay.draw_texture_       // draw icon
         nop
-
-        lli     at, LEFT_RANDOM_INDEX - 1   // at = cursor_id of left random
-        bne     t2, at, _increment          // check for left random
-        nop
-        addiu   t1, t1, 0x0008              // increment position_table 2x on this loop
-
 
         _increment:
         addiu   t1, t1, 0x0008              // increment position_table
@@ -428,7 +450,20 @@ scope Stages {
         b       _draw_icon                  // draw next icon
         nop
 
-
+        _draw_random:
+        // left
+        li      t0, position_table          // t0 = address of position_table
+        lli     t1, LEFT_RANDOM_INDEX       // ~
+        sll     t1, t1, 0x0003              // t1 = offset of left random position
+        addu    t2, t0, t1                  // t2 = address of position_table[offset]
+        lw      a0, 0x0000(t2)              // a0 - ulx
+        lw      a1, 0x0004(t2)              // a1 - uly
+        li      t3, icon_random             // ~
+        lw      t3, 0x0000(t3)              // t3 = address of icon_random image data
+        li      a2, info                    // a2 - address of texture struct
+        sw      t3, 0x00008(a2)             // update info image data
+        jal     Overlay.draw_texture_
+        nop
 
         _end:
         lw      t0, 0x0004(sp)              // ~
@@ -718,17 +753,9 @@ scope Stages {
         jal     get_index_                  // v0 = index
         nop
 
-        // RANODM check
-        sltiu   at, v0, LEFT_RANDOM_INDEX   // if (index >= left)
-        bnez    at, _skip                   // then continue, else skip
-        nop
-        addiu   v0, v0,-0x0001              // decrement get_index_ ret
-
-        _skip:
         li      t0, stage_table             // t0 = address of stage table
         addu    t0, t0, v0                  // t0 = address of stage table + offset
         lbu     v0, 0x0000(t0)              // v0 = ret = stage_id
-
 
         lw      t0, 0x0004(sp)              // ~
         lw      ra, 0x0008(sp)              // ~

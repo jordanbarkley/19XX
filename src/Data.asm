@@ -30,7 +30,7 @@ scope Data {
     insert icon_metal_cavern, "../textures/icon_metal_cavern.rgba5551"
     insert icon_battlefield, "../textures/icon_battlefield.rgba5551"
     insert icon_final_destination, "../textures/icon_final_destination.rgba5551"
-
+    insert icon_random, "../textures/icon_random.rgba5551"
     pullvar base
     pullvar origin
 }
