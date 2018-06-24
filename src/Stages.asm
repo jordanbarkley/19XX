@@ -124,6 +124,7 @@ scope Stages {
     // @ Descirption
     // Stage IDs in order
     // Viable Stage (Most Viable at the Top)
+    stage_table:
     db id.DREAM_LAND                        // 00
     db id.BATTLEFIELD                       // 01
     db id.DREAM_LAND_BETA_1                 // 02
@@ -527,7 +528,7 @@ scope Stages {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      at, 0x000C(sp)              // save registers
 
         // check bounds
         li      t0, column                  // ~
@@ -549,7 +550,7 @@ scope Stages {
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
+        lw      at, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack sapce
         j       _update_right_return        // return
         nop
@@ -568,7 +569,7 @@ scope Stages {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      at, 0x000C(sp)              // save registers
 
         // check bounds
         li      t0, column                  // ~
@@ -590,7 +591,7 @@ scope Stages {
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
+        lw      at, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack sapce
         j       _update_left_return         // return
         nop
@@ -675,6 +676,36 @@ scope Stages {
         lw      ra, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack sapce
         j       _update_up_return           // return
+        nop
+    }
+
+    // @ Descirption
+    // This function replaces the logic to convert the default cursor_id to a stage_id.
+    // @ Returns
+    // v0 - stage_id
+    scope swap_stage_: {
+        OS.patch_start(0x0014F774, 0x80133C04)
+//      jal     0x80132430                  // original line 1
+//      nop                                 // original line 2
+        jal     swap_stage_
+        nop
+        OS.patch_end()
+
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      ra, 0x0008(sp)              // save registers
+
+        jal     get_index_                  // v0 = index
+        nop
+        li      t0, stage_table             // t0 = address of stage table
+        addu    t0, t0, v0                  // t0 = address of stage table + offset
+        lbu     v0, 0x0000(t0)              // v0 = ret = stage_id
+
+
+        lw      t0, 0x0004(sp)              // ~
+        lw      ra, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
         nop
     }
 
