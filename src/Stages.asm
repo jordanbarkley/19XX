@@ -111,7 +111,7 @@ scope Stages {
 
     constant ICON_WIDTH(48)
     constant ICON_HEIGHT(36)
-    constant NUM_ICONS(16)
+    constant NUM_ICONS(16)                  // not including RANDOM
     constant NUM_ROWS(3)
     constant NUM_COLUMNS(6)
 
@@ -383,33 +383,41 @@ scope Stages {
     // @ Descirption
     // Draw stage icons to the screen
     scope draw_icons_: {
-        addiu   sp, sp,-0x0018              // allocate stack space
+        addiu   sp, sp,-0x0020              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
         sw      t2, 0x000C(sp)              // ~
-        sw      ra, 0x0010(sp)              // ~
-        sw      at, 0x0014(sp)              // save registers
+        sw      t3, 0x0010(sp)              // ~
+        sw      t4, 0x0014(sp)              // ~
+        sw      ra, 0x0018(sp)              // ~
+        sw      at, 0x001C(sp)              // save registers
 
         _setup:
         lli     at, NUM_ICONS               // at = number of icons to draw
         li      t0, icon_table              // t0 = address of icon_table
         li      t1, position_table          // t1 = address of position_table
+        lli     t2, 0x0000                  // t2 = index
+        li      t3, stage_table             // t3 = address of stage_table
 
         _draw_icon:
+        sltiu   at, t2, NUM_ICONS           // ~
         beqz    at, _end                    // check to stop drawing
         nop
         lw      a0, 0x0000(t1)              // a0 - ulx
         lw      a1, 0x0004(t1)              // a1 - uly
-        lw      t2, 0x0000(t0)              // t2 = image data
+        addu    t4, t3, t2                  // t4 = stage_table[index]
+        lbu     t4, 0x0000(t4)              // t4 = stage_id
+        sll     t4, t4, 0x0002              // t4 = stage_id * 4 (aka stage_id * sizeof(void *))
+        addu    t4, t0, t4                  // t4 = address of icon_table + offset
+        lw      t4, 0x0000(t4)              // t4 = address of image data
         li      a2, info                    // a2 - address of texture struct
-        sw      t2, 0x00008(a2)             // update info image data
+        sw      t4, 0x00008(a2)             // update info image data
         jal     Overlay.draw_texture_       // draw icon
         nop
 
         _increment:
-        addiu   t0, t0, 0x0004              // increment icon table
         addiu   t1, t1, 0x0008              // increment position_table
-        addiu   at, at,-0x0001              // decrement number of icons to draw
+        addiu   t2, t2, 0x0001              // increment index
         b       _draw_icon                  // draw next icon
         nop
 
@@ -417,9 +425,11 @@ scope Stages {
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
         lw      t2, 0x000C(sp)              // ~
-        lw      ra, 0x0010(sp)              // ~
-        lw      at, 0x0014(sp)              // restore registers
-        addiu   sp, sp, 0x0018              // deallocate stack space
+        lw      t3, 0x0010(sp)              // ~
+        lw      t4, 0x0014(sp)              // ~
+        lw      ra, 0x0018(sp)              // ~
+        lw      at, 0x001C(sp)              // restore registers
+        addiu   sp, sp, 0x0020              // deallocate stack space
         jr      ra                          // return
         nop
 
