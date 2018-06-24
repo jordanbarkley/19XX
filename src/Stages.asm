@@ -114,6 +114,7 @@ scope Stages {
     constant NUM_ICONS(16)                  // not including RANDOM
     constant NUM_ROWS(3)
     constant NUM_COLUMNS(6)
+    constant LEFT_RANDOM_INDEX(12)             // used for skipping an icon to draw
 
     row:
     dw 0
@@ -415,11 +416,19 @@ scope Stages {
         jal     Overlay.draw_texture_       // draw icon
         nop
 
+        lli     at, LEFT_RANDOM_INDEX - 1   // at = cursor_id of left random
+        bne     t2, at, _increment          // check for left random
+        nop
+        addiu   t1, t1, 0x0008              // increment position_table 2x on this loop
+
+
         _increment:
         addiu   t1, t1, 0x0008              // increment position_table
         addiu   t2, t2, 0x0001              // increment index
         b       _draw_icon                  // draw next icon
         nop
+
+
 
         _end:
         lw      t0, 0x0004(sp)              // ~
@@ -703,17 +712,27 @@ scope Stages {
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
-        sw      ra, 0x0008(sp)              // save registers
+        sw      ra, 0x0008(sp)              // ~
+        sw      at, 0x000C(sp)              // save registers
 
         jal     get_index_                  // v0 = index
         nop
+
+        // RANODM check
+        sltiu   at, v0, LEFT_RANDOM_INDEX   // if (index >= left)
+        bnez    at, _skip                   // then continue, else skip
+        nop
+        addiu   v0, v0,-0x0001              // decrement get_index_ ret
+
+        _skip:
         li      t0, stage_table             // t0 = address of stage table
         addu    t0, t0, v0                  // t0 = address of stage table + offset
         lbu     v0, 0x0000(t0)              // v0 = ret = stage_id
 
 
         lw      t0, 0x0004(sp)              // ~
-        lw      ra, 0x0008(sp)              // restore registers
+        lw      ra, 0x0008(sp)              // ~
+        lw      at, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // return
         nop
