@@ -199,18 +199,23 @@ scope Stages {
     dw OS.NULL
 
     // @ Descirption
+    // Modiefies the X/Y position of the models on the stage select screen.
+    OS.patch_start(0x0014F514, 0x801339A4)
+//  lwc1    f16,0x0000(v0)                  // original line 1 (f16 = (float) x)
+//  swc1    f16,0x0048(a0)                  // original line 2
+//  lwc1    f18,0x0004(v0)                  // original line 3 (f18 = (float) y)
+//  swc1    f18,0x004C(a0)                  // original line 4
+    sw      r0, 0x0048(a0)                  // x = 0
+    lui     t8, 0xC480                      // t8 = (float) -512
+    sw      t8, 0x004C(a0)                  // y = -512
+    nop
+    OS.patch_end()
+
+    // @ Descirption
     // Disables the function that draw the preview model
     OS.patch_start(0x0014EF24, 0x801333B4)
     // jr      ra                              // return immediately
     // nop
-    OS.patch_end()
-
-    // @ Descirption
-    // (part of preview model function)
-    // idk what this function usually does but removing it allows icons and previews to be draw
-    OS.patch_start(0x0014EFBC, 0x8013344C)
-//  jal     0x801331AC                      // original line
-    nop                                     // don't take that jump
     OS.patch_end()
 
     // @ Descirption
