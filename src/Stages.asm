@@ -5,7 +5,6 @@ define __STAGES__()
 // @ Descirption
 // This file expands the stage select screen to 16 stages.
 
-
 // Example
 // [00] [01] [02] [03] [04] [05]
 // [06] [07] [08] [09] [0A] [0B]
@@ -35,6 +34,7 @@ define __STAGES__()
 
 include "Color.asm"
 include "Data.asm"
+include "Global.asm"
 include "Memory.asm"
 include "OS.asm"
 include "Overlay.asm"
@@ -62,7 +62,7 @@ scope Stages {
         constant BATTLEFIELD(0x0E)
         constant RACE_TO_THE_FINISH(0x0F)
         constant FINAL_DESTINATION(0x10)
-        constant RANDOM(0xDE)
+        constant RANDOM(0xDE)               // not an actual id, arbitary number used by Sakurai
     }
 
     // @ Descirption
@@ -112,9 +112,9 @@ scope Stages {
 
     constant ICON_WIDTH(48)
     constant ICON_HEIGHT(36)
-    constant NUM_ICONS(18)
     constant NUM_ROWS(3)
     constant NUM_COLUMNS(6)
+    constant NUM_ICONS(NUM_ROWS * NUM_COLUMNS)
     constant LEFT_RANDOM_INDEX(12)
     constant RIGHT_RANDOM_INDEX(17)
 
@@ -586,12 +586,15 @@ scope Stages {
 
     // @ Descirption
     // The following update_<direction>_ functions update Stages.row/Stages.column. Thee functions
-    // use in game hooks (play_sound_ is conserved).
+    // use in game hooks (play_sound_ is conserved). The original cursor_id is set to 1 when
+    // going left or right to avoid bugs with RANDOM.
     scope update_right_: {
         OS.patch_start(0x0014FD78, 0x80134208)
         j       update_right_
         nop
         _update_right_return:
+//      lw      v1, 0x0000(a1)              // original line 3
+        lli     v1, 0x0001                  // v1 = spoofed cursor id
         OS.patch_end()
 
         lui     a1, 0x8013                  // original line 1
@@ -633,6 +636,8 @@ scope Stages {
         j       update_left_
         nop
         _update_left_return:
+//      lw      v1, 0x0000(a1)              // original line 3
+        lli     v1, 0x0001                  // v1 = spoofed cursor id
         OS.patch_end()
 
         lui     a1, 0x8013                  // original line 1
@@ -771,10 +776,22 @@ scope Stages {
         jal     get_index_                  // v0 = index
         nop
 
+        _get_stage_id:
         li      t0, stage_table             // t0 = address of stage table
         addu    t0, t0, v0                  // t0 = address of stage table + offset
         lbu     v0, 0x0000(t0)              // v0 = ret = stage_id
 
+        _check_random:
+        lli     t0, id.RANDOM               // t0 = id.RANDOM
+        bne     v0, t0, _end                // if (stage_id != id.RANDOM), end
+        nop
+        lli     a0, NUM_ICONS               // a0 - N
+        jal     Global.get_random_int_      // v0 = (0, N-1)
+        nop
+        b       _get_stage_id               // get a new stage id based off of random offset
+        nop
+
+        _end:
         lw      t0, 0x0004(sp)              // ~
         lw      ra, 0x0008(sp)              // ~
         lw      at, 0x000C(sp)              // restore registers
@@ -782,53 +799,6 @@ scope Stages {
         jr      ra                          // return
         nop
     }
-
-    scope get_name_: {
-        OS.patch_start(0x0014E2F8, 0x80132788)
-
-        OS.patch_end()
-    }
-
-    // SSS Start
-    // a0 = stage id
-    // a1 = cursor id
-    // 801328A8
-
-    // Draw Cursor
-    // 80132ADC
-
-    // @ Description
-    // This is a fix written by tehz to update the cursor based on stage id instead of in a static
-    // table. It's very nice.
-    // @ TODO
-    // document the function
-    OS.patch_start(0x0014E02C, 0x00000000)
-    lui     at, 0x8013
-    ori     at, at, 0x4644
-    or      v0, r0, r0
-
-    _loop:
-    lbu     t6, 0x0003(at)
-    beq     t6, a0, _end
-
-    _check:
-    ori     t6, r0, 0x0008
-    beq     t6, v0, _loop
-    addiu   v0, v0, 0x0001
-    beq     r0, r0, _loop
-    addiu   at, at, 0x0004
-
-    _end:
-    jr      ra
-    nop
-
-    _fail:
-    jr      ra
-    or      v0, r0, r0
-
-    _find:
-    dw 0xFEDC98BA
-    OS.patch_end()
 
     // @ Description
     // This function fixes a bug that does not allow single player stages to be loaded in training.
