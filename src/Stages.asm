@@ -233,13 +233,6 @@ scope Stages {
     nop
     OS.patch_end()
 
-    // @ Descirption
-    // Disable cursor texture
-    OS.patch_start(0x0014E64C, 0x80132ADC)
-    jr      ra
-    nop
-    OS.patch_end()
-
     // @ Description
     // Prevents the drawing of defaults icons and allocates our own instead
     OS.patch_start(0x0014E098, 0x80132528)
@@ -486,9 +479,19 @@ scope Stages {
     // the Stages.row and Stages.column variables as well as the position_table. It also replaces
     // the cursor itself with a filled rectangle
     scope draw_cursor_: {
+
+        // @ Descirption
+        // Set cursor position.
         OS.patch_start(0x0014E5C8, 0x80132A58)
         // not used, for documentation only
         OS.patch_end()
+
+        // @ Descirption
+        // (part of set cursor position)
+        OS.patch_start(0x0014E5F8, 0x80132A84)
+//      lui     at, 0x41B8                  // original line (at = (float cursor y))
+        lui     at, 0xD1B8                  // at =  a very negative float
+        OS.patch_end
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
