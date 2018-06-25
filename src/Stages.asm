@@ -201,8 +201,16 @@ scope Stages {
     // @ Descirption
     // Disables the function that draw the preview model
     OS.patch_start(0x0014EF24, 0x801333B4)
-    jr      ra                              // return immediately
-    nop
+    // jr      ra                              // return immediately
+    // nop
+    OS.patch_end()
+
+    // @ Descirption
+    // (part of preview model function)
+    // idk what this function usually does but removing it allows icons and previews to be draw
+    OS.patch_start(0x0014EFBC, 0x8013344C)
+//  jal     0x801331AC                      // original line
+    nop                                     // don't take that jump
     OS.patch_end()
 
     // @ Descirption
@@ -488,10 +496,17 @@ scope Stages {
 
         // @ Descirption
         // (part of set cursor position)
-        OS.patch_start(0x0014E5F8, 0x80132A84)
+        OS.patch_start(0x0014E5F4, 0x80132A84)
 //      lui     at, 0x41B8                  // original line (at = (float cursor y))
-        lui     at, 0xD1B8                  // at =  a very negative float
-        OS.patch_end
+        lui     at, 0xC800                  // at =  a very negative float
+        OS.patch_end()
+
+        // @ Descirption
+        // (part of set cursor position)
+        OS.patch_start(0x0014E62C, 0x80132ABC)
+//      lui     at, 0x4274                  // original line (at = (float cursor y))
+        lui     at, 0xC800                  // at =  a very negative float
+        OS.patch_end()
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
