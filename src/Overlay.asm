@@ -23,13 +23,8 @@ scope Overlay {
     // This function highjacks the SSB display list right before the full sync occurs. This allows
     // devolpers to overlay their own display list built using Overlay.draw_* functions in this
     // file. Insert functions below "HOOKS GO HERE."
-    scope highjack_: {
-        OS.patch_start(0x00006150, 0x80005550)
-        j       highjack_
-        nop
-        _highjack_return:
-        OS.patch_end()
 
+    macro highjack_(return_address, original_line_2_hex) {
         addiu   sp, sp,-0x0020              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      a0, 0x0008(sp)              // ~
@@ -87,9 +82,29 @@ scope Overlay {
         lw      t1, 0x001C(sp)              // restore registers
         addiu   sp, sp, 0x0020              // deallocate stack space
 //      sw      t3, 0x0000(v0)              // original line 1
-        lw      v0, 0x0000(s0)              // original line 2
-        j       _highjack_return            // return
+        dw      {original_line_2_hex}       // original line 2
+        j       {return_address}            // return
         nop
+    }
+    
+    scope highjack_1_: {
+        OS.patch_start(0x00006150, 0x80005550)
+        j        highjack_1_
+        nop
+        _highjack_1_return:
+        OS.patch_end()
+
+        highjack_(_highjack_1_return, 0x8E020000)
+    }
+
+    scope highjack_2_: {
+        OS.patch_start(0x000062A4, 0x800056A4)
+        j       highjack_2_
+        nop
+        _highjack_2_return:
+        OS.patch_end()
+
+        highjack_(_highjack_2_return, 0x8E020004)
     }
 
     // @ Description
