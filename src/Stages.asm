@@ -217,15 +217,55 @@ scope Stages {
 
     // @ Descirption
     // Modifies the zoom of the model previews.
-    OS.patch_start(0x0014ECE4, 0x80133174)
-//  lwc1    f4, 0x0000(v1)                  // original line 1
-//  or      v0, s0, r0                      // original line 2
-//  swc1    f4, 0x0040(t5)                  // original line 3
-//  lw      t4, 0x0074(s0)                  // original line 4
-    lui     t4, 0x3F00
-    or      v0, s0, r0
-    sw      t4, 0x0040(t5)
-    OS.patch_end()
+    scope set_zoom_: {
+        OS.patch_start(0x0014ECE4, 0x80133174)
+//      lwc1    f4, 0x0000(v1)              // original line 1
+        j       set_zoom_
+        or      v0, s0, r0                  // original line 2
+        _set_zoom_return:
+        OS.patch_end()
+
+        addiu   sp, sp,-0x00010             // allocate stack space
+        sw      ra, 0x0004(sp)              // ~
+        sw      v0, 0x0008(sp)              // ~
+        sw      t0, 0x000C(sp)              // save registesr
+
+        jal     get_stage_id_               // v0 = stage_id
+        nop
+        sll     v0, v0, 0x0002              // v0 = stage_id * sizeof(word)
+        li      t0, table                   // ~
+        addu    t0, t0, v0                  // t0 = address of zoom
+        lw      t0, 0x0000(t0)              // t0 = zoom
+        mtc1    t0, f4                      // f4 = zoom
+        swc1    f4, 0x0000(v1)              // update all zoom
+
+        lw      ra, 0x0004(sp)              // ~
+        lw      v0, 0x0008(sp)              // ~
+        lw      t0, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        j       _set_zoom_return
+        nop
+
+        table:
+        float32 0.4                         // Peach's Castle
+        float32 0.2                         // Sector Z
+        float32 0.5                         // Congo Jungle
+        float32 0.4                         // Planet Zebes
+        float32 0.3                         // Hyrule Castle
+        float32 0.5                         // Yoshi's Island
+        float32 0.4                         // Dream Land
+        float32 0.4                         // Saffron City
+        float32 0.2                         // Musrhoom Kingdom
+        float32 0.5                         // Dream Land Beta 1
+        float32 0.5                         // Dream Land Beta 2
+        float32 0.5                         // How to Play
+        float32 0.5                         // Yoshi's Island Cloudless
+        float32 0.5                         // Metal Cavern
+        float32 0.5                         // Battlefield
+        float32 0.5                         // Race to the Finish (Placeholder)
+        float32 0.5                         // Final Deestination
+    }
+
 
     // @ Descirption
     // These modify the x/y position of the model background on the stage select screen
