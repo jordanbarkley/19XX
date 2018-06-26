@@ -118,9 +118,13 @@ scope Stages {
     constant LEFT_RANDOM_INDEX(12)
     constant RIGHT_RANDOM_INDEX(17)
 
+    // @ Descirption
+    // Row the cursor is on
     row:
     dw 0
 
+    // @ Descirption
+    // column the cursor is on
     column:
     dw 0
 
@@ -228,8 +232,6 @@ scope Stages {
     lli     s2, x + 0x70                    // loop terminator
     OS.patch_end()
 
-
-    
     // RANDOM
     OS.patch_start(0x0014E96C, 0x80132E0C)
 //  lui     at, 0x4220                      // original line 1
@@ -242,7 +244,7 @@ scope Stages {
     // ELSE
     OS.patch_start(0x0014EA0C, 0x80132E9C)
 //  lui     at, 0x4220                      // original line 1
-    lui     at, 0x42C8                      // xpos = 115
+    lui     at, 0x42C8                      // xpos = 100
     mtc1    at, f16                         // original line 2
     lhu     t8, 0x0024(v0)                  // original line 3
 //  lui     at, 0x42FE                      // original line 3
@@ -257,15 +259,12 @@ scope Stages {
     OS.patch_end()
 
     // @ Descirption
-    // This function occurs before get_preview_ to check for if RANDOM is selected. That function
-    // has been broken in this file. fix_get_preview_ restores that funciton in an odd fashion.
-    // Although a0 at this time is usually cursor_id, since I use 0xDE as stage_id.RANDOM and
-    // Sakurai uses that as his RANDOM check, this fix works.
-    scope fix_get_preview_: {
+    // These following functions are designed to fix get_preview for RANDOM.
+    scope random_fix_1_: {
         OS.patch_start(0x0014EF2C, 0x801333BC)
-        j       fix_get_preview_
+        j       random_fix_1_
         nop
-        _fix_get_preview_return:
+        _random_fix_1_return:
         OS.patch_end()
 
         addiu   at, r0, 0x00DE                  // original line 1
@@ -282,9 +281,79 @@ scope Stages {
         lw      v0, 0x0004(sp)                  // ~
         lw      ra, 0x0008(sp)                  // restore registers
         addiu   sp, sp, 0x0010                  // deallocate stack space
-        j       _fix_get_preview_return         // return
+        j       _random_fix_1_return            // return
         nop
     }
+
+    scope random_fix_2_: {
+        OS.patch_start(0x0014EFA4, 0x80133434)
+        j       random_fix_2_
+        nop
+        _random_fix_2_return:
+        OS.patch_end()
+
+//      lli     at, 0x00DE                      // original line 1
+//      beq     s0, at, 0x80133464              // original line 2
+        
+        addiu   sp, sp,-0x0010                  // allocate stack space
+        sw      ra, 0x0004(sp)                  // ~
+        sw      v0, 0x0008(sp)                  // save registers
+
+        jal     get_stage_id_                   // v0 = stage_id
+        nop
+        lli     at, 0x00DE
+        beq     at, v0, _take_branch
+        nop
+
+        _default:
+        lw      ra, 0x0004(sp)                  // ~
+        lw      v0, 0x0008(sp)                  // restore registers
+        addiu   sp, sp, 0x0010                  // deallocate stack
+        j       _random_fix_2_return
+        nop
+
+        _take_branch:
+        lw      ra, 0x0004(sp)                  // ~
+        lw      v0, 0x0008(sp)                  // restore registers
+        addiu   sp, sp, 0x0010                  // deallocate stack
+        j       0x80133464                      // (from original line 2)
+        nop
+    }
+
+    scope random_fix_3_: {
+        OS.patch_start(0x0014E950, 0x80132DE0)
+        j       random_fix_3_
+        nop
+        _random_fix_3_return:
+        OS.patch_end()
+
+//      bne     v1, at, 0x80132E18              // original line 1
+//      lui     t0, 0x8013                      // original line 2
+
+        addiu   sp, sp,-0x0010                  // allocate stack space
+        sw      ra, 0x0004(sp)                  // ~
+        sw      v0, 0x0008(sp)                  // save registers
+
+        jal     get_stage_id_                   // v0 = stage_id
+        nop
+        bne     at, v0, _take_branch
+        nop
+
+        _default:
+        lw      ra, 0x0004(sp)                  // ~
+        lw      v0, 0x0008(sp)                  // restore registers
+        addiu   sp, sp, 0x0010                  // deallocate stack
+        j       _random_fix_3_return            // return
+        nop
+
+        _take_branch:
+        lw      ra, 0x0004(sp)                  // ~
+        lw      v0, 0x0008(sp)                  // restore registers
+        addiu   sp, sp, 0x0010                  // deallocate stack
+        j       0x80132E18                      // (from original line 1)
+        nop
+    }
+
 
     // @ Descirption
     // This functions modifies which preview file is drawn based on stage_table
