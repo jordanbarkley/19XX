@@ -216,6 +216,18 @@ scope Stages {
     OS.patch_end()
 
     // @ Descirption
+    // Modifies the zoom of the model previews.
+    OS.patch_start(0x0014ECE4, 0x80133174)
+//  lwc1    f4, 0x0000(v1)                  // original line 1
+//  or      v0, s0, r0                      // original line 2
+//  swc1    f4, 0x0040(t5)                  // original line 3
+//  lw      t4, 0x0074(s0)                  // original line 4
+    lui     t4, 0x3F00
+    or      v0, s0, r0
+    sw      t4, 0x0040(t5)
+    OS.patch_end()
+
+    // @ Descirption
     // These modify the x/y position of the model background on the stage select screen
     // WOOD Y
     OS.patch_start(0x0014E8FC, 0x80132D8C)
