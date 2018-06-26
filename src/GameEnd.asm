@@ -1,6 +1,7 @@
 // GameEnd.asm
 if !{defined __GAME_END__} {
 define __GAME_END__()
+if !{defined __TE__} {
 
 // @ Description
 // This file modidfies what screen the game exits to.
@@ -80,7 +81,6 @@ scope GameEnd {
         nop
 
         _success:
-
         lw      t0, 0x0004(sp)              // ~
         lw      v0, 0x0008(sp)              // ~
         lw      ra, 0x000C(sp)              // restore registers
@@ -92,4 +92,5 @@ scope GameEnd {
 
 }
 
+}
 }

@@ -54,6 +54,7 @@ scope Menu {
     }
 
     // @ Description
+    if !{defined __TE__} {
     // This patch disables functionality on the OPTION screen.
     OS.patch_start(0x001205FC, 0x80132E4C)
     jr      ra
@@ -68,6 +69,7 @@ scope Menu {
     nop
     nop
     OS.patch_end()
+    }
 
     // @ Description
     // This function will chnage the currently loaded SSB screen

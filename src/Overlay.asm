@@ -5,7 +5,7 @@ define __OVERLAY__()
 // @ Description
 // The framebuffer overlay is implemented in this file.
 // @ Note
-// This file only support rgba5551
+// This file only supports rgba5551
 
 include "Global.asm"
 include "OS.asm"
@@ -55,12 +55,14 @@ scope Overlay {
         li      t0, Global.current_screen   // ~
         lb      t0, 0x0000(t0)              // t0 = screen id
 
+        if !{defined __TE__} {
         // OPTION screen
         lli     t1, 0x0039                  // t1 = OPTION screen
         bne     t0, t1, _sss                // if (screen_id != OPTION), skip
         nop
         jal     Menu.run_
         nop
+        }
 
         _sss:
         lli     t1, 0x0015                  // t1 = stage select screen

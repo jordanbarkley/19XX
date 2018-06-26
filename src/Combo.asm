@@ -1,6 +1,7 @@
 // Combo.asm (by Fray)
 if !{defined __COMBO__} {
 define __COMBO__()
+if !{defined __TE__} {
 
 // @ Description
 // This file contains extensions to Sakurai's combo meter.
@@ -86,4 +87,5 @@ scope Combo {
     }
 }
 
+}
 }

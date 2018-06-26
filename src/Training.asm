@@ -1,6 +1,7 @@
 // Training.asm (by Fray and bit)
 if !{defined __TRAINING__} {
 define __TRAINING__()
+if !{defined __TE__} {
 
 // @ Descirption
 // This file include enhancements for training purposes.
@@ -228,4 +229,5 @@ scope Training {
 
 }
 
+}
 }

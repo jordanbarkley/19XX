@@ -160,6 +160,8 @@ scope AI {
         nop
     }
 
+    if !{defined __TE__} {
+
     // @ Description
     // Usually, this function checks for a z-cancel press with 10 frames. At the end of this, at
     // holds a boolean for successful z-cancel. This function has been modified to make sure that
@@ -226,6 +228,7 @@ scope AI {
         nop
     }
 
+    } // __TE__
 
 }
 

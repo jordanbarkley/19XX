@@ -1,6 +1,7 @@
 // Shield.asm
 if !{defined __SHIELD__} {
 define __SHIELD__()
+if !{defined __TE__} {
 
 // @ Description
 // Thise file changes shield colors to match port colors.
@@ -89,4 +90,5 @@ scope Shield {
 
 }
 
+}
 }

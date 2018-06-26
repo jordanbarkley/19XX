@@ -266,7 +266,6 @@ scope Stages {
         float32 0.5                         // Final Deestination
     }
 
-
     // @ Descirption
     // These modify the x/y position of the model background on the stage select screen
     // WOOD Y

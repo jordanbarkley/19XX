@@ -1,6 +1,7 @@
 // Camera.asm
 if !{defined __CAMERA__} {
 define __CAMERA__()
+if !{defined __TE___} {
 
 // @ Description
 // This file disables the cinematic introduction before VS. matches.
@@ -32,4 +33,5 @@ scope Camera {
     }
 }
 
+}
 }
