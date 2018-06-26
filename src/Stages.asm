@@ -199,7 +199,7 @@ scope Stages {
     dw OS.NULL
 
     // @ Descirption
-    // Modiefies the X/Y position of the models on the stage select screen.
+    // Modifies the x/y position of the models on the stage select screen.
     OS.patch_start(0x0014F514, 0x801339A4)
 //  lwc1    f16,0x0000(v0)                  // original line 1 (f16 = (float) x)
 //  swc1    f16,0x0048(a0)                  // original line 2
@@ -212,11 +212,142 @@ scope Stages {
     OS.patch_end()
 
     // @ Descirption
+    // These modify the x/y position of the model background on the stage select screen
+    // WOOD Y
+    OS.patch_start(0x0014E8FC, 0x80132D8C)
+//  lui     at, 0x4302                      // original line 1
+    lui     at, 0x4190                      // ypos = 18
+    OS.patch_end()
+
+    // WOOD X
+    OS.patch_start(0x0014E914, 0x80132DA4)
+    variable x(103)
+//  lli     s0, 0x003B                      // original line 1
+//  lli     s0, 0x00AB                      // original line 2
+    lli     s0, x                           // xpos = x
+    lli     s2, x + 0x70                    // loop terminator
+    OS.patch_end()
+
+
+    
+    // RANDOM
+    OS.patch_start(0x0014E96C, 0x80132E0C)
+//  lui     at, 0x4220                      // original line 1
+    lui     at, 0x42C8                      // xpos = 100
+    mtc1    at, f8                          // original line 2
+//  lui     at, 0x42FE                      // original line 3
+    lui     at, 0x4170                      // ypos = 15
+    OS.patch_end()
+
+    // ELSE
+    OS.patch_start(0x0014EA0C, 0x80132E9C)
+//  lui     at, 0x4220                      // original line 1
+    lui     at, 0x42C8                      // xpos = 115
+    mtc1    at, f16                         // original line 2
+    lhu     t8, 0x0024(v0)                  // original line 3
+//  lui     at, 0x42FE                      // original line 3
+    lui     at, 0x4170                      // ypos = 15
+    OS.patch_end()
+
+    // @ Descirption
     // Disables the function that draw the preview model
     OS.patch_start(0x0014EF24, 0x801333B4)
     // jr      ra                              // return immediately
     // nop
     OS.patch_end()
+
+    // @ Descirption
+    // This function occurs before get_preview_ to check for if RANDOM is selected. That function
+    // has been broken in this file. fix_get_preview_ restores that funciton in an odd fashion.
+    // Although a0 at this time is usually cursor_id, since I use 0xDE as stage_id.RANDOM and
+    // Sakurai uses that as his RANDOM check, this fix works.
+    scope fix_get_preview_: {
+        OS.patch_start(0x0014EF2C, 0x801333BC)
+        j       fix_get_preview_
+        nop
+        _fix_get_preview_return:
+        OS.patch_end()
+
+        addiu   at, r0, 0x00DE                  // original line 1
+        or      s0, a0, r0                      // original line 2
+
+        addiu   sp, sp,-0x0010                  // allocate stack space
+        sw      v0, 0x0004(sp)                  // ~
+        sw      ra, 0x0008(sp)                  // restore registers
+
+        jal     get_stage_id_                   // v0 = stage_id
+        nop
+        move    a0, v0                          // a0 = stage_id
+
+        lw      v0, 0x0004(sp)                  // ~
+        lw      ra, 0x0008(sp)                  // restore registers
+        addiu   sp, sp, 0x0010                  // deallocate stack space
+        j       _fix_get_preview_return         // return
+        nop
+    }
+
+    // @ Descirption
+    // This functions modifies which preview file is drawn based on stage_table
+    scope get_preview_: {
+        OS.patch_start(0x0014E708, 0x80132B98)
+        j       get_preview_
+        nop
+        _get_preview_return:
+        OS.patch_end()
+
+        addiu   sp, sp,-0x0010                  // allocate stack space
+        sw      ra, 0x0004(sp)                  // ~
+        sw      t0, 0x0008(sp)                  // ~
+        sw      v0, 0x000C(sp)                  // save registers
+
+        jal     get_stage_id_                   // v0 = stage_id
+        nop
+        sll     v0, v0, 0x0002                  // t0 = offset << 2 (offset * 4)
+        li      t0, preview_table               // ~
+        addu    t0, v0, t0                      // t0 = address of file/preview
+
+        addu    v1, t6, t7                      // original line 1
+//      lw      a0, 0x0000(v1)                  // original line 2 
+        lw      a0, 0x0000(t0)                  // a0 - file preview id
+
+        lw      ra, 0x0004(sp)                  // ~
+        lw      t0, 0x0008(sp)                  // ~
+        lw      v0, 0x000C(sp)                  // resore registers
+        addiu   sp, sp, 0x0010                  // deallocate stack space
+        j       _get_preview_return             // return
+        nop
+    }
+
+    // @ Descirption
+    // This functions modifies which preview type is used based on stage_table
+    scope get_type_: {
+        OS.patch_start(0x0014E720, 0x80132BB0)
+        j       get_type_
+        nop
+        _get_type_return:
+        OS.patch_end()
+
+        addiu   sp, sp,-0x0010                  // allocate stack space
+        sw      ra, 0x0004(sp)                  // ~
+        sw      t0, 0x0008(sp)                  // ~
+        sw      v0, 0x000C(sp)                  // save registers
+
+        jal     get_stage_id_                   // v0 = stage_id
+        nop
+        sll     v0, v0, 0x0002                  // t0 = offset << 2 (offset * 4)
+        li      t0, type_table                  // ~
+        addu    t0, v0, t0                      // t0 = address of file/preview
+        lw      t8, 0x0000(t0)                  // t8 = type
+
+        lw      ra, 0x0004(sp)                  // ~
+        lw      t0, 0x0008(sp)                  // ~
+        lw      v0, 0x000C(sp)                  // resore registers
+        addiu   sp, sp, 0x0010                  // deallocate stack space
+        lui     at, 0x8013                      // original line 1
+//      lw      t8, 0x0004(v1)                  // original line 2
+        j       _get_type_return                // return
+        nop
+    }
 
     // @ Descirption
     // Prevents series logo from being drawn on wood circle
@@ -423,7 +554,7 @@ scope Stages {
 
         _draw_icon:
         sltiu   at, t2, NUM_ICONS           // ~
-        beqz    at, _draw_random            // check to stop drawing stage icons
+        beqz    at, _end                     // check to stop drawing stage icons
         nop
         lw      a0, 0x0000(t1)              // a0 - ulx
         lw      a1, 0x0004(t1)              // a1 - uly
@@ -457,7 +588,6 @@ scope Stages {
         nop
 
         _draw_random:
-        // left
         li      t0, position_table          // t0 = address of position_table
         lli     t1, LEFT_RANDOM_INDEX       // ~
         sll     t1, t1, 0x0003              // t1 = offset of left random position
@@ -543,7 +673,6 @@ scope Stages {
         nop
     }
 
-
     // @ Descirption
     // Returns an index based on column and row
     // @ Returns
@@ -572,6 +701,28 @@ scope Stages {
     }
 
     // @ Descirption
+    // returns a stage id based on cursor position
+    // @ Returns
+    // v0 - stage_id
+    scope get_stage_id_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      ra, 0x0008(sp)              // save registers
+
+        jal     get_index_                  // v0 = index
+        nop
+        li      t0, stage_table             // t0 = address of stage table
+        addu    t0, t0, v0                  // t0 = address of stage table + offset
+        lbu     v0, 0x0000(t0)              // v0 = ret = stage_id
+
+        lw      t0, 0x0004(sp)              // ~
+        lw      ra, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
+
+    // @ Descirption
     // This is what Overlay.HOOKS_GO_HERE_ calls. It is the main() of Stages.asm
     scope run_: {
         addiu   sp, sp,-0x0008              // allocate stack space
@@ -588,6 +739,10 @@ scope Stages {
         jr      ra
         nop
     }
+
+    // @ Descirption
+    // Equivalent of _update_right_return.
+    constant update_(0x80134210)
 
     // @ Descirption
     // The following update_<direction>_ functions update Stages.row/Stages.column. Thee functions
@@ -716,7 +871,7 @@ scope Stages {
         lw      t1, 0x0008(sp)              // ~
         lw      ra, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack sapce
-        j       _update_down_return         // return
+        j       update_                     // (go to right update bc down update sucks)
         nop
     }
 
@@ -757,7 +912,7 @@ scope Stages {
         lw      t1, 0x0008(sp)              // ~
         lw      ra, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack sapce
-        j       _update_up_return           // return
+        j       update_                     // (go to right update bc up update sucks)
         nop
     }
 
@@ -778,13 +933,8 @@ scope Stages {
         sw      ra, 0x0008(sp)              // ~
         sw      at, 0x000C(sp)              // save registers
 
-        jal     get_index_                  // v0 = index
+        jal     get_stage_id_
         nop
-
-        _get_stage_id:
-        li      t0, stage_table             // t0 = address of stage table
-        addu    t0, t0, v0                  // t0 = address of stage table + offset
-        lbu     v0, 0x0000(t0)              // v0 = ret = stage_id
 
         _check_random:
         lli     t0, id.RANDOM               // t0 = id.RANDOM
@@ -793,7 +943,7 @@ scope Stages {
         lli     a0, NUM_ICONS               // a0 - N
         jal     Global.get_random_int_      // v0 = (0, N-1)
         nop
-        b       _get_stage_id               // get a new stage id based off of random offset
+        b       _check_random               // get a new stage id based off of random offset
         nop
 
         _end:
@@ -872,6 +1022,44 @@ scope Stages {
         db id.SECTOR_Z                      // Final Destination
         OS.align(4)
     }
+
+    preview_table:
+    dw file.PEACHS_CASTLE
+    dw file.SECTOR_Z
+    dw file.CONGO_JUNGLE
+    dw file.PLANET_ZEBES
+    dw file.HYRULE_CASTLE
+    dw file.YOSHIS_ISLAND
+    dw file.DREAM_LAND
+    dw file.SAFFRON_CITY
+    dw file.MUSHROOM_KINGDOM
+    dw file.DREAM_LAND_BETA_1
+    dw file.DREAM_LAND_BETA_2
+    dw file.HOW_TO_PLAY
+    dw file.YOSHIS_ISLAND_CLOUDLESS
+    dw file.METAL_CAVERN
+    dw file.BATTLEFIELD
+    dw file.RACE_TO_THE_FINISH
+    dw file.FINAL_DESTINATION
+
+    type_table:
+    dw type.PEACHS_CASTLE
+    dw type.SECTOR_Z
+    dw type.CONGO_JUNGLE
+    dw type.PLANET_ZEBES
+    dw type.HYRULE_CASTLE
+    dw type.YOSHIS_ISLAND
+    dw type.DREAM_LAND
+    dw type.SAFFRON_CITY
+    dw type.MUSHROOM_KINGDOM
+    dw type.DREAM_LAND_BETA_1
+    dw type.DREAM_LAND_BETA_2
+    dw type.HOW_TO_PLAY
+    dw type.YOSHIS_ISLAND_CLOUDLESS
+    dw type.METAL_CAVERN
+    dw type.BATTLEFIELD
+    dw type.RACE_TO_THE_FINISH
+    dw type.FINAL_DESTINATION
 }
 
 }
