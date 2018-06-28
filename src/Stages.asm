@@ -964,10 +964,13 @@ scope Stages {
         lui     v1, 0x8013                  // original line 1
         lw      v1, 0x4BD8(v1)              // original line 2
 
+        lui     a1, 0x8013                  // original line 1 (update_right_)
+        addiu   a1, a1, 0x4BD8              // original line 2 (update_right_)
+        
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      at, 0x000C(sp)              // save registers
 
         // check bounds
         li      t0, row                     // ~
@@ -989,7 +992,7 @@ scope Stages {
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
+        lw      at, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack sapce
         j       update_                     // (go to right update bc down update sucks)
         nop
@@ -1004,11 +1007,14 @@ scope Stages {
 
         lui     v1, 0x8013                  // original line 1
         lw      v1, 0x4BD8(v1)              // original line 2
+        
+        lui     a1, 0x8013                  // original line 1 (update_right_)
+        addiu   a1, a1, 0x4BD8              // original line 2 (update_right_)
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      at, 0x000C(sp)              // save registers
 
         // check bounds
         li      t0, row                     // ~
@@ -1030,7 +1036,7 @@ scope Stages {
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
+        lw      at, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack sapce
         j       update_                     // (go to right update bc up update sucks)
         nop
