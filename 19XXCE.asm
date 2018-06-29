@@ -44,12 +44,12 @@ variable size(end - start)
 
 if size > 65536 {
     // 0x10000 = 65536
-    print "needed RAM space "
+    print "needed heap space "
     print size
-    print " is greater than max RAM space (65536)\n"
-    warning "not enough RAM space"
+    print " is greater than max heap space (65536)\n"
+    warning "not enough heap space"
 } else {
-    print "RAM space used: "
+    print "heap space used: "
     print size
     print "/65536\n"
 }
