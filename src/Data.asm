@@ -1,17 +1,18 @@
 // Data.asm
 if !{defined __DATA__} {
 define __DATA__()
+if !{defined __TE__} {
 
 // @ Description
-// This file contains binary data such as images and stage files. It must be loaded dynamically
-// using Memory.allocate_*
+// This file contains binary data such as images and stage files. It all gets dumped to expansion
+// RAM. This data is only available in 19XXCE.
 
 scope Data {
 
     pushvar origin
     pushvar base
-    origin  0x01100000
-    base    0x01100000
+    origin  0x01400000
+    base    0x80400000
 
     // SSS Textures
     insert icon_peachs_castle, "../textures/icon_peachs_castle.rgba5551"
@@ -35,4 +36,5 @@ scope Data {
     pullvar origin
 }
 
+}
 }

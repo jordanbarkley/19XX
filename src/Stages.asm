@@ -35,7 +35,6 @@ define __STAGES__()
 include "Color.asm"
 include "Data.asm"
 include "Global.asm"
-include "Memory.asm"
 include "OS.asm"
 include "Overlay.asm"
 include "Texture.asm"
@@ -181,26 +180,26 @@ scope Stages {
     
     // sorted by stage id
     icon_table:
-    dw OS.NULL                              // 0x0000 - Peach's Castle
-    dw OS.NULL                              // 0x0004 - Sector Z
-    dw OS.NULL                              // 0x0008 - Congo Jungle
-    dw OS.NULL                              // 0x000C - Planet Zebes
-    dw OS.NULL                              // 0x0010 - Hyrule Castle
-    dw OS.NULL                              // 0x0014 - Yoshi's Island
-    dw OS.NULL                              // 0x0018 - Dream Land
-    dw OS.NULL                              // 0x001C - Saffron City
-    dw OS.NULL                              // 0x0020 - Musrhoom Kingdom
-    dw OS.NULL                              // 0x0024 - Dream Land Beta 1
-    dw OS.NULL                              // 0x0028 - Dream Land Beta 2
-    dw OS.NULL                              // 0x002C - How to Play
-    dw OS.NULL                              // 0x0030 - Yoshi's Island Cloudless
-    dw OS.NULL                              // 0x0034 - Metal Cavern
-    dw OS.NULL                              // 0x0038 - Battlefield
-    dw OS.NULL                              // 0x003C - Race to the Finish (Placeholder)
-    dw OS.NULL                              // 0x0040 - Final Deestination
+    dw Data.icon_peachs_castle
+    dw Data.icon_sector_z
+    dw Data.icon_congo_jungle
+    dw Data.icon_planet_zebes
+    dw Data.icon_hyrule_castle
+    dw Data.icon_yoshis_island
+    dw Data.icon_dream_land
+    dw Data.icon_saffron_city
+    dw Data.icon_mushroom_kingdom
+    dw Data.icon_dream_land_beta_1
+    dw Data.icon_dream_land_beta_2
+    dw Data.icon_how_to_play
+    dw Data.icon_yoshis_island_cloudless
+    dw Data.icon_metal_cavern
+    dw Data.icon_battlefield
+    dw OS.NULL                              // Race to the Finish (Placeholder)
+    dw Data.icon_final_destination
 
     icon_random:
-    dw OS.NULL
+    dw Data.icon_random
 
     // @ Descirption
     // Modifies the x/y position of the models on the stage select screen.
@@ -498,160 +497,11 @@ scope Stages {
     OS.patch_end()
 
     // @ Description
-    // Prevents the drawing of defaults icons and allocates our own instead
+    // Prevents the drawing of defaults icons
     OS.patch_start(0x0014E098, 0x80132528)
-    addiu   sp, sp,-0x0008                  // allocate stack space
-    sw      ra, 0x0004(sp)                  // save ra
-
-    jal     Memory.reset_                   // reset memory
-    nop
-
-    jal     allocate_icons_
-    nop
-
-    lw      ra, 0x0004(sp)                  // restore ra
-    addiu   sp, sp, 0x0008                  // deallocate stack sapce
     jr      ra                              // return
     nop
     OS.patch_end()
-
-    // @ Descirption
-    // Puts stage icons into RAM
-    scope allocate_icons_: {
-        addiu   sp, sp,-0x0010              // allocate stack sapce
-        sw      t0, 0x0008(sp)              // save t0
-        sw      ra, 0x0004(sp)              // save ra
-
-        li      t0, icon_table              // t0 = address of icon_table
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_peachs_castle // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0000(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_sector_z      // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0004(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_congo_jungle  // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0008(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_planet_zebes  // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x000C(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_hyrule_castle // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0010(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_yoshis_island // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0014(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_dream_land    // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0018(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_saffron_city  // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x001C(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_mushroom_kingdom
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0020(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_dream_land_beta_1
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0024(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_dream_land_beta_2
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0028(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_how_to_play   // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x002C(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_yoshis_island_cloudless
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0030(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_metal_cavern  // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0034(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_battlefield   // a0 - texture struct
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0038(t0)              // store icon address
-
-        // Race to the Finish not included
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_final_destination
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        sw      v0, 0x0040(t0)              // store icon address
-
-        lli     a0, ICON_WIDTH              // a0 - width
-        lli     a1, ICON_HEIGHT             // a1 - height
-        li      a2, Data.icon_random        // a2 - ROM address
-        jal     Texture.allocate_           // put icon into RAM
-        nop
-        li      t0, icon_random             // ~
-        sw      v0, 0x0000(t0)              // store icon address
-
-        lw      t0, 0x0008(sp)              // restore t0
-        lw      ra, 0x0004(sp)              // restore ra
-        addiu   sp, sp, 0x0010              // allocate stack sapce
-        jr      ra
-        nop
-    }
 
     // @ Descirption
     // Draw stage icons to the screen

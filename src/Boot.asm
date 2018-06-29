@@ -25,22 +25,33 @@ scope Boot {
 
     // @ Description
     // Originally, this instruction performed one DMA as part of the boot sequence. It now branches
-    // to unsused space in the boot sequence and transfers 0x10000 bytes to 0x80380000
-    OS.patch_start(0x00001234, 0x80000634)
-    j       0x80000438
-    nop
-    OS.patch_end()
+    // to unsused space in the boot sequence and transfers 0x10000 bytes to 0x80380000 and
+    // 0x400000 to 0x80400000
+    scope load_: {
+        OS.patch_start(0x00001234, 0x80000634)
+        j       0x80000438
+        nop
+        OS.patch_end()
 
-    OS.patch_start(0x00001038, 0x80000438)
-    jal     Global.dma_copy_        // original line 1
-    addiu   a2, r0, 0x0100          // original line 2
-    lui     a0, 0x0100              // load rom address (0x01000000)
-    lui     a1, 0x8038              // load ram address (0x80380000)
-    jal     Global.dma_copy_        // add custom functions
-    lui     a2, 0x0001              // load length of 0x100000
-    j       0x80000638              // return
-    nop
-    OS.patch_end()
+        OS.patch_start(0x00001038, 0x80000438)
+        jal     Global.dma_copy_        // original line 1
+        addiu   a2, r0, 0x0100          // original line 2
+        lui     a0, 0x0100              // load rom address (0x01000000)
+        lui     a1, 0x8038              // load ram address (0x80380000)
+        jal     Global.dma_copy_        // add custom functions
+        lui     a2, 0x0001              // load length of 0x10000
+        j       load_                   // finish function
+        nop
+        OS.patch_end()
+
+        lui     a0, 0x0140              // load rom address (0x01400000)
+        lui     a1, 0x8040              // load ram address (0x80400000)
+        jal     Global.dma_copy_        // add custom functions
+        lui     a2, 0x0040              // load length of 0x400000
+        j       0x80000638              // return
+        nop
+    }
+
 
     // @ Description
     // This shrinks Sakurai's heap equivalent for the main heap (0x8013XXXX - 0x8039XXXX)
