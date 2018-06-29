@@ -3,34 +3,7 @@ if !{defined __STAGES__} {
 define __STAGES__()
 
 // @ Descirption
-// This file expands the stage select screen to 16 stages.
-
-// Example
-// [00] [01] [02] [03] [04] [05]
-// [06] [07] [08] [09] [0A] [0B]
-// [RR] [0C] [0D] [0E] [0F] [RR]
-
-// Viable Stage (Most Viable at the Top)
-// 00 - Dream Land
-// 01 - Battlefield
-// 02 - Pokemon Stadium (Dream Land Beta 1)
-// 03 - Smashville (How to Play)
-// 04 - Final Destination
-// 05 - Wario Ware (Dream Land Beta 2)
-
-// Somewhat Viable Stages (Most Viable at the Top)
-// 06 - Peach's Castle
-// 07 - Congo Jungle
-// 08 - Metal Cavern
-// 09 - Hyrule Castle
-// 0A - Yoshi's Island (Cloudless)
-// 0B - Saffron City
-
-// Alphabetical
-// 0C - Planet Zebes
-// 0D - Mushroom Kingdom
-// 0E - Sector Z
-// 0F - Yoshi's Island
+// This file expands the stage select screen.
 
 include "Color.asm"
 include "Data.asm"
@@ -109,23 +82,110 @@ scope Stages {
         constant FINAL_DESTINATION(0x010A)
     }
 
-    constant ICON_WIDTH(48)
-    constant ICON_HEIGHT(36)
+    constant ICON_WIDTH(40)
+    constant ICON_HEIGHT(30)
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // TE STAGE SELECT SCREEN
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Layout
+    // [00] [01] [02] [03] [04] [05]
+    // [06] [07] [08] [09] [0A] [RR]
+
+    if {defined __TE__} {
+    constant NUM_ROWS(2)
+    constant NUM_COLUMNS(6)
+    constant NUM_ICONS(NUM_ROWS * NUM_COLUMNS)
+    constant LEFT_RANDOM_INDEX(0x0B)
+    constant RIGHT_RANDOM_INDEX(0x0B)
+
+    // @ Descirption
+    // Stage IDs in order
+    // Viable Stage (Most Viable at the Top)
+    stage_table:
+    db id.PEACHS_CASTLE                     // 00
+    db id.CONGO_JUNGLE                      // 01
+    db id.HYRULE_CASTLE                     // 02
+    db id.PLANET_ZEBES                      // 03
+    db id.MUSHROOM_KINGDOM                  // 04
+    db id.BATTLEFIELD                       // 05
+    db id.YOSHIS_ISLAND                     // 06
+    db id.DREAM_LAND                        // 07
+    db id.SECTOR_Z                          // 08
+    db id.SAFFRON_CITY                      // 09
+    db id.FINAL_DESTINATION                 // 0A
+    db id.RANDOM                            // RR
+    OS.align(4)
+    
+    insert icon_peachs_castle, "../textures/icon_peachs_castle.rgba5551"
+    insert icon_sector_z, "../textures/icon_sector_z.rgba5551"
+    insert icon_congo_jungle, "../textures/icon_congo_jungle.rgba5551"
+    insert icon_planet_zebes, "../textures/icon_planet_zebes.rgba5551"
+    insert icon_hyrule_castle, "../textures/icon_hyrule_castle.rgba5551"
+    insert icon_yoshis_island, "../textures/icon_yoshis_island.rgba5551"
+    insert icon_dream_land, "../textures/icon_dream_land.rgba5551"
+    insert icon_saffron_city, "../textures/icon_saffron_city.rgba5551"
+    insert icon_mushroom_kingdom, "../textures/icon_mushroom_kingdom.rgba5551"
+    insert icon_battlefield, "../textures/icon_battlefield.rgba5551"
+    insert icon_final_destination, "../textures/icon_final_destination.rgba5551"
+    insert icon_random_, "../textures/icon_random.rgba5551"
+
+    // sorted by stage id
+    icon_table:
+    dw icon_peachs_castle
+    dw icon_sector_z
+    dw icon_congo_jungle
+    dw icon_planet_zebes
+    dw icon_hyrule_castle
+    dw icon_yoshis_island
+    dw icon_dream_land
+    dw icon_saffron_city
+    dw icon_mushroom_kingdom
+    dw OS.NULL                              // Dream Land Beta 1
+    dw OS.NULL                              // Dream Land Beta 2
+    dw OS.NULL                              // How To Play
+    dw OS.NULL                              // Yoshi's Island Cloudless
+    dw OS.NULL                              // Metal Cavern
+    dw icon_battlefield
+    dw OS.NULL                              // Race to the Finish (Placeholder)
+    dw icon_final_destination
+
+    icon_random:
+    dw icon_random_
+
+    position_table:
+    // row 0
+    dw 033, 030                             // 00
+    dw 075, 030                             // 01
+    dw 117, 030                             // 02
+    dw 159, 030                             // 03
+    dw 201, 030                             // 04
+    dw 243, 030                             // 05
+
+    // row 1
+    dw 033, 062                             // 06
+    dw 075, 062                             // 07
+    dw 117, 062                             // 08
+    dw 159, 062                             // 09
+    dw 201, 062                             // 0A
+    dw 243, 062                             // 0B
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // CE STAGE SELECT SCREEN
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Layout
+    // [00] [01] [02] [03] [04] [05]
+    // [06] [07] [08] [09] [0A] [0B]
+    // [RR] [0C] [0D] [0E] [0F] [RR]
+
+    if !{defined __TE__} {
     constant NUM_ROWS(3)
     constant NUM_COLUMNS(6)
     constant NUM_ICONS(NUM_ROWS * NUM_COLUMNS)
     constant LEFT_RANDOM_INDEX(12)
     constant RIGHT_RANDOM_INDEX(17)
-
-    // @ Descirption
-    // Row the cursor is on
-    row:
-    dw 0
-
-    // @ Descirption
-    // column the cursor is on
-    column:
-    dw 0
 
     // @ Descirption
     // Stage IDs in order
@@ -155,28 +215,28 @@ scope Stages {
     // Coordinates of stage icons in vanilla Super Smash Bros.
     position_table:
     // row 0
-    dw 013, 117                             // 00
-    dw 062, 117                             // 01
-    dw 111, 117                             // 02
-    dw 161, 117                             // 03
-    dw 210, 117                             // 04
-    dw 259, 117                             // 05
+    dw 033, 020                             // 00
+    dw 075, 020                             // 01
+    dw 117, 020                             // 02
+    dw 159, 020                             // 03
+    dw 201, 020                             // 04
+    dw 243, 020                             // 05
 
     // row 1
-    dw 013, 154                             // 06
-    dw 062, 154                             // 07
-    dw 111, 154                             // 08
-    dw 161, 154                             // 09
-    dw 210, 154                             // 0A
-    dw 259, 154                             // 0B
+    dw 033, 052                             // 06
+    dw 075, 052                             // 07
+    dw 117, 052                             // 08
+    dw 159, 052                             // 09
+    dw 201, 052                             // 0A
+    dw 243, 052                             // 0B
 
     // row 2
-    dw 013, 191                             // RR
-    dw 062, 191                             // 0C
-    dw 111, 191                             // 0D
-    dw 161, 191                             // 0E
-    dw 210, 191                             // 0F
-    dw 259, 191                             // RR
+    dw 033, 084                             // RR
+    dw 075, 084                             // 0C
+    dw 117, 084                             // 0D
+    dw 159, 084                             // 0E
+    dw 201, 084                             // 0F
+    dw 243, 084                             // RR
     
     // sorted by stage id
     icon_table:
@@ -201,111 +261,53 @@ scope Stages {
     icon_random:
     dw Data.icon_random
 
+    } // __TE__
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Logic for Both
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     // @ Descirption
+    // Row the cursor is on
+    row:
+    dw 0
+
+    // @ Descirption
+    // column the cursor is on
+    column:
+    dw 0
+
+    // @ Descirption
+    // Prevents series logo from being drawn on wood circle
+    OS.patch_start(0x0014E418, 0x801328A8)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
+    // @ Description
+    // Prevents the drawing of defaults icons
+    OS.patch_start(0x0014E098, 0x80132528)
+    jr      ra                              // return
+    nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Prevents stage name text from being drawn.
+    OS.patch_start(0x0014E2A8, 0x80132738)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
     // Modifies the x/y position of the models on the stage select screen.
     OS.patch_start(0x0014F514, 0x801339A4)
 //  lwc1    f16,0x0000(v0)                  // original line 1 (f16 = (float) x)
 //  swc1    f16,0x0048(a0)                  // original line 2
 //  lwc1    f18,0x0004(v0)                  // original line 3 (f18 = (float) y)
 //  swc1    f18,0x004C(a0)                  // original line 4
-    sw      r0, 0x0048(a0)                  // x = 0
-    lui     t8, 0xC480                      // t8 = (float) -512
-    sw      t8, 0x004C(a0)                  // y = -512
+    lui     t8, 0x44C8                      // t8 = 
+    sw      t8, 0x0048(a0)                  // x = 0
+    sw      t8, 0x004C(a0)                  // y = 4200
     nop
-    OS.patch_end()
-
-    // @ Descirption
-    // Modifies the zoom of the model previews.
-    scope set_zoom_: {
-        OS.patch_start(0x0014ECE4, 0x80133174)
-//      lwc1    f4, 0x0000(v1)              // original line 1
-        j       set_zoom_
-        or      v0, s0, r0                  // original line 2
-        _set_zoom_return:
-        OS.patch_end()
-
-        addiu   sp, sp,-0x00010             // allocate stack space
-        sw      ra, 0x0004(sp)              // ~
-        sw      v0, 0x0008(sp)              // ~
-        sw      t0, 0x000C(sp)              // save registesr
-
-        jal     get_stage_id_               // v0 = stage_id
-        nop
-        sll     v0, v0, 0x0002              // v0 = stage_id * sizeof(word)
-        li      t0, table                   // ~
-        addu    t0, t0, v0                  // t0 = address of zoom
-        lw      t0, 0x0000(t0)              // t0 = zoom
-        mtc1    t0, f4                      // f4 = zoom
-        swc1    f4, 0x0000(v1)              // update all zoom
-
-        lw      ra, 0x0004(sp)              // ~
-        lw      v0, 0x0008(sp)              // ~
-        lw      t0, 0x000C(sp)              // restore registers
-        addiu   sp, sp, 0x0010              // deallocate stack space
-        j       _set_zoom_return
-        nop
-
-        table:
-        float32 0.4                         // Peach's Castle
-        float32 0.2                         // Sector Z
-        float32 0.5                         // Congo Jungle
-        float32 0.4                         // Planet Zebes
-        float32 0.3                         // Hyrule Castle
-        float32 0.5                         // Yoshi's Island
-        float32 0.4                         // Dream Land
-        float32 0.4                         // Saffron City
-        float32 0.2                         // Musrhoom Kingdom
-        float32 0.5                         // Dream Land Beta 1
-        float32 0.5                         // Dream Land Beta 2
-        float32 0.5                         // How to Play
-        float32 0.5                         // Yoshi's Island Cloudless
-        float32 0.5                         // Metal Cavern
-        float32 0.5                         // Battlefield
-        float32 0.5                         // Race to the Finish (Placeholder)
-        float32 0.5                         // Final Deestination
-    }
-
-    // @ Descirption
-    // These modify the x/y position of the model background on the stage select screen
-    // WOOD Y
-    OS.patch_start(0x0014E8FC, 0x80132D8C)
-//  lui     at, 0x4302                      // original line 1
-    lui     at, 0x4190                      // ypos = 18
-    OS.patch_end()
-
-    // WOOD X
-    OS.patch_start(0x0014E914, 0x80132DA4)
-    variable x(103)
-//  lli     s0, 0x003B                      // original line 1
-//  lli     s0, 0x00AB                      // original line 2
-    lli     s0, x                           // xpos = x
-    lli     s2, x + 0x70                    // loop terminator
-    OS.patch_end()
-
-    // RANDOM
-    OS.patch_start(0x0014E96C, 0x80132E0C)
-//  lui     at, 0x4220                      // original line 1
-    lui     at, 0x42C8                      // xpos = 100
-    mtc1    at, f8                          // original line 2
-//  lui     at, 0x42FE                      // original line 3
-    lui     at, 0x4170                      // ypos = 15
-    OS.patch_end()
-
-    // ELSE
-    OS.patch_start(0x0014EA0C, 0x80132E9C)
-//  lui     at, 0x4220                      // original line 1
-    lui     at, 0x42C8                      // xpos = 100
-    mtc1    at, f16                         // original line 2
-    lhu     t8, 0x0024(v0)                  // original line 3
-//  lui     at, 0x42FE                      // original line 3
-    lui     at, 0x4170                      // ypos = 15
-    OS.patch_end()
-
-    // @ Descirption
-    // Disables the function that draw the preview model
-    OS.patch_start(0x0014EF24, 0x801333B4)
-    // jr      ra                              // return immediately
-    // nop
     OS.patch_end()
 
     // @ Descirption
@@ -404,6 +406,37 @@ scope Stages {
         nop
     }
 
+    // @ Descirption
+    // Modifies the zoom of the model previews.
+    scope set_zoom_: {
+        OS.patch_start(0x0014ECE4, 0x80133174)
+//      lwc1    f4, 0x0000(v1)              // original line 1
+        j       set_zoom_
+        or      v0, s0, r0                  // original line 2
+        _set_zoom_return:
+        OS.patch_end()
+
+        addiu   sp, sp,-0x00010             // allocate stack space
+        sw      ra, 0x0004(sp)              // ~
+        sw      v0, 0x0008(sp)              // ~
+        sw      t0, 0x000C(sp)              // save registesr
+
+        jal     get_stage_id_               // v0 = stage_id
+        nop
+        sll     v0, v0, 0x0002              // v0 = stage_id * sizeof(word)
+        li      t0, zoom_table              // ~
+        addu    t0, t0, v0                  // t0 = address of zoom
+        lw      t0, 0x0000(t0)              // t0 = zoom
+        mtc1    t0, f4                      // f4 = zoom
+        swc1    f4, 0x0000(v1)              // update all zoom
+
+        lw      ra, 0x0004(sp)              // ~
+        lw      v0, 0x0008(sp)              // ~
+        lw      t0, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        j       _set_zoom_return
+        nop
+    }
 
     // @ Descirption
     // This functions modifies which preview file is drawn based on stage_table
@@ -469,41 +502,6 @@ scope Stages {
     }
 
     // @ Descirption
-    // Prevents series logo from being drawn on wood circle
-    OS.patch_start(0x0014E418, 0x801328A8)
-    jr      ra                              // return immediately
-    nop
-    OS.patch_end()
-
-    // @ Descirption
-    // Prevents stage name text from being drawn.
-    OS.patch_start(0x0014E2A8, 0x80132738)
-    jr      ra                              // return immediately
-    nop
-    OS.patch_end()
-
-    // @ Descirption
-    // Prevents "Stage Select" texture from being drawn.
-    OS.patch_start(0x0014DDF8, 0x80132288)
-    jr      ra                              // return immediately
-    nop
-    OS.patch_end()
-
-    // @ Descirption
-    // Prevents the wooden circle from being drawn.
-    OS.patch_start(0x0014DBB8, 0x80132048)
-    jr      ra                              // return immediately
-    nop
-    OS.patch_end()
-
-    // @ Description
-    // Prevents the drawing of defaults icons
-    OS.patch_start(0x0014E098, 0x80132528)
-    jr      ra                              // return
-    nop
-    OS.patch_end()
-
-    // @ Descirption
     // Draw stage icons to the screen
     scope draw_icons_: {
         addiu   sp, sp,-0x0020              // allocate stack space
@@ -557,20 +555,6 @@ scope Stages {
         b       _draw_icon                  // draw next icon
         nop
 
-        _draw_random:
-        li      t0, position_table          // t0 = address of position_table
-        lli     t1, LEFT_RANDOM_INDEX       // ~
-        sll     t1, t1, 0x0003              // t1 = offset of left random position
-        addu    t2, t0, t1                  // t2 = address of position_table[offset]
-        lw      a0, 0x0000(t2)              // a0 - ulx
-        lw      a1, 0x0004(t2)              // a1 - uly
-        li      t3, icon_random             // ~
-        lw      t3, 0x0000(t3)              // t3 = address of icon_random image data
-        li      a2, info                    // a2 - address of texture struct
-        sw      t3, 0x00008(a2)             // update info image data
-        jal     Overlay.draw_texture_
-        nop
-
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
@@ -584,7 +568,7 @@ scope Stages {
         nop
 
         info:
-        Texture.info(48, 36)
+        Texture.info(ICON_WIDTH, ICON_HEIGHT)
     }
 
     // @ Descirption
@@ -628,11 +612,11 @@ scope Stages {
         nop
 
         lw      a0, 0x0000(t0)              // a0 - ulx
-        addiu   a0, a0,-0x0001              // decrement ulx
+        addiu   a0, a0,-0x0002              // decrement ulx
         lw      a1, 0x0004(t0)              // a1 - uly
-        addiu   a1, a1,-0x0001              // decrement uly
-        lli     a2, ICON_WIDTH + 2          // a2 - width
-        lli     a3, ICON_HEIGHT + 2         // a3 - height
+        addiu   a1, a1,-0x0002              // decrement uly
+        lli     a2, ICON_WIDTH + 4          // a2 - width
+        lli     a3, ICON_HEIGHT + 4         // a3 - height
         jal     Overlay.draw_rectangle_     // draw curso
         nop
 
@@ -960,7 +944,7 @@ scope Stages {
         li      t0, 0x800A50E8              // ~
         lw      t0, 0x0000(t0)              // t0 = dereference 0x800A50E8
         lbu     t0, 0x0001(t0)              // t0 =  stage id
-        li      t1, table                   // t1 = stage id table (offset)
+        li      t1, background_table        // t1 = stage id table (offset)
         addu    t1, t1, t0                  // t1 = stage id table + offset
         lbu     t0, 0x0000(t1)              // t0 = new working stage id
         li      t2, id                      // t2 = id
@@ -977,27 +961,46 @@ scope Stages {
         id:
         db 0x00                             // holds new stage id
         OS.align(4)
-
-        table:
-        db id.PEACHS_CASTLE                 // Peach's Castle
-        db id.SECTOR_Z                      // Sector Z
-        db id.CONGO_JUNGLE                  // Congo Jungle
-        db id.PLANET_ZEBES                  // Planet Zebes
-        db id.HYRULE_CASTLE                 // Hyrule Castle
-        db id.YOSHIS_ISLAND                 // Yoshi's Island
-        db id.DREAM_LAND                    // Dream Land
-        db id.SAFFRON_CITY                  // Saffron City
-        db id.MUSHROOM_KINGDOM              // Mushroom Kingdom
-        db id.DREAM_LAND                    // Dream Land Beta 1
-        db id.DREAM_LAND                    // Dream Land Beta 2
-        db id.DREAM_LAND                    // How to Play
-        db id.YOSHIS_ISLAND                 // Yoshi's Island (1P)
-        db id.SECTOR_Z                      // Metal Cavern
-        db id.SECTOR_Z                      // Batlefield
-        db 0xFF                             // Race to the Finish (Placeholder)
-        db id.SECTOR_Z                      // Final Destination
-        OS.align(4)
     }
+
+    zoom_table:
+    float32 0.4                         // Peach's Castle
+    float32 0.2                         // Sector Z
+    float32 0.5                         // Congo Jungle
+    float32 0.4                         // Planet Zebes
+    float32 0.3                         // Hyrule Castle
+    float32 0.5                         // Yoshi's Island
+    float32 0.4                         // Dream Land
+    float32 0.4                         // Saffron City
+    float32 0.2                         // Musrhoom Kingdom
+    float32 0.5                         // Dream Land Beta 1
+    float32 0.3                         // Dream Land Beta 2
+    float32 0.5                         // How to Play
+    float32 0.5                         // Yoshi's Island Cloudless
+    float32 0.5                         // Metal Cavern
+    float32 0.5                         // Battlefield
+    float32 0.5                         // Race to the Finish (Placeholder)
+    float32 0.5                         // Final Deestination
+
+    background_table:
+    db id.PEACHS_CASTLE                 // Peach's Castle
+    db id.SECTOR_Z                      // Sector Z
+    db id.CONGO_JUNGLE                  // Congo Jungle
+    db id.PLANET_ZEBES                  // Planet Zebes
+    db id.HYRULE_CASTLE                 // Hyrule Castle
+    db id.YOSHIS_ISLAND                 // Yoshi's Island
+    db id.DREAM_LAND                    // Dream Land
+    db id.SAFFRON_CITY                  // Saffron City
+    db id.MUSHROOM_KINGDOM              // Mushroom Kingdom
+    db id.DREAM_LAND                    // Dream Land Beta 1
+    db id.DREAM_LAND                    // Dream Land Beta 2
+    db id.DREAM_LAND                    // How to Play
+    db id.YOSHIS_ISLAND                 // Yoshi's Island (1P)
+    db id.SECTOR_Z                      // Metal Cavern
+    db id.SECTOR_Z                      // Batlefield
+    db 0xFF                             // Race to the Finish (Placeholder)
+    db id.SECTOR_Z                      // Final Destination
+    OS.align(4)
 
     preview_table:
     dw file.PEACHS_CASTLE
