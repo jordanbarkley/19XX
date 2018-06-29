@@ -1,6 +1,8 @@
 // AI.asm (by bit)
 if !{defined __AI__} {
 define __AI__()
+if !{defined __TE__} {
+
 
 // @ Description
 // This file includes things that make the AIs/CPUs suck a little less.
@@ -160,7 +162,6 @@ scope AI {
         nop
     }
 
-    if !{defined __TE__} {
 
     // @ Description
     // Usually, this function checks for a z-cancel press with 10 frames. At the end of this, at
@@ -228,8 +229,7 @@ scope AI {
         nop
     }
 
-    } // __TE__
-
 }
 
+} // __TE__
 }
