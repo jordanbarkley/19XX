@@ -22,6 +22,7 @@ scope BGM {
     // This function is not yet documented.
     constant stop_(0x00000000)
 
+    if !{defined __TE__} {
     // @ Description
     // This function implements the mono/stero toggle (boolean stereo_enabled - 0x8003CB24)
     scope get_type_: {
@@ -39,6 +40,7 @@ scope BGM {
         j       _get_type_return            // return
         nop
     }
+    } // __TE__
 
     // @ Description
     // a1 holds BGM_id. This function replaces a1 with a random id from the table
