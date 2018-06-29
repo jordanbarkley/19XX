@@ -7,6 +7,7 @@ define __OVERLAY__()
 // @ Note
 // This file only supports rgba5551
 
+include "Data.asm"
 include "Global.asm"
 include "OS.asm"
 include "RCP.asm"
@@ -158,7 +159,6 @@ scope Overlay {
     // a2 - address of texture struct 
     // @ Note
     // This can only handle textures <= 4096 bytes in size
-    // draw_texture_big_ handles the larger textures
     scope draw_texture_: {
         // order from SSB
         // 1. set other modes copy
@@ -432,11 +432,21 @@ scope Overlay {
     // @ Description
     // Custom display list goes here.
     OS.align(16)
-    display_list:
-    fill 0x8000
+
+    if !{defined __TE__} {
+    constant display_list(Data.display_list)
 
     display_list_info:
-    RCP.display_list_info(display_list, 0x8000)
+    RCP.display_list_info(display_list, 0x10000)
+    }
+
+    if {defined __TE__} {
+    display_list:
+    fill 0x1000
+
+    display_list_info:
+    RCP.display_list_info(display_list, 0x1000)
+    }
 
 
 }

@@ -32,6 +32,10 @@ scope Data {
     insert icon_battlefield, "../textures/icon_battlefield.rgba5551"
     insert icon_final_destination, "../textures/icon_final_destination.rgba5551"
     insert icon_random, "../textures/icon_random.rgba5551"
+
+    display_list:
+    fill 0x10000
+    
     pullvar base
     pullvar origin
 }
