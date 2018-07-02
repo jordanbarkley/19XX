@@ -304,7 +304,7 @@ scope Stages {
 //  swc1    f16,0x0048(a0)                  // original line 2
 //  lwc1    f18,0x0004(v0)                  // original line 3 (f18 = (float) y)
 //  swc1    f18,0x004C(a0)                  // original line 4
-    lui     t8, 0x44C8                      // t8 = 
+    lui     t8, 0x44C8                      // t8 = float
     sw      t8, 0x0048(a0)                  // x = 0
     sw      t8, 0x004C(a0)                  // y = 4200
     nop
