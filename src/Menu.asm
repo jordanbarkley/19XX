@@ -28,14 +28,14 @@ scope Menu {
 
     // @ Description
     // Struct for menu entries
-    macro entry(title, type, default, min, max, function_address, string_table, edit_address, next) {
+    macro entry(title, type, default, min, max, function_address, string_table, next) {
         dw {type}                           // 0x0000 - type (int, bool, etc.)
         dw {default}                        // 0x0004 - current value
         dw {min}                            // 0x0008 - minimum value
         dw {max}                            // 0x000C - maximum value
         dw {function_address}               // 0x0010 - if (!null), function ran when A is pressed
         dw {string_table}                   // 0x0014 - if (!null), use table of string pointers
-        dw {edit_address}                   // 0x0018 - if (!null), write curr to this address
+        dw 0x00000000                       // (currently unused)
         dw {next}                           // 0x001C - if !(null), address of next entry
         db {title}                          // 0x0020 - title
         db 0x00
@@ -60,26 +60,6 @@ scope Menu {
                 }
             }
         }
-
-        // @ Description
-        // size checks
-        if {type} == Menu.type.U8 {
-            if {max} - {min} > 0xFF {
-                warning "integer range is too large for u8
-            }
-        }
-
-        if {type} == Menu.type.U16 {
-            if {max} - {min} > 0xFFFF {
-                warning "integer range is too large for u16
-            }
-        }
-
-        if {type} == Menu.type.U32 {
-            if {max} - {min} > 0xFFFFFFFF {
-                warning "integer range is too large for u16
-            }
-        }
     }
 
     bool_0:; db "OFF", 0x00
@@ -91,8 +71,12 @@ scope Menu {
     dw bool_1
     OS.align(4)
 
-    macro entry_bool(title, default, edit_address, next) {
-        Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_table, {edit_address}, {next})
+    macro entry_bool(title, default, next) {
+        Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_table, {next})
+    }
+
+    macro entry_title(title, function_address) {
+        Menu.entry({title}), Menu.type.TITLE, 0, 1, OS.NULL, OS.NULL, {next})
     }
 
     // @ Description

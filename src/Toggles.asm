@@ -37,22 +37,22 @@ scope Toggles {
         addiu   sp, sp, 0x0008              // deallocate stack space
     }
 
-    // @ Description
     if {defined __CE__} {
-    // This patch disables functionality on the OPTION screen.
-    OS.patch_start(0x001205FC, 0x80132E4C)
-    jr      ra
-    nop
-    OS.patch_end()
+        // @ Description
+        // This patch disables functionality on the OPTION screen.
+        OS.patch_start(0x001205FC, 0x80132E4C)
+        jr      ra
+        nop
+        OS.patch_end()
 
-    // @ Description
-    // This patch disables back (press B) on Main Menu
-    OS.patch_start(0x0011D768, 0x801327D8)
-    nop
-    nop
-    nop
-    nop
-    OS.patch_end()
+        // @ Description
+        // This patch disables back (press B) on Main Menu
+        OS.patch_start(0x0011D768, 0x801327D8)
+        nop
+        nop
+        nop
+        nop
+        OS.patch_end()
     }
 
     scope run_: {
@@ -104,50 +104,40 @@ scope Toggles {
 
     head:
     entry_practice_overlay:
-    Menu.entry_bool("COLOR OVERLAYS", OS.FALSE, OS.NULL, entry_disable_cinematic_camera)
+    Menu.entry_bool("COLOR OVERLAYS", OS.FALSE, entry_disable_cinematic_camera)
     
     entry_disable_cinematic_camera:
-    Menu.entry_bool("DISABLE CINEMATIC CAMERA", OS.FALSE, OS.NULL, entry_flash_on_z_cancel)
+    Menu.entry_bool("DISABLE CINEMATIC CAMERA", OS.FALSE, entry_flash_on_z_cancel)
 
     entry_flash_on_z_cancel:
-    Menu.entry_bool("FLASH ON Z-CANCEL", OS.FALSE, OS.NULL, entry_hold_to_pause)
+    Menu.entry_bool("FLASH ON Z-CANCEL", OS.FALSE, entry_hold_to_pause)
 
     entry_hold_to_pause:
-    Menu.entry_bool("HOLD TO PAUSE", OS.TRUE, OS.NULL, entry_improved_combo_meter)
+    Menu.entry_bool("HOLD TO PAUSE", OS.TRUE, entry_improved_combo_meter)
 
     entry_improved_combo_meter:
-    Menu.entry_bool("IMPROVED COMBO METER", OS.TRUE, OS.NULL, entry_improved_ai)
+    Menu.entry_bool("IMPROVED COMBO METER", OS.TRUE, entry_improved_ai)
 
     entry_improved_ai:
-    Menu.entry_bool("IMPROVED AI", OS.TRUE, OS.NULL, entry_neutral_spawns)
+    Menu.entry_bool("IMPROVED AI", OS.TRUE, entry_neutral_spawns)
 
     entry_neutral_spawns:
-    Menu.entry_bool("NEUTRAL SPAWNS", OS.TRUE, OS.NULL, entry_random_music)
+    Menu.entry_bool("NEUTRAL SPAWNS", OS.TRUE, entry_random_music)
 
     entry_random_music:
-    Menu.entry_bool("RANDOM MUSIC", OS.FALSE, OS.NULL, entry_skip_results_screen)
+    Menu.entry_bool("RANDOM MUSIC", OS.FALSE, entry_skip_results_screen)
 
     entry_skip_results_screen:
-    Menu.entry_bool("SKIP RESULTS SCREEN", OS.FALSE, OS.NULL, entry_stereo_sound)
+    Menu.entry_bool("SKIP RESULTS SCREEN", OS.FALSE, entry_stereo_sound)
 
     entry_stereo_sound:
-    Menu.entry_bool("STEREO SOUND", OS.TRUE, OS.NULL, entry_stock_handicap)
+    Menu.entry_bool("STEREO SOUND", OS.TRUE, entry_stock_handicap)
 
     entry_stock_handicap:
-    Menu.entry_bool("STOCK HANDICAP", OS.TRUE, OS.NULL, entry_salty_runback)
+    Menu.entry_bool("STOCK HANDICAP", OS.TRUE, entry_salty_runback)
 
     entry_salty_runback:
-    Menu.entry_bool("SALTY RUNBACK", OS.TRUE, OS.NULL, test)
-
-    test:
-    Menu.entry("TEST12345", Menu.type.U8, 2, 0, 4, test_f, OS.NULL, OS.NULL, OS.NULL)
-
-    scope test_f: {
-        lli     a0, 0                       // a0 - unknown, set to 0
-        lli     a1, BGM.special.INVINCIBLE  // a1 - BGM ID
-        j       BGM.play_
-        nop
-    }
+    Menu.entry_bool("SALTY RUNBACK", OS.TRUE, test)
 }
 
 
