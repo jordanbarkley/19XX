@@ -3,7 +3,7 @@ if !{defined __TRAINING__} {
 define __TRAINING__()
 if !{defined __TE__} {
 
-// @ Descirption
+// @ Description
 // This file include enhancements for training purposes.
 
 include "Global.asm"
@@ -185,7 +185,7 @@ scope Training {
         
     }
 
-    // @ Descirption
+    // @ Description
     // This function flashes when a z-cancel is successful [bit]
     scope flash_on_z_cancel_: {
         constant Z_CACNEL_WINDOW(10)
