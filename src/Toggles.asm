@@ -137,8 +137,10 @@ scope Toggles {
     Menu.entry_bool("STOCK HANDICAP", OS.TRUE, OS.NULL, entry_salty_runback)
 
     entry_salty_runback:
-    Menu.entry_bool("SALTY RUNBACK", OS.TRUE, OS.NULL, OS.NULL)
+    Menu.entry_bool("SALTY RUNBACK", OS.TRUE, OS.NULL, test)
 
+    test:
+    Menu.entry("TEST12345", Menu.type.U8, 2, 0, 4, OS.NULL, OS.NULL, OS.NULL, OS.NULL)
 }
 
 

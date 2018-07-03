@@ -18,10 +18,11 @@ scope Menu {
         constant U8(0x0000)                 // 08 bit integer (unsigned)
         constant U16(0x0001)                // 16 bit integer (unsigned)
         constant U32(0x0002)                // 32 bit integer (unsigned)
-        constant S8(0x0003)                 // 08 bit integer (signed)
-        constant S16(0x0004)                // 16 bit integer (signed)
-        constant S32(0x0005)                // 32 bit integer (signed)
+        constant S8(0x0003)                 // 08 bit integer (signed, not supported) 
+        constant S16(0x0004)                // 16 bit integer (signed, not supported)
+        constant S32(0x0005)                // 32 bit integer (signed, not supported)
         constant BOOL(0x0006)               // bool
+        constant TITLE(0x0007)              // has no value on the right
     }
 
     // @ Description
@@ -39,6 +40,17 @@ scope Menu {
         db 0x00
         OS.align(4)
 
+        // @ Description
+        // signed integers are not supproted yet!
+        if {type} >= Menu.type.S8 {
+            if {type} <= Menu.type.S32 {
+                if {string_address} != OS.NULL {
+                    warning "signed integers are not supported (yet)"
+                }
+            }
+        }
+
+        // @ Description
         // warning for strings with a negative index
         if {type} >= Menu.type.S8 {
             if {type} <= Menu.type.S32 {
@@ -47,11 +59,30 @@ scope Menu {
                 }
             }
         }
+
+        // @ Description
+        // size checks
+        if {type} == Menu.type.U8 {
+            if {max} - {min} > 0xFF {
+                warning "integer range is too large for u8
+            }
+        }
+
+        if {type} == Menu.type.U16 {
+            if {max} - {min} > 0xFFFF {
+                warning "integer range is too large for u16
+            }
+        }
+
+        if {type} == Menu.type.U32 {
+            if {max} - {min} > 0xFFFFFFFF {
+                warning "integer range is too large for u16
+            }
+        }
     }
 
     bool_string_address:
-    db "OFF,ON"
-    db 0x00
+    db "DISABLED,ENABLED", 0x00
     OS.align(4)
 
     macro entry_bool(title, default, edit_address, next) {
@@ -69,7 +100,7 @@ scope Menu {
         sw      s0, 0x0004(sp)              // ~
         sw      s1, 0x0008(sp)              // ~
         sw      s2, 0x000C(sp)              // ~
-        sw      t0, 0x0010(sp)              // ~
+        sw      at, 0x0010(sp)              // ~
         sw      ra, 0x0014(sp)              // save registers
 
         move    s0, a0                      // s0 = entry
@@ -82,43 +113,27 @@ scope Menu {
         jal     Overlay.draw_string_
         nop
 
-        lw      t0, 0x0004(s0)              // t0 = current value
-        bnez    t0, _on                     // if (is_enabled), skip
+        _number:
+        lw      a0, 0x0004(s0)              // a0 - (int) current value
+        jal     OS.int_to_string_           // v0 = (string) current value
         nop
-
-        _off:
         lli     a0, 000276                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
         or      a1, s2, r0                  // a1 - uly
-        li      a2, off                     // a0 - address of string
+        move    a2, v0                      // a2 - address of string
         jal     Overlay.draw_string_
-        nop
-        b       _end                        // skip _on
         nop
 
-        _on:
-        lli     a0, 000284                  // a0 - ulx = 320 - 20 - (2 * 8) = 284
-        or      a1, s2, r0                  // a1 - uly
-        li      a2, on                      // a0 - address of string
-        jal     Overlay.draw_string_
-        nop
+        _string:
 
         _end:
         lw      s0, 0x0004(sp)              // ~
         lw      s1, 0x0008(sp)              // ~
         lw      s2, 0x000C(sp)              // ~
-        lw      t0, 0x0010(sp)              // ~
+        lw      at, 0x0010(sp)              // ~
         lw      ra, 0x0014(sp)              // restore registers
         addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra
         nop
-
-        on:
-        db "ON", 0x00
-        OS.align(4)
-
-        off:
-        db "OFF", 0x00
-        OS.align(4)
     }
 
     // @ Description
@@ -263,8 +278,13 @@ scope Menu {
         lw      a1, 0x0018(sp)              // a1 = address of selection
         jal     get_selected_entry_         // v0 = selected entry
         nop
-        lli     t0, OS.TRUE                 // t0 = true
-        sw      t0, 0x0004(v0)              // selection.is_enabled = true
+        lw      t0, 0x0004(v0)              // t0 = entry.current_value
+        lw      t1, 0x000C(v0)              // t1 = entry.max_value
+        sltu    at, t0, t1                  // if (entry.current_value < entry.max_value)
+        beqz    at, _end                    // then, skip
+        nop                                 // else, continue
+        addiu   t0, t0, 0x0001              // ~
+        sw      t0, 0x0004(v0)              // entry.current_value++
         b       _end                        // only allow one update
         nop
 
@@ -278,8 +298,13 @@ scope Menu {
         lw      a1, 0x0018(sp)              // a1 = address of selection
         jal     get_selected_entry_         // v0 = selected entry
         nop
-        lli     t0, OS.FALSE                // t0 = false
-        sw      t0, 0x0004(v0)              // selection.is_enabled = false
+        lw      t0, 0x0004(v0)              // t0 = entry.current_value
+        lw      t1, 0x0008(v0)              // t1 = entry.min_value
+        sltu    at, t1, t0                  // if (entry.min_value < entry.curr_value)
+        beqz    at, _end                    // then, skip
+        nop                                 // else, continue
+        addiu   t0, t0,-0x0001              // ~
+        sw      t0, 0x0004(v0)              // entry.current_value--
         b       _end                        // only allow one update
         nop
 
