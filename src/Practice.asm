@@ -1,17 +1,17 @@
-// Training.asm (by Fray and bit)
-if !{defined __TRAINING__} {
-define __TRAINING__()
+// Practice.asm (by Fray and bit)
+if !{defined __PRACTICE__} {
+define __PRACTICE__()
 if !{defined __TE__} {
 
 // @ Description
-// This file include enhancements for training purposes.
+// This file include enhancements for practice purposes.
 
 include "Global.asm"
 include "OS.asm"
 include "Toggles.asm"
 
 
-scope Training {
+scope Practice {
 
     // @ Description
     // first actionable frame for various player states

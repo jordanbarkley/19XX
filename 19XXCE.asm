@@ -14,8 +14,8 @@ origin  0x01000000
 base    0x80380000
 variable start(pc())
 include "src/AI.asm"
-include "src/Boot.asm"
 include "src/BGM.asm"
+include "src/Boot.asm"
 include "src/Camera.asm"
 include "src/Character.asm"
 include "src/Cheats.asm"
@@ -31,6 +31,7 @@ include "src/Menu.asm"
 include "src/OS.asm"
 include "src/Overlay.asm"
 include "src/Pause.asm"
+include "src/Practice.asm"
 include "src/RCP.asm"
 include "src/Settings.asm"
 include "src/Shield.asm"
@@ -39,7 +40,7 @@ include "src/Stages.asm"
 include "src/Texture.asm"
 include "src/TimedStock.asm"
 include "src/Timeouts.asm"
-include "src/Training.asm"
+include "src/Toggles.asm"
 include "src/TrainingMode.asm"
 variable end(pc())
 variable size(end - start)
