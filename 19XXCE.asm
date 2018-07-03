@@ -40,6 +40,7 @@ include "src/Texture.asm"
 include "src/TimedStock.asm"
 include "src/Timeouts.asm"
 include "src/Training.asm"
+include "src/TrainingMode.asm"
 variable end(pc())
 variable size(end - start)
 
