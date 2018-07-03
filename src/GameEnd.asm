@@ -6,7 +6,7 @@ if !{defined __TE__} {
 // @ Description
 // This file modidfies what screen the game exits to.
 
-include "Menu.asm"
+include "Toggles.asm"
 include "OS.asm"
 
 scope GameEnd {
@@ -26,7 +26,7 @@ scope GameEnd {
         OS.patch_end()
 
         _skip_results_screen:
-        Menu.toggle_guard(Menu.entry_skip_results_screen, _update_screen_return)
+        Toggles.guard(Toggles.entry_skip_results_screen, _update_screen_return)
         lli     t6, 0x0010                  // original line 1 (modified to character select screen)
         sb      t6, 0x0000(v0)              // original line 2
         j       _update_screen_return       // return
@@ -35,7 +35,7 @@ scope GameEnd {
         _salty_runback:
         lli     t6, 0x0018                  // original line 1
         sb      t6, 0x0000(v0)              // original line 2
-        Menu.toggle_guard(Menu.entry_salty_runback, _skip_results_screen)
+        Toggles.guard(Toggles.entry_salty_runback, _skip_results_screen)
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      v0, 0x0008(sp)              // ~

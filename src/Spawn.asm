@@ -5,9 +5,9 @@ define __SPAWN__()
 // @ Description
 // This file alters spawn position for different circumstances such as Neutral Spawns.
 
-include "OS.asm"
 include "Global.asm"
-include "Menu.asm"
+include "OS.asm"
+include "Toggles.asm"
 
 scope Spawn {
 
@@ -51,7 +51,7 @@ scope Spawn {
 
         lui     t6, 0x8013              // original line 1
         lw      t6, 0x1368(t6)          // original line 2
-        Menu.toggle_guard(Menu.entry_neutral_spawns, _load_neutral_return)
+        Toggles.guard(Toggles.entry_neutral_spawns, _load_neutral_return)
 
         addiu   sp, sp,-0x0020          // allocate stack space
         sw      t0, 0x0004(sp)          // ~

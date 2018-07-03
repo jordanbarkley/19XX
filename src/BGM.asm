@@ -6,7 +6,7 @@ define __BGM__()
 // This file allows BGM (background music) to be played and stopped.
 
 include "Global.asm"
-include "Menu.asm"
+include "Toggles.asm"
 include "OS.asm"
 
 scope BGM {
@@ -35,7 +35,7 @@ scope BGM {
         lw      t8, 0xCB24(t8)              // original line 1 (t8 = stereo_enabled, overwritten.)
         mfhi    s3                          // original line 2
 
-        li      t8, Menu.entry_stereo_sound // ~
+        li      t8, Toggles.entry_stereo_sound // ~
         lw      t8, 0x0000(t8)              // t8 = custom stereo_enabled
         j       _get_type_return            // return
         nop
@@ -55,7 +55,7 @@ scope BGM {
 
         or      v0, a1, r0                  // original line 1
         addu    t3, t1, t2                   // original line 2
-        Menu.toggle_guard(Menu.entry_random_music, _random_music_return)
+        Toggles.guard(Toggles.entry_random_music, _random_music_return)
 
         addiu   sp, sp,-0x0018              // allocate stack space
         sw      a0, 0x0004(sp)              // ~

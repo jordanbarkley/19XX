@@ -5,7 +5,7 @@ define __PAUSE__()
 // @ Description
 // Hold to pause is implemented in this file.
 
-include "Menu.asm"
+include "Toggles.asm"
 include "OS.asm"
 
 scope Pause {
@@ -30,7 +30,7 @@ scope Pause {
 
         lhu     t6, 0x0002(s1)              // original line 1
         andi    t7, t6, 0x1000              // original line 2
-        Menu.toggle_guard(Menu.entry_hold_to_pause, _hold_return)
+        Toggles.guard(Toggles.entry_hold_to_pause, _hold_return)
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~

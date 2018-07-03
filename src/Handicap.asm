@@ -3,7 +3,7 @@ if !{defined __HANDICAP__} {
 define __HANDICAP__()
 
 include "Global.asm"
-include "Menu.asm"
+include "Toggles.asm"
 include "OS.asm"
 
 // TODO: auto and AI fix
@@ -27,7 +27,7 @@ scope Handicap {
         lbu     t9, 0x0021(v1)              // original line 1 (t9 = handicap)
         sb      t9, 0x0075(sp)              // original line 2
         lbu     t8, 0x0007(a1)              // original line 5 (t8 = stocks)
-        Menu.toggle_guard(Menu.entry_stock_handicap, _use_stocks_return)
+        Toggles.guard(Toggles.entry_stock_handicap, _use_stocks_return)
 
         li      t9, Global.vs.handicap      // ~
         lbu     t9, 0x0000(t9)              // at = handicap

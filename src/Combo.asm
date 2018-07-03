@@ -6,7 +6,7 @@ if !{defined __TE__} {
 // @ Description
 // This file contains extensions to Sakurai's combo meter.
 
-include "Menu.asm"
+include "Toggles.asm"
 include "OS.asm"
 
 scope Combo {
@@ -22,7 +22,7 @@ scope Combo {
 
         mtc1    r0, f14                     // original line 1
         andi    t9, t8, 0x0001              // original line 2
-        Menu.toggle_guard(Menu.entry_improved_combo_meter, _improve_meter_return)
+        Toggles.guard(Toggles.entry_improved_combo_meter, _improve_meter_return)
 
         // a2 contains the player struct
         // t9 contains the current value of the hitstun flag (doesn't account for wallbounces/grabs)

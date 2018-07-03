@@ -7,8 +7,9 @@ if !{defined __TE__} {
 // This file include enhancements for training purposes.
 
 include "Global.asm"
-include "Menu.asm"
 include "OS.asm"
+include "Toggles.asm"
+
 
 scope Training {
 
@@ -31,7 +32,7 @@ scope Training {
         
         lw      v0, 0x0084(a0)              // original line 1
         lw      t6, 0x0844(v0)              // original line 2
-        Menu.toggle_guard(Menu.entry_practice_overlay, _overlay_colour_return)
+        Toggles.guard(Toggles.entry_practice_overlay, _overlay_colour_return)
         
         
         addiu   sp, sp,-0x0018              // allocate stack space
@@ -196,7 +197,7 @@ scope Training {
 
 //      jal     0x80142D9C                  // original line 1
 //      nop                                 // original line 2
-        Menu.toggle_guard(Menu.entry_flash_on_z_cancel, 0x80142D9C)
+        Toggles.guard(Toggles.entry_flash_on_z_cancel, 0x80142D9C)
 
         addiu   sp, sp, -0x0018             // allocate stack space
         sw      t0, 0x0004(sp)              // ~

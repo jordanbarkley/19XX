@@ -7,7 +7,7 @@ if !{defined __TE___} {
 // This file disables the cinematic introduction before VS. matches.
 
 include "Global.asm"
-include "Menu.asm"
+include "Toggles.asm"
 include "OS.asm"
 
 scope Camera {
@@ -24,7 +24,7 @@ scope Camera {
 
         jal     Global.get_random_int_      // original line 1
         lli     a0, 0x0003                  // original line 2
-        Menu.toggle_guard(Menu.entry_disable_cinematic_camera, _disable_cinematic_return)
+        Toggles.guard(Toggles.entry_disable_cinematic_camera, _disable_cinematic_return)
 
         lli     v0, OS.FALSE                // v0 = not cinematic camera
         j       _disable_cinematic_return   // return

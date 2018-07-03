@@ -8,7 +8,7 @@ if !{defined __TE__} {
 // This file includes things that make the AIs/CPUs suck a little less.
 
 include "Global.asm"
-include "Menu.asm"
+include "Toggles.asm"
 include "OS.asm"
 
 scope AI {
@@ -81,7 +81,7 @@ scope AI {
         addiu   sp, sp,-0x0018              // allocate stack space
         sw      ra, 0x0014(sp)              // save ra
 
-        Menu.toggle_guard(Menu.entry_improved_ai, j_random_teching__orginal_)
+        Toggles.guard(Toggles.entry_improved_ai, j_random_teching__orginal_)
 
         li      t0, Global.match_info       // ~
         lw      t0, 0x0000(t0)              // t0 = address of match_info (0x800A4D08 in VS.)
@@ -177,7 +177,7 @@ scope AI {
         lw      t6, 0x0160(v1)              // original line 1
         slti    at, t6, 0x000B              // original line 2
 
-        Menu.toggle_guard(Menu.entry_improved_ai, OS.NULL)
+        Toggles.guard(Toggles.entry_improved_ai, OS.NULL)
 
         addiu   sp, sp,-0x0020              // allocate stack space
         sw      ra, 0x001C(sp)              // ~
