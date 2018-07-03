@@ -27,15 +27,15 @@ scope Menu {
 
     // @ Description
     // Struct for menu entries
-    macro entry(title, type, default, min, max, function_address, string_address, edit_address, next) {
+    macro entry(title, type, default, min, max, function_address, string_table, edit_address, next) {
         dw {type}                           // 0x0000 - type (int, bool, etc.)
         dw {default}                        // 0x0004 - current value
         dw {min}                            // 0x0008 - minimum value
         dw {max}                            // 0x000C - maximum value
-        dw {function_address}               // 0x0010 - function ran when A is pressed
-        dw {string_address}                 // 0x0014 - address of comma delimeted string
+        dw {function_address}               // 0x0010 - if (!null), function ran when A is pressed
+        dw {string_table}                   // 0x0014 - if (!null), use table of string pointers
         dw {edit_address}                   // 0x0018 - if (!null), write curr to this address
-        dw {next}                           // 0x001C - address of next entry (or null)
+        dw {next}                           // 0x001C - if !(null), address of next entry
         db {title}                          // 0x0020 - title
         db 0x00
         OS.align(4)
@@ -81,12 +81,19 @@ scope Menu {
         }
     }
 
-    bool_string_address:
-    db "DISABLED,ENABLED", 0x00
+    bool_0:
+    db "OFF", 0x00
+    bool_1:
+    db "ON", 0x00
+    OS.align(4)
+
+    bool_string_table:
+    dw bool_0
+    dw bool_1
     OS.align(4)
 
     macro entry_bool(title, default, edit_address, next) {
-        Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_address, {edit_address}, {next})
+        Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_table, {edit_address}, {next})
     }
 
     // @ Description
@@ -100,8 +107,9 @@ scope Menu {
         sw      s0, 0x0004(sp)              // ~
         sw      s1, 0x0008(sp)              // ~
         sw      s2, 0x000C(sp)              // ~
-        sw      at, 0x0010(sp)              // ~
-        sw      ra, 0x0014(sp)              // save registers
+        sw      t0, 0x0010(sp)              // ~
+        sw      t1, 0x0014(sp)              // ~
+        sw      ra, 0x0018(sp)              // save registers
 
         move    s0, a0                      // s0 = entry
         move    s1, a1                      // s1 = ulx
@@ -113,24 +121,39 @@ scope Menu {
         jal     Overlay.draw_string_
         nop
 
+        lw      t0, 0x0014(s0)              // at = entry.string_table
+        bnez    t0, _string                 // if (entry.string_table != null), skip
+        nop                                 // else, continue
+
         _number:
         lw      a0, 0x0004(s0)              // a0 - (int) current value
         jal     OS.int_to_string_           // v0 = (string) current value
         nop
         lli     a0, 000276                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
-        or      a1, s2, r0                  // a1 - uly
+        move    a1, s2                      // a1 - uly
         move    a2, v0                      // a2 - address of string
-        jal     Overlay.draw_string_
+        jal     Overlay.draw_string_        // draw value
+        nop
+        b       _end                        // skip draw string
         nop
 
         _string:
+        lw      t1, 0x0004(s0)              // at =  (int) current value
+        sll     t1, t1, 0x0002              // t1 = curr * sizeof(string pointer)
+        addu    a2, t0, t1                  // ~
+        lw      a2, 0x0000(a2)              // a2 - address of string
+        lli     a0, 000276                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
+        move    a1, s2                      // a1 - uly
+        jal     Overlay.draw_string_        // draw string
+        nop
 
         _end:
         lw      s0, 0x0004(sp)              // ~
         lw      s1, 0x0008(sp)              // ~
         lw      s2, 0x000C(sp)              // ~
-        lw      at, 0x0010(sp)              // ~
-        lw      ra, 0x0014(sp)              // restore registers
+        lw      t0, 0x0010(sp)              // ~
+        lw      t1, 0x0014(sp)              // ~
+        lw      ra, 0x0018(sp)              // restore registers
         addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra
         nop
