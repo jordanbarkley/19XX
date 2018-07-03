@@ -11,6 +11,7 @@ include "Overlay.asm"
 scope Menu {
 
     constant ROW_HEIGHT(000010)
+    constant VALUE_COLUMN(000025)
     constant DEADZONE(000020)
     constant NUM_ENTRIES(000012)
 
@@ -81,10 +82,8 @@ scope Menu {
         }
     }
 
-    bool_0:
-    db "OFF", 0x00
-    bool_1:
-    db "ON", 0x00
+    bool_0:; db "OFF", 0x00
+    bool_1:; db "ON", 0x00
     OS.align(4)
 
     bool_string_table:
@@ -129,7 +128,7 @@ scope Menu {
         lw      a0, 0x0004(s0)              // a0 - (int) current value
         jal     OS.int_to_string_           // v0 = (string) current value
         nop
-        lli     a0, 000276                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
+        addiu   a0, s1, (8 * VALUE_COLUMN)  // a0 - ulx
         move    a1, s2                      // a1 - uly
         move    a2, v0                      // a2 - address of string
         jal     Overlay.draw_string_        // draw value
@@ -142,7 +141,7 @@ scope Menu {
         sll     t1, t1, 0x0002              // t1 = curr * sizeof(string pointer)
         addu    a2, t0, t1                  // ~
         lw      a2, 0x0000(a2)              // a2 - address of string
-        lli     a0, 000276                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
+        addiu   a0, s1, (8 * VALUE_COLUMN)  // a0 - ulx
         move    a1, s2                      // a1 - uly
         jal     Overlay.draw_string_        // draw string
         nop
