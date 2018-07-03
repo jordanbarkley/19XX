@@ -145,7 +145,7 @@ scope Stages {
     dw OS.NULL                              // Dream Land Beta 2
     dw OS.NULL                              // How To Play
     dw OS.NULL                              // Yoshi's Island Cloudless
-    dw OS.NULL                              // Metal Cavern
+    dw OS.NULL                              // Meta Crystal
     dw icon_battlefield
     dw OS.NULL                              // Race to the Finish (Placeholder)
     dw icon_final_destination
@@ -977,7 +977,7 @@ scope Stages {
     float32 0.3                         // Dream Land Beta 2
     float32 0.5                         // How to Play
     float32 0.5                         // Yoshi's Island Cloudless
-    float32 0.5                         // Metal Cavern
+    float32 0.5                         // Meta Crystal
     float32 0.5                         // Battlefield
     float32 0.5                         // Race to the Finish (Placeholder)
     float32 0.5                         // Final Deestination
@@ -996,7 +996,7 @@ scope Stages {
     db id.DREAM_LAND                    // Dream Land Beta 2
     db id.DREAM_LAND                    // How to Play
     db id.YOSHIS_ISLAND                 // Yoshi's Island (1P)
-    db id.SECTOR_Z                      // Metal Cavern
+    db id.SECTOR_Z                      // Meta Crystal
     db id.SECTOR_Z                      // Batlefield
     db 0xFF                             // Race to the Finish (Placeholder)
     db id.SECTOR_Z                      // Final Destination
