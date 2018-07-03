@@ -15,39 +15,54 @@ scope Menu {
     constant NUM_ENTRIES(000012)
 
     scope type {
-        constant U8(0x0000)
-        constant U16(0x0001)
-        constant U32(0x0002)
-        constant S8(0x0003)
-        constant S16(0x0004)
-        constant S32(0x0005)
-        constant BOOL(0x0006)
+        constant U8(0x0000)                 // 08 bit integer (unsigned)
+        constant U16(0x0001)                // 16 bit integer (unsigned)
+        constant U32(0x0002)                // 32 bit integer (unsigned)
+        constant S8(0x0003)                 // 08 bit integer (signed)
+        constant S16(0x0004)                // 16 bit integer (signed)
+        constant S32(0x0005)                // 32 bit integer (signed)
+        constant BOOL(0x0006)               // bool
     }
 
     // @ Description
     // Struct for menu entries
-    macro entry_new(title, type, default, min, max, function_address, string_address, edit_address) {
+    macro entry(title, type, default, min, max, function_address, string_address, edit_address, next) {
         dw {type}                           // 0x0000 - type (int, bool, etc.)
         dw {default}                        // 0x0004 - current value
         dw {min}                            // 0x0008 - minimum value
         dw {max}                            // 0x000C - maximum value
         dw {function_address}               // 0x0010 - function ran when A is pressed
-        dw {string_address}                 // 0x0014 - comma delimated string (replaces index)
+        dw {string_address}                 // 0x0014 - address of comma delimeted string
         dw {edit_address}                   // 0x0018 - if (!null), write curr to this address
+        dw {next}                           // 0x001C - address of next entry (or null)
+        db {title}                          // 0x0020 - title
+        db 0x00
+        OS.align(4)
+
+        // warning for strings with a negative index
+        if {type} >= Menu.type.S8 {
+            if {type} <= Menu.type.S32 {
+                if {string_address} != OS.NULL {
+                    warning "string index may be less than 0"
+                }
+            }
+        }
     }
 
-    macro entry(title, next, is_enabled) {
-        dw {is_enabled}                     // 0x0000 - is_enabled
-        dw {next}                           // 0x0004 - next_entry
-        db {title}                          // 0x0008 - title
-        OS.align(4)
+    bool_string_address:
+    db "OFF,ON"
+    db 0x00
+    OS.align(4)
+
+    macro entry_bool(title, default, edit_address, next) {
+        Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_address, {edit_address}, {next})
     }
 
     // @ Description
     // Draw a menu entry (title, on/off)
     // @ Arguments
     // a0 - entry
-    // a1 - ulx (= 20)
+    // a1 - ulx
     // a2 - uly
     scope draw_entry_: {
         addiu   sp, sp,-0x0018              // allocate stack space
@@ -57,23 +72,23 @@ scope Menu {
         sw      t0, 0x0010(sp)              // ~
         sw      ra, 0x0014(sp)              // save registers
 
-        or      s0, a0, r0                  // ~
-        or      s1, a2, r0                  // ~
-        or      s2, a0, r0                  // sx = ax
+        move    s0, a0                      // s0 = entry
+        move    s1, a1                      // s1 = ulx
+        move    s2, a2                      // s2 = uly
 
-        lli     a0, 000028                  // a0 - ulx = 0 + 20 + (sizeof(char), the '>') = 28
-        or      a1, s1, r0                  // a1 - uly
-        addiu   a2, s0, 0x0008              // a2 - address of string
+        move    a0, s1                      // a1 - ulx
+        move    a1, s2                      // a1 - uly
+        addiu   a2, s0, 0x0020              // a2 - address of string (title = entry + 0x0020)
         jal     Overlay.draw_string_
         nop
 
-        lw      t0, 0x0000(s0)              // t0 = is_enabled
+        lw      t0, 0x0004(s0)              // t0 = current value
         bnez    t0, _on                     // if (is_enabled), skip
         nop
 
         _off:
         lli     a0, 000276                  // a0 - ulx = 320 - 20 - (3 * 8) = 276
-        or      a1, s1, r0                  // a1 - uly
+        or      a1, s2, r0                  // a1 - uly
         li      a2, off                     // a0 - address of string
         jal     Overlay.draw_string_
         nop
@@ -82,7 +97,7 @@ scope Menu {
 
         _on:
         lli     a0, 000284                  // a0 - ulx = 320 - 20 - (2 * 8) = 284
-        or      a1, s1, r0                  // a1 - uly
+        or      a1, s2, r0                  // a1 - uly
         li      a2, on                      // a0 - address of string
         jal     Overlay.draw_string_
         nop
@@ -110,29 +125,38 @@ scope Menu {
     // Draw linked list of menu entries
     // @ Arguments
     // a0 - address of head_entry
-    // a1 - address of selection
+    // a1 - ulx
+    // a2 - uly
+    // a3 - address of selection
     scope draw_: {
-        addiu   sp, sp,-0x0018              // allocate stack space
+        addiu   sp, sp,-0x0020              // allocate stack space
         sw      s0, 0x0004(sp)              // ~
         sw      t0, 0x0008(sp)              // ~
         sw      ra, 0x000C(sp)              // ~
-        sw      a1, 0x0010(sp)              // save registers
+        sw      a0, 0x0010(sp)              // ~
+        sw      a1, 0x0014(sp)              // ~
+        sw      a2, 0x0018(sp)              // ~
+        sw      a3, 0x001C(sp)              // save registers
 
         // draw first entry
-        or      s0, a0, r0                  // s0 = copy of a0
-        lli     t0, 20                      // t0 = uly
-        or      a2, t0, r0                  // a2 = uly
+//      move    a0, a0                      // a0 - entry
+//      move    a1, a1                      // a1 - ulx
+//      move    a2, a2                      // a2 - uly
         jal     draw_entry_                 // draw first entry
         nop
 
         // draw following entries
+        lw      s0, 0x0010(sp)              // s0 = entry_head
+        lw      t0, 0x0018(sp)              // t0 = uly
+
         _loop:
-        lw      s0, 0x0004(s0)              // s0 = entry->next
+        lw      s0, 0x001C(s0)              // s0 = entry->next
         beqz    s0, _end                    // if (entry->next == NULL), end
         nop
         addiu   t0, t0, ROW_HEIGHT          // increment height
-        or      a0, s0, r0                  // a0 = entry
-        or      a2, t0, r0                  // a2 = uly
+        move    a0, s0                      // a0 - entry
+        lw      a1, 0x0014(sp)              // a1 - ulx
+        move    a2, t0                      // a2 - uly
         jal     draw_entry_
         nop
         b       _loop
@@ -140,14 +164,15 @@ scope Menu {
 
         _end:
         // draw ">"
-        lw      t0, 0x0010(sp)              // t0 = address of selection
+        lw      t0, 0x001C(sp)              // t0 = address of selection
         lw      t0, 0x0000(t0)              // t0 = selection
         addiu   t0, t0, 0x0002              // t0 = selection + 2
         lli     s0, ROW_HEIGHT              // ~
         mult    t0, s0                      // ~
         mflo    a1                          // s0 = height of row
 
-        lli     a0, 000020                  // a0 - ulx
+        lw      a0, 0x0014(sp)              // ~
+        addiu   a0, a0,-0x0008              // a0 - ulx
 //      or      a1, a1, r0                  // a1 - uly
         lli     a2, '>'                     // a2 - char
         jal     Overlay.draw_char_          // draw '>'
@@ -155,9 +180,12 @@ scope Menu {
 
         lw      s0, 0x0004(sp)              // ~
         lw      t0, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
-        lw      a1, 0x0010(sp)              // save registers
-        addiu   sp, sp, 0x0018              // deallocate stack space
+        lw      ra, 0x000C(sp)              // ~
+        lw      a0, 0x0010(sp)              // ~
+        lw      a1, 0x0014(sp)              // ~
+        lw      a2, 0x0018(sp)              // ~
+        lw      a3, 0x001C(sp)              // restore registers
+        addiu   sp, sp, 0x0020              // deallocate stack space
         jr      ra                          // return
         nop
     }
@@ -201,7 +229,6 @@ scope Menu {
         b       _end                        // exit
         nop
 
-
         _up:
         lli     a0, DEADZONE               // a0 - min coordinate (deadzone)
         jal     Joypad.check_stick_up_      // check if stick pressed up
@@ -237,7 +264,7 @@ scope Menu {
         jal     get_selected_entry_         // v0 = selected entry
         nop
         lli     t0, OS.TRUE                 // t0 = true
-        sw      t0, 0x0000(v0)              // selection.is_enabled = true
+        sw      t0, 0x0004(v0)              // selection.is_enabled = true
         b       _end                        // only allow one update
         nop
 
@@ -252,7 +279,7 @@ scope Menu {
         jal     get_selected_entry_         // v0 = selected entry
         nop
         lli     t0, OS.FALSE                // t0 = false
-        sw      t0, 0x0000(v0)              // selection.is_enabled = false
+        sw      t0, 0x0004(v0)              // selection.is_enabled = false
         b       _end                        // only allow one update
         nop
 
@@ -289,7 +316,7 @@ scope Menu {
         nop
         beq     at, t0, _end                // if (i == selection), end loop
         nop
-        lw      a0, 0x0004(a0)              // a0 = entry->next
+        lw      a0, 0x001C(a0)              // a0 = entry->next
         addiu   at, at, 0x0001              // increment i 
         b       _loop                       // check again
         nop
@@ -342,7 +369,7 @@ scope Menu {
         _loop:
         beqz    a0, _end                    // if (entry = null), end
         nop
-        lw      a0, 0x0004(a0)              // a0 = entry->next
+        lw      a0, 0x001C(a0)              // a0 = entry->next
         addiu   v0, v0, 0x0001              // increment ret
         b       _loop                       // check again
         nop

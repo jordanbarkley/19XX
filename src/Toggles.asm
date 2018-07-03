@@ -7,7 +7,6 @@ include "OS.asm"
 
 scope Toggles {
 
-    constant NUM_ENTRIES(000012)
     selection:
     dw 0x00000000
     
@@ -17,7 +16,7 @@ scope Toggles {
         addiu   sp, sp,-0x0008              // allocate stack space
         sw      at, 0x0004(sp)              // save at
         li      at, {entry_address}         // ~
-        lw      at, 0x0000(at)              // at = is_enabled
+        lw      at, 0x0004(at)              // at = is_enabled
         bnez    at, pc() + 24               // if (is_enabled), _continue
         nop
 
@@ -73,13 +72,15 @@ scope Toggles {
 
         // update menu
         li      a0, head                    // a0 - head
-        li      a1, selection               // a1 - selection
+        li      a1, selection               // a1 - address of selection
         jal     Menu.update_                // check for updates
         nop
 
         // draw menu
         li      a0, head                    // a0 - menu head
-        li      a1, selection               // a1 - selection
+        lli     a1, 000028                  // a1 - ulx
+        lli     a2, 000020                  // a2 - uly
+        li      a3, selection               // a3 - selection
         jal     Menu.draw_                  // draw menu
         nop
 
@@ -103,40 +104,41 @@ scope Toggles {
 
     head:
     entry_practice_overlay:
-    Menu.entry("COLOUR OVERLAYS", entry_disable_cinematic_camera, OS.FALSE)
-
+    Menu.entry_bool("COLOR OVERLAYS", OS.FALSE, OS.NULL, entry_disable_cinematic_camera)
+    
     entry_disable_cinematic_camera:
-    Menu.entry("DISABLE CINEMATIC CAMERA", entry_flash_on_z_cancel, OS.TRUE)
+    Menu.entry_bool("DISABLE CINEMATIC CAMERA", OS.FALSE, OS.NULL, entry_flash_on_z_cancel)
 
     entry_flash_on_z_cancel:
-    Menu.entry("FLASH ON Z CANCEL", entry_hold_to_pause, OS.FALSE)
+    Menu.entry_bool("FLASH ON Z-CANCEL", OS.FALSE, OS.NULL, entry_hold_to_pause)
 
     entry_hold_to_pause:
-    Menu.entry("HOLD TO PAUSE", entry_improved_combo_meter, OS.TRUE)
+    Menu.entry_bool("HOLD TO PAUSE", OS.TRUE, OS.NULL, entry_improved_combo_meter)
 
     entry_improved_combo_meter:
-    Menu.entry("IMPROVED COMBO METER", entry_improved_ai, OS.TRUE)
+    Menu.entry_bool("IMPROVED COMBO METER", OS.TRUE, OS.NULL, entry_improved_ai)
 
     entry_improved_ai:
-    Menu.entry("IMPROVED AI", entry_neutral_spawns, OS.TRUE)
+    Menu.entry_bool("IMPROVED AI", OS.TRUE, OS.NULL, entry_neutral_spawns)
 
     entry_neutral_spawns:
-    Menu.entry("NEUTRAL SPAWNS", entry_random_music, OS.TRUE)
+    Menu.entry_bool("NEUTRAL SPAWNS", OS.TRUE, OS.NULL, entry_random_music)
 
     entry_random_music:
-    Menu.entry("RANDOM MUSIC", entry_skip_results_screen, OS.FALSE)
+    Menu.entry_bool("RANDOM MUSIC", OS.FALSE, OS.NULL, entry_skip_results_screen)
 
     entry_skip_results_screen:
-    Menu.entry("SKIP RESULTS SCREEN", entry_stereo_sound, OS.FALSE)
+    Menu.entry_bool("SKIP RESULTS SCREEN", OS.FALSE, OS.NULL, entry_stereo_sound)
 
     entry_stereo_sound:
-    Menu.entry("STEREO SOUND", entry_stock_handicap, OS.TRUE)
+    Menu.entry_bool("STEREO SOUND", OS.TRUE, OS.NULL, entry_stock_handicap)
 
     entry_stock_handicap:
-    Menu.entry("STOCK HANDICAP", entry_salty_runback, OS.FALSE)
+    Menu.entry_bool("STOCK HANDICAP", OS.TRUE, OS.NULL, entry_salty_runback)
 
     entry_salty_runback:
-    Menu.entry("SALTY RUNBACK", OS.NULL, OS.TRUE)
+    Menu.entry_bool("SALTY RUNBACK", OS.TRUE, OS.NULL, OS.NULL)
+
 }
 
 
