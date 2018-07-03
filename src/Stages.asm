@@ -180,7 +180,7 @@ scope Stages {
     // [06] [07] [08] [09] [0A] [0B]
     // [RR] [0C] [0D] [0E] [0F] [RR]
 
-    if !{defined __TE__} {
+    if {defined __CE__} {
     constant NUM_ROWS(3)
     constant NUM_COLUMNS(6)
     constant NUM_ICONS(NUM_ROWS * NUM_COLUMNS)

@@ -1,7 +1,7 @@
 // GameEnd.asm
 if !{defined __GAME_END__} {
 define __GAME_END__()
-if !{defined __TE__} {
+if {defined __CE__} {
 
 // @ Description
 // This file modidfies what screen the game exits to.

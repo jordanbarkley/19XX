@@ -56,7 +56,7 @@ scope Overlay {
         li      t0, Global.current_screen   // ~
         lb      t0, 0x0000(t0)              // t0 = screen id
 
-        if !{defined __TE__} {
+        if {defined __CE__} {
         // OPTION screen
         lli     t1, 0x0039                  // t1 = OPTION screen
         bne     t0, t1, _sss                // if (screen_id != OPTION), skip
@@ -433,7 +433,7 @@ scope Overlay {
     // Custom display list goes here.
     OS.align(16)
 
-    if !{defined __TE__} {
+    if {defined __CE__} {
     constant display_list(Data.display_list)
 
     display_list_info:

@@ -22,7 +22,7 @@ scope BGM {
     // This function is not yet documented.
     constant stop_(0x00000000)
 
-    if !{defined __TE__} {
+    if {defined __CE__} {
     // @ Description
     // This function implements the mono/stero toggle (boolean stereo_enabled - 0x8003CB24)
     scope get_type_: {
@@ -97,7 +97,7 @@ scope BGM {
         db stage.FINAL_DESTINATION
         db stage.HOW_TO_PLAY
         db stage.BATTLEFIELD
-        db stage.METAL_CAVERN
+        db stage.META_CRYSTAL
         db menu.DATA
         OS.align(4)
     }
@@ -123,7 +123,6 @@ scope BGM {
         constant FIGHT_POLYGON_STAGE(36)
         constant BATTLEFIELD(36)
         constant METAL_MARIO(37)
-        constant METAL_CAVERN(37)
         constant META_CRYSTAL(37)
     }
 

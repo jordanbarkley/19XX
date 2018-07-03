@@ -1,7 +1,7 @@
 // AI.asm (by bit)
 if !{defined __AI__} {
 define __AI__()
-if !{defined __TE__} {
+if {defined __CE__} {
 
 
 // @ Description

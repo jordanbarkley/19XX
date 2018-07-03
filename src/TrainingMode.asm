@@ -1,7 +1,7 @@
 // TrainingMode.asm
 if !{defined __TRAINING_MODE__} {
 define __TRAINING_MODE__()
-if !{defined __TE__} {
+if {defined __CE__} {
 
 // @ Description
 // This file contains functions and defines structs intended to assist training mode modifications.

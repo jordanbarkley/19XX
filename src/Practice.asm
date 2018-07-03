@@ -1,7 +1,7 @@
 // Practice.asm (by Fray and bit)
 if !{defined __PRACTICE__} {
 define __PRACTICE__()
-if !{defined __TE__} {
+if {defined __CE__} {
 
 // @ Description
 // This file include enhancements for practice purposes.

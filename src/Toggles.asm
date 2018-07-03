@@ -38,7 +38,7 @@ scope Toggles {
     }
 
     // @ Description
-    if !{defined __TE__} {
+    if {defined __CE__} {
     // This patch disables functionality on the OPTION screen.
     OS.patch_start(0x001205FC, 0x80132E4C)
     jr      ra

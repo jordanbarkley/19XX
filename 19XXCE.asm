@@ -1,4 +1,7 @@
 // 19XXCE.asm
+if !{defined __TE__} {
+    define __CE__()
+}
 
 // copy fresh rom
 origin  0x00000000
