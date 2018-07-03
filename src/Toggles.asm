@@ -140,7 +140,14 @@ scope Toggles {
     Menu.entry_bool("SALTY RUNBACK", OS.TRUE, OS.NULL, test)
 
     test:
-    Menu.entry("TEST12345", Menu.type.U8, 2, 0, 4, OS.NULL, OS.NULL, OS.NULL, OS.NULL)
+    Menu.entry("TEST12345", Menu.type.U8, 2, 0, 4, test_f, OS.NULL, OS.NULL, OS.NULL)
+
+    scope test_f: {
+        lli     a0, 0                       // a0 - unknown, set to 0
+        lli     a1, BGM.special.INVINCIBLE  // a1 - BGM ID
+        j       BGM.play_
+        nop
+    }
 }
 
 

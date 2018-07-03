@@ -11,7 +11,7 @@ include "Overlay.asm"
 scope Menu {
 
     constant ROW_HEIGHT(000010)
-    constant VALUE_COLUMN(000025)
+    constant VALUE_COLUMN(000025)           // TODO : remove this
     constant DEADZONE(000020)
     constant NUM_ENTRIES(000012)
 
@@ -291,8 +291,8 @@ scope Menu {
         nop
 
         _right:
-        lli     a0, DEADZONE               // a0 - min coordinate (deadzone)
-        jal     Joypad.check_stick_right_ // check if stick pressed right
+        lli     a0, DEADZONE                // a0 - min coordinate (deadzone)
+        jal     Joypad.check_stick_right_   // check if stick pressed right
         nop
         beqz    v0, _left                   // if not pressed, check left
         nop
@@ -314,7 +314,7 @@ scope Menu {
         lli     a0, -DEADZONE               // a0 - min coordinate (deadzone)
         jal     Joypad.check_stick_left_    // check if stick pressed left
         nop
-        beqz    v0, _end                    // if not pressed, end
+        beqz    v0, _a                      // if not pressed, check A
         nop
         lw      a0, 0x0014(sp)              // a0 - head
         lw      a1, 0x0018(sp)              // a1 = address of selection
@@ -328,6 +328,47 @@ scope Menu {
         addiu   t0, t0,-0x0001              // ~
         sw      t0, 0x0004(v0)              // entry.current_value--
         b       _end                        // only allow one update
+        nop
+
+        _a:
+        // player 1
+        lli     a0, Joypad.A                // a0 - button mask
+        lli     a1, 0x0000                  // a1 - player
+        jal     Joypad.was_pressed_         // v0 = a was pressed (p1)
+        nop
+        move    t0, v0                      // t0 = return
+
+        // player 2
+        lli     a0, Joypad.A                // a0 - button mask
+        lli     a1, 0x0001                  // a1 - player
+        jal     Joypad.was_pressed_         // v0 = a was pressed (p2)
+        nop
+        or      t0, t0, v0                  // t0 = a was pressed (p1/p2)
+
+        // player 3
+        lli     a0, Joypad.A                // a0 - button mask
+        lli     a1, 0x0002                  // a1 - player
+        jal     Joypad.was_pressed_         // v0 = a was pressed (p3)
+        nop
+        or      t0, t0, v0                  // at = a was pressed (p1/p2/p3)
+
+        // player 4
+        lli     a0, Joypad.A                // a0 - button mask
+        lli     a1, 0x0003                  // a1 - player
+        jal     Joypad.was_pressed_         // v0 = a was pressed (p4)
+        nop
+        or      t0, t0, v0                  // at = a was pressed (p1/p2/p3/p4)
+
+        beqz    t0, _end                    // if (a was pressed (p1/p2/p3/p4) == false), skip
+        nop
+        lw      a0, 0x0014(sp)              // a0 - head
+        lw      a1, 0x0018(sp)              // a1 = address of selection
+        jal     get_selected_entry_         // v0 = selected entry
+        nop
+        lw      t0, 0x0010(v0)              // t0 = function address
+        beqz    t0, _end                    // if (function == null), skip
+        nop
+        jalr    t0                          // go to function address
         nop
 
         _end:
