@@ -84,6 +84,66 @@ scope Joypad {
     }
 
     // @ Description
+    // Calls check buttons for each player. If any player's check return true, this function returns
+    // true as well.
+    // @ Arguments
+    // a0 - button_mask
+    // a1 - whatever you like!
+    // a2 - type
+    // @ Returns
+    // v0 - bool
+    scope check_buttons_all_: {
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      a0, 0x0004(sp)              // ~
+        sw      a1, 0x0008(sp)              // ~
+        sw      a2, 0x000C(sp)              // ~
+        sw      t0, 0x0010(sp)              // ~
+        sw      ra, 0x0014(sp)              // save registers
+        
+        // player 1
+        lw      a0, 0x0004(sp)              // a0 - button mask
+        lli     a1, 0x0000                  // a1 - player
+        lw      a2, 0x000C(sp)              // a2 - type
+        jal     Joypad.check_buttons_       // v0 = bool (p1)
+        nop
+        move    t0, v0                      // t0 = return
+
+        // player 2
+        lw      a0, 0x0004(sp)              // a0 - button mask
+        lli     a1, 0x0001                  // a1 - player
+        lw      a2, 0x000C(sp)              // a2 - type
+        jal     Joypad.check_buttons_       // v0 = bool (p2)
+        nop
+        or      t0, t0, v0                  // t0 = bool (p1/p2)
+
+        // player 3
+        lw      a0, 0x0004(sp)              // a0 - button mask
+        lli     a1, 0x0002                  // a1 - player
+        lw      a2, 0x000C(sp)              // a2 - type
+        jal     Joypad.check_buttons_       // v0 = bool (p3)
+        nop
+        or      t0, t0, v0                  // at = bool (p1/p2/p3)
+
+        // player 4
+        lw      a0, 0x0004(sp)              // a0 - button mask
+        lli     a1, 0x0003                  // a1 - player
+        lw      a2, 0x000C(sp)              // a2 - type
+        jal     Joypad.check_buttons_       // v0 = bool (p4)
+        nop
+        or      t0, t0, v0                  // at = bool (p1/p2/p3/p4)
+        move    v0, t0                      // v0 = ret = bool (p1/p2/p3/p4)
+
+        lw      a0, 0x0004(sp)              // ~
+        lw      a1, 0x0008(sp)              // ~
+        lw      a2, 0x000C(sp)              // ~
+        lw      t0, 0x0010(sp)              // ~
+        lw      ra, 0x0014(sp)              // save registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
+
+    // @ Description
     // Determine if a button is held or not
     // @ Arguments
     // a0 - button_mask

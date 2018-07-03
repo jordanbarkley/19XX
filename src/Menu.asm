@@ -331,35 +331,12 @@ scope Menu {
         nop
 
         _a:
-        // player 1
-        lli     a0, Joypad.A                // a0 - button mask
-        lli     a1, 0x0000                  // a1 - player
-        jal     Joypad.was_pressed_         // v0 = a was pressed (p1)
+        lli     a0, Joypad.A                // a0 - button_mask
+        lli     a1, 0x0000                  // a1 - whatever you like!
+        lli     a2, Joypad.PRESSED          // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 = someone pressed a?
         nop
-        move    t0, v0                      // t0 = return
-
-        // player 2
-        lli     a0, Joypad.A                // a0 - button mask
-        lli     a1, 0x0001                  // a1 - player
-        jal     Joypad.was_pressed_         // v0 = a was pressed (p2)
-        nop
-        or      t0, t0, v0                  // t0 = a was pressed (p1/p2)
-
-        // player 3
-        lli     a0, Joypad.A                // a0 - button mask
-        lli     a1, 0x0002                  // a1 - player
-        jal     Joypad.was_pressed_         // v0 = a was pressed (p3)
-        nop
-        or      t0, t0, v0                  // at = a was pressed (p1/p2/p3)
-
-        // player 4
-        lli     a0, Joypad.A                // a0 - button mask
-        lli     a1, 0x0003                  // a1 - player
-        jal     Joypad.was_pressed_         // v0 = a was pressed (p4)
-        nop
-        or      t0, t0, v0                  // at = a was pressed (p1/p2/p3/p4)
-
-        beqz    t0, _end                    // if (a was pressed (p1/p2/p3/p4) == false), skip
+        beqz    v0, _end                    // if (a was pressed (p1/p2/p3/p4) == false), skip
         nop
         lw      a0, 0x0014(sp)              // a0 - head
         lw      a1, 0x0018(sp)              // a1 = address of selection
