@@ -28,7 +28,7 @@ scope Data {
     insert icon_dream_land_beta_2, "../textures/icon_dream_land_beta_2.rgba5551"
     insert icon_how_to_play, "../textures/icon_how_to_play.rgba5551"
     insert icon_yoshis_island_cloudless, "../textures/icon_yoshis_island.rgba5551"
-    insert icon_metal_cavern, "../textures/icon_metal_cavern.rgba5551"
+    insert icon_meta_crystal, "../textures/icon_meta_crystal.rgba5551"
     insert icon_battlefield, "../textures/icon_battlefield.rgba5551"
     insert icon_final_destination, "../textures/icon_final_destination.rgba5551"
     insert icon_random, "../textures/icon_random.rgba5551"

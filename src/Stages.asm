@@ -30,7 +30,7 @@ scope Stages {
         constant DREAM_LAND_BETA_2(0x0A)
         constant HOW_TO_PLAY(0x0B)
         constant YOSHIS_ISLAND_CLOUDLESS(0x0C)
-        constant METAL_CAVERN(0x0D)
+        constant META_CRYSTAL(0x0D)
         constant BATTLEFIELD(0x0E)
         constant RACE_TO_THE_FINISH(0x0F)
         constant FINAL_DESTINATION(0x10)
@@ -54,7 +54,7 @@ scope Stages {
         constant DREAM_LAND_BETA_2(0x14)
         constant HOW_TO_PLAY(0x00)
         constant YOSHIS_ISLAND_CLOUDLESS(0x14)
-        constant METAL_CAVERN(0x14)
+        constant META_CRYSTAL(0x14)
         constant BATTLEFIELD(0x14)
         constant RACE_TO_THE_FINISH(0x00)
         constant FINAL_DESTINATION(0x00)
@@ -76,7 +76,7 @@ scope Stages {
         constant DREAM_LAND_BETA_2(0x0102)
         constant HOW_TO_PLAY(0x010B)
         constant YOSHIS_ISLAND_CLOUDLESS(0x010E)
-        constant METAL_CAVERN(0x10D)
+        constant META_CRYSTAL(0x10D)
         constant BATTLEFIELD(0x010C)
         constant RACE_TO_THE_FINISH(0x0127)
         constant FINAL_DESTINATION(0x010A)
@@ -199,7 +199,7 @@ scope Stages {
     db id.DREAM_LAND_BETA_2                 // 05
     db id.PEACHS_CASTLE                     // 06
     db id.CONGO_JUNGLE                      // 07
-    db id.METAL_CAVERN                      // 08
+    db id.META_CRYSTAL                      // 08
     db id.HYRULE_CASTLE                     // 09
     db id.YOSHIS_ISLAND_CLOUDLESS           // 0A
     db id.SAFFRON_CITY                      // 0B
@@ -253,7 +253,7 @@ scope Stages {
     dw Data.icon_dream_land_beta_2
     dw Data.icon_how_to_play
     dw Data.icon_yoshis_island_cloudless
-    dw Data.icon_metal_cavern
+    dw Data.icon_meta_crystal
     dw Data.icon_battlefield
     dw OS.NULL                              // Race to the Finish (Placeholder)
     dw Data.icon_final_destination
@@ -1016,7 +1016,7 @@ scope Stages {
     dw file.DREAM_LAND_BETA_2
     dw file.HOW_TO_PLAY
     dw file.YOSHIS_ISLAND_CLOUDLESS
-    dw file.METAL_CAVERN
+    dw file.META_CRYSTAL
     dw file.BATTLEFIELD
     dw file.RACE_TO_THE_FINISH
     dw file.FINAL_DESTINATION
@@ -1035,7 +1035,7 @@ scope Stages {
     dw type.DREAM_LAND_BETA_2
     dw type.HOW_TO_PLAY
     dw type.YOSHIS_ISLAND_CLOUDLESS
-    dw type.METAL_CAVERN
+    dw type.META_CRYSTAL
     dw type.BATTLEFIELD
     dw type.RACE_TO_THE_FINISH
     dw type.FINAL_DESTINATION
