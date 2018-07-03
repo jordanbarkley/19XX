@@ -1,6 +1,6 @@
-// TrainingMode.asm
-if !{defined __TRAINING_MODE__} {
-define __TRAINING_MODE__()
+// Training.asm
+if !{defined __TRAINING__} {
+define __TRAINING__()
 if {defined __CE__} {
 
 // @ Description
@@ -11,7 +11,7 @@ include "Global.asm"
 include "Menu.asm"
 include "OS.asm"
 
-scope TrainingMode {
+scope Training {
     // @ Description
     // Byte, determines whether the player is able to control the training mode menu, regardless of
     // if it is currently being displayed. 01 = disable control, 02 = enable control
@@ -28,7 +28,7 @@ scope TrainingMode {
     // Contains the costume ID.
     // @ Percent    [read only]
     // Contains the current percentage.
-    // Read only. Use Character.add_percent_ and TrainingMode.reset_percent_ to write.
+    // Read only. Use Character.add_percent_ and Training.reset_percent_ to write.
     scope struct {
         scope main: {
             // @ Description
