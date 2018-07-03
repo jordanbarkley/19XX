@@ -1,4 +1,4 @@
-// Training.asm
+// Training.asm (by Fray)
 if !{defined __TRAINING__} {
 define __TRAINING__()
 if {defined __CE__} {
@@ -16,19 +16,29 @@ scope Training {
     // Byte, determines whether the player is able to control the training mode menu, regardless of
     // if it is currently being displayed. 01 = disable control, 02 = enable control
     constant toggle_menu(0x80190979)
-
+    
+    // @ Description
+    // Byte, contains the training mode stage id
+    constant stage(0x80190969)
+    
     // @ Description
     // Contains game settings, as well as information and properties for each port.
     // PORT STRUCT INFO
     // @ ID         [read/write]
     // Contains character ID, see character.asm for list.
-    // @ Type       [read/write]
-    // 00 = MAN, 01 = COM, 02 = NOT
-    // @ Costume    [read/write]
+    // @ type       [read/write]
+    // 0x00 = MAN, 0x01 = COM, 0x02 = NOT
+    // @ costume    [read/write]
     // Contains the costume ID.
-    // @ Percent    [read only]
+    // @ percent    [read only]
     // Contains the current percentage.
     // Read only. Use Character.add_percent_ and Training.reset_percent_ to write.
+    // @ spawn_id    [read/write]
+    // Contains the player's spawn id.
+    // 0x00 = port 1, 0x01 = port 2, 0x02 = port 3, 0x03 = port 4, 0x04 = custom
+    // @ spawn_pos
+    // Contains custom spawn position.
+    // float32 xpos, float32 ypos
     scope struct {
         scope main: {
             // @ Description
@@ -45,6 +55,10 @@ scope Training {
             dw OS.NULL
             percent:
             dw OS.NULL
+            spawn_id:
+            dw OS.NULL
+            spawn_pos:
+            float32 0,0
         }
         scope port_2: {
             ID:
@@ -55,6 +69,10 @@ scope Training {
             dw OS.NULL
             percent:
             dw OS.NULL
+            spawn_id:
+            dw OS.NULL
+            spawn_pos:
+            float32 0,0
         }
         scope port_3: {
             ID:
@@ -65,6 +83,10 @@ scope Training {
             dw OS.NULL
             percent:
             dw OS.NULL
+            spawn_id:
+            dw OS.NULL
+            spawn_pos:
+            float32 0,0
         }
         scope port_4: {
             ID:
@@ -75,6 +97,10 @@ scope Training {
             dw OS.NULL
             percent:
             dw OS.NULL
+            spawn_id:
+            dw OS.NULL
+            spawn_pos:
+            float32 0,0
         }
         
         // @ Description
@@ -87,7 +113,7 @@ scope Training {
     }
 
     // @ Description
-    // This function loads various character properties when training mode is reset
+    // This function loads various character properties when training mode is loaded
     scope load_character_: {
         OS.patch_start(0x00116AA0, 0x80190280)
         jal load_character_
@@ -218,7 +244,7 @@ scope Training {
     }    
     
     // @ Description
-    // This function once per frame, per character and can be used to update character information
+    // This function runs once per frame, per character. Can be used to update character info
     // s0 = player struct address
     scope update_character_: {
         OS.patch_start(0x000621B4, 0x800E69B4)
@@ -239,7 +265,7 @@ scope Training {
         lbu     t1, 0x000D(s0)              // ~
         sll     t1, t1, 0x2                 // t1 = offset (player port * 4)
         add     t0, t0, t1                  // t0 = struct table + offset
-        lw      t0, 0x0000(t0)              // t0 = training struct address
+        lw      t0, 0x0000(t0)              // t0 = port struct address
         lhu     t1, 0x002E(s0)              // t1 = current percentage
         sw      t1, 0x000C(t0)              // save percentage to struct
         
@@ -266,12 +292,28 @@ scope Training {
         addiu   a0, a0, 0x0870              // original line 2
         
         addiu   sp, sp,-0x000C              // allocate stack space
-        sw      t1, 0x0008(sp)              // store t0
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // store t0-t1
         
         li      t0, reset_counter           // t0 = reset_counter
         sw      r0, 0x0000(t0)              // reset reset_counter value
         
-        lw      t0, 0x0004(sp)              // load t0
+        initialize_spawns:
+        li      t0, struct.port_1.spawn_id  // t0 = port 1 spawn id address
+        or      t1, r0, r0                  // t1 = port 1 id
+        sw      t1, 0x0000(t0)              // save port id as spawn id
+        li      t0, struct.port_2.spawn_id  // t0 = port 2 spawn id address
+        addiu   t1, t1, 0x0001              // t1 = port 2 id
+        sw      t1, 0x0000(t0)              // save port id as spawn id
+        li      t0, struct.port_3.spawn_id  // t0 = port 3 spawn id address
+        addiu   t1, t1, 0x0001              // t1 = port 3 id
+        sw      t1, 0x0000(t0)              // save port id as spawn id
+        li      t0, struct.port_4.spawn_id  // t0 = port 4 spawn id address
+        addiu   t1, t1, 0x0001              // t1 = port 4 id
+        sw      t1, 0x0000(t0)              // save port id as spawn id
+        
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // load t0-t1
         addiu   sp, sp, 0x000C              // deallocate stack space
         j       _load_from_sss_return
         nop
@@ -347,13 +389,9 @@ scope Training {
 }    
 
 // To-Do List
-// add to port structs:
-// spawn position (0x0 - 0x5: ports 1-4, custom), modify spawn.asm to adhere to this
-// custom spawn position (x,y)
 // create functions:
 // set custom spawn position (if player state = standing, set custom spawn to current x,y position)
 // freeze % toggle?
-// set % (create a function that will set the % to a given value using Character.add_percent_)
 
 // End Goal
 // create an additional menu that can be easily accessed within training mode
