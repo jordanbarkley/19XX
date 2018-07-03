@@ -430,7 +430,7 @@ scope Spawn {
     float32  0900,  1140
     float32 -0990,  0828
 
-    // 0D - Metal Cavern
+    // 0D - Meta Crystal
     float32 -0960,  0135
     float32 -0330,  0045
     float32  0525,  0030
