@@ -47,7 +47,7 @@ scope Character {
     // @ Arguments
     // a0 - address of the player struct
     // a1 - percentage to add to the player
-    constant add_percent_
+    constant add_percent_(0x800EA248)
 
 }
 
