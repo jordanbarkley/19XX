@@ -39,6 +39,9 @@ scope Training {
     // @ spawn_pos
     // Contains custom spawn position.
     // float32 xpos, float32 ypos
+    // @ spawn_dir
+    // Contains custom spawn direction.
+    // 0xFFFFFFFF = left, 0x00000001 = right
     scope struct {
         scope main: {
             // @ Description
@@ -59,6 +62,8 @@ scope Training {
             dw OS.NULL
             spawn_pos:
             float32 0,0
+            spawn_dir:
+            dw 0xFFFFFFFF
         }
         scope port_2: {
             ID:
@@ -73,6 +78,8 @@ scope Training {
             dw OS.NULL
             spawn_pos:
             float32 0,0
+            spawn_dir:
+            dw 0xFFFFFFFF
         }
         scope port_3: {
             ID:
@@ -87,6 +94,8 @@ scope Training {
             dw OS.NULL
             spawn_pos:
             float32 0,0
+            spawn_dir:
+            dw 0xFFFFFFFF
         }
         scope port_4: {
             ID:
@@ -101,6 +110,8 @@ scope Training {
             dw OS.NULL
             spawn_pos:
             float32 0,0
+            spawn_dir:
+            dw 0xFFFFFFFF
         }
         
         // @ Description
@@ -215,7 +226,7 @@ scope Training {
         li      t2, struct.port_3.type      // t2 = struct type pointer
         sw      t1, 0x0000(t2)              // store type in struct
         lbu     t1, 0x0006(t0)              // t1 = costume id
-        li      t2, struct.port_1.costume   // t2 = struct type pointer
+        li      t2, struct.port_3.costume   // t2 = struct type pointer
         sw      t1, 0x0000(t2)              // store costume id in struct
         _initialize_p4:
         addiu   t0, Global.vs.P_DIFF        // t0 = p4 info
@@ -227,7 +238,7 @@ scope Training {
         li      t2, struct.port_4.type      // t2 = struct type pointer
         sw      t1, 0x0000(t2)              // store type in struct
         lbu     t1, 0x0006(t0)              // t1 = costume id
-        li      t2, struct.port_1.costume   // t2 = struct type pointer
+        li      t2, struct.port_4.costume   // t2 = struct type pointer
         sw      t1, 0x0000(t2)              // store costume id in struct
         
         _end:
@@ -244,6 +255,40 @@ scope Training {
     }    
     
     // @ Description
+    // This function loads the facing direction when a custom spawn position is used
+    // v1 = player struct address
+    scope load_spawn_dir_: {
+        OS.patch_start(0x00053210, 0x800D7A10)
+        j   load_spawn_dir_
+        nop
+        _load_spawn_dir_return:
+        OS.patch_end()
+        lw      t7, 0x0024(a1)              // original line 1
+        or      s0, a0, r0                  // original line 2
+        addiu   sp, sp,-0x000C              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // store t0, t1
+        li      t0, struct.table            // t0 = struct table
+        lbu     t1, 0x000D(v1)              // ~
+        sll     t1, t1, 0x2                 // t1 = offset (player port * 4)
+        add     t0, t0, t1                  // t0 = struct table + offset
+        lw      t0, 0x0000(t0)              // t0 = port struct address
+        lw      t1, 0x0010(t0)              // ~
+        slti    t1, t1, 0x4                 // t1 = 1 if spawn_id > 0x4; else t1 = 0
+        bnez    t1, _end                    // skip if spawn_id != custom
+        nop
+        lw      t1, 0x001C(t0)              // t1 = spawn_dir
+        sw      t1, 0x0044(v1)              // player facing direction = spawn_dir
+        
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // load t0, t1
+        addiu   sp, sp, 0x000C              // deallocate stack space       
+        j       _load_spawn_dir_return
+        nop
+        }
+    
+    // @ Description
     // This function runs once per frame, per character. Can be used to update character info
     // s0 = player struct address
     scope update_character_: {
@@ -255,11 +300,11 @@ scope Training {
         _update_percent:
         addiu   sp, sp,-0x000C              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // store t0-t1
+        sw      t1, 0x0008(sp)              // store t0, t1
         li      t0, Global.current_screen   // ~
         lbu     t0, 0x0000(t0)              // t0 = screen_id
         ori     t1, r0, 0x0036              // ~
-        bne     t0, t1, end                 // skip if screen_id != training mode
+        bne     t0, t1, _end                // skip if screen_id != training mode
         nop
         li      t0, struct.table            // t0 = struct table
         lbu     t1, 0x000D(s0)              // ~
@@ -269,9 +314,24 @@ scope Training {
         lhu     t1, 0x002E(s0)              // t1 = current percentage
         sw      t1, 0x000C(t0)              // save percentage to struct
         
-        end:
+        ///////DPAD DOWN to call custom spawn function (used for testing)///////
+        //lbu     t0, 0x01BE(s0)              // t0 = dpad_pressed adress
+        //andi    t0, t0, 0x0008              // ~
+        //beq     t0, r0, _end                // skip if dpad up is not being pressed
+        //nop
+        //addiu   sp, sp,-0x000C              // allocate stack space
+        //sw      a0, 0x0004(sp)              // ~
+        //sw      ra, 0x0008(sp)              // store a0, ra
+        //or      a0, s0, r0                  // a0 = struct address
+        //jal     set_custom_spawn_           // set custom spawn position
+        //nop
+        //lw      a0, 0x0004(sp)              // ~
+        //lw      ra, 0x0008(sp)              // load a0, ra
+        //addiu   sp, sp, 0x000C              // deallocate stack space
+        
+        _end:
         lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // load t0-t1
+        lw      t1, 0x0008(sp)              // load t0, t1
         addiu   sp, sp, 0x000C              // deallocate stack space
         lw      s0, 0x0020(sp)              // original line 1
         addiu   sp, sp, 0x00A0              // original line 2
@@ -293,12 +353,12 @@ scope Training {
         
         addiu   sp, sp,-0x000C              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // store t0-t1
+        sw      t1, 0x0008(sp)              // store t0, t1
         
         li      t0, reset_counter           // t0 = reset_counter
         sw      r0, 0x0000(t0)              // reset reset_counter value
         
-        initialize_spawns:
+        _initialize_spawns:
         li      t0, struct.port_1.spawn_id  // t0 = port 1 spawn id address
         or      t1, r0, r0                  // t1 = port 1 id
         sw      t1, 0x0000(t0)              // save port id as spawn id
@@ -313,7 +373,7 @@ scope Training {
         sw      t1, 0x0000(t0)              // save port id as spawn id
         
         lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // load t0-t1
+        lw      t1, 0x0008(sp)              // load t0, t1
         addiu   sp, sp, 0x000C              // deallocate stack space
         j       _load_from_sss_return
         nop
@@ -335,7 +395,7 @@ scope Training {
         
         addiu   sp, sp,-0x000C              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // store t0-t1
+        sw      t1, 0x0008(sp)              // store t0, t1
         
         li      t0, reset_counter           // t0 = reset_counter
         lw      t1, 0x0000(t0)              // t1 = reset_counter value
@@ -346,14 +406,14 @@ scope Training {
         
         sw      r0, 0x0000(t0)              // reset reset_counter value
         lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // load t0-t1
+        lw      t1, 0x0008(sp)              // load t0, t1
         addiu   sp, sp, 0x000C              // deallocate stack space
         j       _exit_game
         nop
         
         _reset_game:
         lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // load t0-t1
+        lw      t1, 0x0008(sp)              // load t0, t1
         addiu   sp, sp, 0x000C              // deallocate stack space
         j       0x80190654
         nop
@@ -375,6 +435,46 @@ scope Training {
         lw      a1, 0x0004(sp)              // ~
         lw      ra, 0x0008(sp)              // load a1, ra
         addiu   sp, sp, 0x000C              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
+    
+    // @ Description
+    // This function will copy the player's current position to Training.struct.port_x.spawn_pos
+    // as well as copying the player's facing direction to Training.struct.port_x.spawn_dir
+    // @ Arguments
+    // a0 - address of the player struct
+    // CURRENTLY UNTESTED
+    scope set_custom_spawn_: {
+        addiu   sp, sp,-0x000C              // allocate stack space
+        sw      t0, 0x0000(sp)              // ~
+        sw      t1, 0x0004(sp)              // ~
+        sw      t2, 0x0008(sp)              // store t0-t2
+        lw      t0, 0x0024(a0)              // t0 = current action id
+        ori     t1, r0, 0x000A              // t1 = standing action id
+        bne     t0, t1, _end                // skip if current action id != standing
+        nop
+        
+        li      t2, struct.table            // t2 = struct table address
+        lbu     t0, 0x000D(a0)              // ~
+        sll     t0, t0, 0x2                 // t0 = offset (player port * 4)
+        add     t2, t2, t0                  // t2 = struct table + offset
+        lw      t2, 0x0000(t2)              // t2 = port struct address
+        lw      t0, 0x0078(a0)              // t0 = player position address
+        lw      t1, 0x0000(t0)              // t1 = player x position
+        sw      t1, 0x0014(t2)              // save player x position to struct
+        lw      t1, 0x0004(t0)              // t1 = player y position
+        sw      t1, 0x0018(t2)              // save player y position to struct
+        lw      t1, 0x0044(a0)              // t1 = player facing direction
+        sw      t1, 0x001C(t2)              // save player facing direction to struct
+    
+        _end:
+        lw      t0, 0x0000(sp)              // ~
+        lw      t1, 0x0004(sp)              // ~
+        lw      t2, 0x0008(sp)              // load t0-t2, a0
+        addiu   sp, sp, 0x000C              // deallocate stack space
+        jr      ra                          // return
+        nop
     }
     
     // @ Description
