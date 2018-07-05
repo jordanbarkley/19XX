@@ -23,7 +23,13 @@ scope Global {
     // @ Arguments
     // a0 - N 
     constant get_random_int_(0x80018994)
-
+    
+    // @ Description
+    // Plays a sound effect (found by tehz)
+    // @ Arguments
+    // a0 - FGM ID
+    constant play_fgm_(0x800269C0)
+    
     // @ Description
     // Byte, Current screen value is here (CSS = 0x10, Debug = 0x03/0x04)
     constant current_screen(0x800A4AD0)
