@@ -128,7 +128,7 @@ scope OS {
         sw      ra, 0x006C(sp)              // save registers
     }
 
-    macro restore registers() {
+    macro restore_registers() {
         lw      at, 0x0004(sp)              // ~
         lw      v0, 0x0008(sp)              // ~
         lw      v1, 0x000C(sp)              // ~
