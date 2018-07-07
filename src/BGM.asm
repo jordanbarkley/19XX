@@ -40,7 +40,7 @@ scope BGM {
         j       _get_type_return            // return
         nop
     }
-    } // __TE__
+    } // __CE__
 
     // @ Description
     // a1 holds BGM_id. This function replaces a1 with a random id from the table
