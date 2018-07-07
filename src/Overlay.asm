@@ -59,10 +59,18 @@ scope Overlay {
         if {defined __CE__} {
         // OPTION screen
         lli     t1, 0x0039                  // t1 = OPTION screen
-        bne     t0, t1, _sss                // if (screen_id != OPTION), skip
+        bne     t0, t1, _training           // if (screen_id != OPTION), skip
         nop
         jal     Toggles.run_
         nop
+
+        // training mode
+        _training:
+        lli     t1, 0x0036
+        bne     t0, t1, _sss                // if (screen_id != training), skip
+        nop
+        jal     Training.run_
+        nop        
         }
 
         _sss:

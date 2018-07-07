@@ -1,4 +1,4 @@
-// Training.asm (by Fray)
+// Training.asm (functions by Fray, menu implementation by Cyjorg)
 if !{defined __TRAINING__} {
 define __TRAINING__()
 if {defined __CE__} {
@@ -10,6 +10,7 @@ include "Character.asm"
 include "Global.asm"
 include "Menu.asm"
 include "OS.asm"
+include "Overlay.asm"
 
 scope Training {
     // @ Description
@@ -485,6 +486,114 @@ scope Training {
     // stage select and loads from the reset function
     reset_counter:
     dw OS.NULL
+
+    // @ Description
+    // Runs the menu
+    scope run_: {
+        OS.save_registers()
+
+        li      a0, head
+        li      a1, 10
+        li      a2, 10
+        li      a3, selection
+        // jal     Menu.draw_
+        nop
+
+        OS.restore_registers()
+        jr      ra
+        nop
+    }
+
+    // @ Description
+    // Type strings
+    type_1:; db "HUMAN", 0x00
+    type_2:; db "CPU", 0x00
+    type_3:; db "DISABLED", 0x00
+
+    string_table_type:
+    dw type_1
+    dw type_2
+    dw type_3
+
+    // @ Description
+    // Character Strings
+    char_1:;  db "MARIO" , 0x00
+    char_2:;  db "FOX", 0x00
+    char_3:;  db "DK", 0x00
+    char_4:;  db "SAMUS", 0x00
+    char_5:;  db "LUIGI", 0x00
+    char_6:;  db "LINK", 0x00
+    char_7:;  db "YOSHI", 0x00
+    char_8:;  db "C. FALCON", 0x00
+    char_9:;  db "KIRBY", 0x00
+    char_10:; db "PIKACHU", 0x00
+    char_11:; db "JIGGLYPUFF", 0x00
+    char_12:; db "NESS", 0x00
+
+    string_table_char:
+    dw char_1
+    dw char_2
+    dw char_3
+    dw char_4
+    dw char_5
+    dw char_6
+    dw char_7
+    dw char_8
+    dw char_9
+    dw char_10
+    dw char_11
+    dw char_12
+
+    // @ Description 
+    // Spawn Position Strings
+    spawn_1:; db "PORT 1", 0x00
+    spawn_2:; db "PORT 2", 0x00
+    spawn_3:; db "PORT 3", 0x00
+    spawn_4:; db "PORT 4", 0x00
+    spawn_5:; db "CUSTOM", 0x00
+
+    string_table_spawn:
+    dw spawn_1
+    dw spawn_2
+    dw spawn_3
+    dw spawn_4
+    dw spawn_5
+
+    selection:
+    dw 0x00000000
+
+    head:
+    entry_port_x:
+    Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, head_p1)
+
+    head_p1:
+    entry_type_1:
+    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_char, entry_character_1)
+
+    entry_character_1:
+    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_1)
+
+    entry_costume_1:
+    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_1)
+
+    entry_percentage_1:
+    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
+
+    head_p2:
+    head_p3:
+    head_p4:
+    entry_type_2:
+    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_char, entry_character_2)
+
+    entry_character_2:
+    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_2)
+
+    entry_costume_2:
+    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_2)
+
+    entry_percentage_2:
+    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
+
 }
 
 }
