@@ -25,7 +25,7 @@ scope Character {
             constant KIRBY(0x08)
             constant PIKACHU(0x09)
             constant JIGGLY(0x0A)
-            constatn JIGGLYPUFF(0x0A)
+            constant JIGGLYPUFF(0x0A)
             constant NESS(0x0B)
             constant BOSS(0x0C)
             constant METAL(0x0D)
