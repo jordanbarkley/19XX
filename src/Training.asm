@@ -41,6 +41,8 @@ scope Training {
     // float32 xpos, float32 ypos
     // @ spawn_dir
     // Contains custom spawn direction.
+    constant FACE_LEFT(0xFFFFFFFF)
+    constant FACE_RIGHT(0x00000001)
     // 0xFFFFFFFF = left, 0x00000001 = right
     scope struct {
         scope main: {
@@ -63,7 +65,7 @@ scope Training {
             spawn_pos:
             float32 0,0
             spawn_dir:
-            dw 0xFFFFFFFF
+            dw FACE_LEFT
         }
         scope port_2: {
             ID:
@@ -79,7 +81,7 @@ scope Training {
             spawn_pos:
             float32 0,0
             spawn_dir:
-            dw 0xFFFFFFFF
+            dw FACE_LEFT
         }
         scope port_3: {
             ID:
@@ -95,7 +97,7 @@ scope Training {
             spawn_pos:
             float32 0,0
             spawn_dir:
-            dw 0xFFFFFFFF
+            dw FACE_LEFT
         }
         scope port_4: {
             ID:
@@ -111,7 +113,7 @@ scope Training {
             spawn_pos:
             float32 0,0
             spawn_dir:
-            dw 0xFFFFFFFF
+            dw FACE_LEFT
         }
         
         // @ Description
@@ -486,7 +488,7 @@ scope Training {
 }
 
 }
-}    
+}
 
 // To-Do List
 // create functions:
