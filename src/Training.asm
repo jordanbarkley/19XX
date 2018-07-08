@@ -492,11 +492,18 @@ scope Training {
     scope run_: {
         OS.save_registers()
 
+        // update menu
+        li      a0, head                    // a0 - head
+        li      a1, selection               // a1 - address of selection
+        jal     Menu.update_                // check for updates
+        nop
+
+        // draw menu
         li      a0, head
-        li      a1, 10
-        li      a2, 10
+        li      a1, 28
+        li      a2, 20
         li      a3, selection
-        // jal     Menu.draw_
+        jal     Menu.draw_
         nop
 
         OS.restore_registers()
@@ -509,6 +516,7 @@ scope Training {
     type_1:; db "HUMAN", 0x00
     type_2:; db "CPU", 0x00
     type_3:; db "DISABLED", 0x00
+    OS.align(4)
 
     string_table_type:
     dw type_1
@@ -529,6 +537,7 @@ scope Training {
     char_10:; db "PIKACHU", 0x00
     char_11:; db "JIGGLYPUFF", 0x00
     char_12:; db "NESS", 0x00
+    OS.align(4)
 
     string_table_char:
     dw char_1
@@ -551,6 +560,7 @@ scope Training {
     spawn_3:; db "PORT 3", 0x00
     spawn_4:; db "PORT 4", 0x00
     spawn_5:; db "CUSTOM", 0x00
+    OS.align(4)
 
     string_table_spawn:
     dw spawn_1
@@ -568,7 +578,7 @@ scope Training {
 
     head_p1:
     entry_type_1:
-    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_char, entry_character_1)
+    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_1)
 
     entry_character_1:
     Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_1)
