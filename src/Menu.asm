@@ -187,14 +187,14 @@ scope Menu {
         // draw ">"
         lw      t0, 0x001C(sp)              // t0 = address of selection
         lw      t0, 0x0000(t0)              // t0 = selection
-        addiu   t0, t0, 0x0002              // t0 = selection + 2
         lli     s0, ROW_HEIGHT              // ~
         mult    t0, s0                      // ~
-        mflo    a1                          // s0 = height of row
+        mflo    a1                          // a1 = height of row
 
         lw      a0, 0x0014(sp)              // ~
         addiu   a0, a0,-0x0008              // a0 - ulx
-//      or      a1, a1, r0                  // a1 - uly
+        lw      t0, 0x0018(sp)              // t0 = menu uly
+        addu    a1, a1, t0                  // a1 - uly
         lli     a2, '>'                     // a2 - char
         jal     Overlay.draw_char_          // draw '>'
         nop
