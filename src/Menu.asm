@@ -40,13 +40,14 @@ scope Menu {
     // @ Description
     // Struct for menu entries
     macro entry(title, type, default, min, max, function_address, string_table, next) {
+        define address(pc())
         dw {type}                           // 0x0000 - type (int, bool, etc.)
         dw {default}                        // 0x0004 - current value
         dw {min}                            // 0x0008 - minimum value
         dw {max}                            // 0x000C - maximum value
         dw {function_address}               // 0x0010 - if (!null), function ran when A is pressed
         dw {string_table}                   // 0x0014 - if (!null), use table of string pointers
-        dw 0x00000000                       // (currently unused)
+        dw {address}                        // 0x0018 - address of entry, passed as argument a0
         dw {next}                           // 0x001C - if !(null), address of next entry
         db {title}                          // 0x0020 - title
         db 0x00
@@ -384,6 +385,7 @@ scope Menu {
         lw      t0, 0x0010(v0)              // t0 = function address
         beqz    t0, _end                    // if (function == null), skip
         nop
+        lw      a0, 0x0018(v0)              // a0 - address
         jalr    t0                          // go to function address
         nop
 
