@@ -7,13 +7,12 @@ include "Global.asm"
 include "Joypad.asm"
 include "OS.asm"
 include "Overlay.asm"
+include "String.asm"
 
 scope Menu {
 
     constant ROW_HEIGHT(000010)
-    constant VALUE_COLUMN(000025)           // TODO : remove this
     constant DEADZONE(000020)
-    constant NUM_ENTRIES(000012)
 
     scope type {
         constant U8(0x0000)                 // 08 bit integer (unsigned)
@@ -24,6 +23,18 @@ scope Menu {
         constant S32(0x0005)                // 32 bit integer (signed, not supported)
         constant BOOL(0x0006)               // bool
         constant TITLE(0x0007)              // has no value on the right
+    }
+
+    // @ Description
+    // Struct for menu arguments.
+    macro info(head, ulx, uly, rgba5551, width) {
+        dw {head}                           // 0x0000 - address of menu head
+        dw {ulx}                            // 0x0004 - ulx
+        dw {uly}                            // 0x0008 - uly
+        dw 0x00000000                       // 0x000C - selection
+        dh {rgba5551}                       // 0x0010 - color of background
+        dh {rgba5551}                       // ^
+        dw {width}                          // 0x0014 - widht of menu in chars
     }
 
     // @ Description
@@ -82,17 +93,22 @@ scope Menu {
     // @ Description
     // Draw a menu entry (title, on/off)
     // @ Arguments
-    // a0 - entry
+    // a0 - address of entry
     // a1 - ulx
     // a2 - uly
+    // a3 - address of info()
     scope draw_entry_: {
-        addiu   sp, sp,-0x0018              // allocate stack space
+        addiu   sp, sp,-0x0030              // allocate stack space
         sw      s0, 0x0004(sp)              // ~
         sw      s1, 0x0008(sp)              // ~
         sw      s2, 0x000C(sp)              // ~
         sw      t0, 0x0010(sp)              // ~
         sw      t1, 0x0014(sp)              // ~
-        sw      ra, 0x0018(sp)              // save registers
+        sw      ra, 0x0018(sp)              // ~
+        sw      a0, 0x001C(sp)              // ~
+        sw      a1, 0x0020(sp)              // ~
+        sw      a2, 0x0024(sp)              // ~
+        sw      a3, 0x0028(sp)              // save registers
 
         move    s0, a0                      // s0 = entry
         move    s1, a1                      // s1 = ulx
@@ -110,12 +126,16 @@ scope Menu {
 
         _number:
         lw      a0, 0x0004(s0)              // a0 - (int) current value
-        jal     OS.int_to_string_           // v0 = (string) current value
+        jal     String.itoa_                // v0 = (string) current value
         nop
-        addiu   a0, s1, (8 * VALUE_COLUMN)  // a0 - ulx
+        lw      a0, 0x0028(sp)              // a0 = address of info()
+        lw      at, 0x0014(a0)              // at = width
+        sll     at, at, 0x0003              // at = urx_difference
+        lw      a0, 0x0004(a0)              // a0 = ulx
+        addu    a0, a0, at                  // a0 - urx
         move    a1, s2                      // a1 - uly
         move    a2, v0                      // a2 - address of string
-        jal     Overlay.draw_string_        // draw value
+        jal     Overlay.draw_string_urx_    // draw value
         nop
         b       _end                        // skip draw string
         nop
@@ -125,9 +145,13 @@ scope Menu {
         sll     t1, t1, 0x0002              // t1 = curr * sizeof(string pointer)
         addu    a2, t0, t1                  // ~
         lw      a2, 0x0000(a2)              // a2 - address of string
-        addiu   a0, s1, (8 * VALUE_COLUMN)  // a0 - ulx
+        lw      a0, 0x0028(sp)              // a0 = address of info()
+        lw      at, 0x0014(a0)              // at = width
+        sll     at, at, 0x0003              // at = urx_difference
+        lw      a0, 0x0004(a0)              // a0 = ulx
+        addu    a0, a0, at                  // a0 - urx
         move    a1, s2                      // a1 - uly
-        jal     Overlay.draw_string_        // draw string
+        jal     Overlay.draw_string_urx_    // draw string
         nop
 
         _end:
@@ -136,8 +160,12 @@ scope Menu {
         lw      s2, 0x000C(sp)              // ~
         lw      t0, 0x0010(sp)              // ~
         lw      t1, 0x0014(sp)              // ~
-        lw      ra, 0x0018(sp)              // restore registers
-        addiu   sp, sp, 0x0018              // deallocate stack space
+        lw      ra, 0x0018(sp)              // ~
+        lw      a0, 0x001C(sp)              // ~
+        lw      a1, 0x0020(sp)              // ~
+        lw      a2, 0x0024(sp)              // ~
+        lw      a3, 0x0028(sp)              // srestore registers
+        addiu   sp, sp, 0x0030              // deallocate stack space
         jr      ra
         nop
     }
@@ -145,39 +173,68 @@ scope Menu {
     // @ Description
     // Draw linked list of menu entries
     // @ Arguments
-    // a0 - address of head_entry
-    // a1 - ulx
-    // a2 - uly
-    // a3 - address of selection
+    // a0 - address of Menu.info()
     scope draw_: {
-        addiu   sp, sp,-0x0020              // allocate stack space
+        addiu   sp, sp,-0x0028              // allocate stack space
         sw      s0, 0x0004(sp)              // ~
         sw      t0, 0x0008(sp)              // ~
         sw      ra, 0x000C(sp)              // ~
         sw      a0, 0x0010(sp)              // ~
         sw      a1, 0x0014(sp)              // ~
         sw      a2, 0x0018(sp)              // ~
-        sw      a3, 0x001C(sp)              // save registers
+        sw      a3, 0x001C(sp)              // ~
+        sw      at, 0x0020(sp)              // save registers
+
+        // draw rectangle
+        lw      a0, 0x0010(a0)              // a0 - fill color
+        jal     Overlay.set_color_          // set fill color
+        nop
+        lw      a0, 0x0010(sp)              // a0 - address of info()
+        jal     get_num_entries_            // v0 = num_entries
+        nop
+        lli     at, ROW_HEIGHT              // at = ROW_HEIGHT
+        mult    v0, at                      // ~
+        mflo    v0                          // v0 = num_entries * NUM_PIXELS
+       
+        lw      at, 0x0010(sp)              // at = address of info()
+        lw      a0, 0x0004(at)              // ~
+        addiu   a1, a1,-0x0002              // a0 - ulx
+        lw      a1, 0x0008(at)              // ~
+        addiu   a1, a1,-0x0002              // a1 - uly
+        lw      a2, 0x0014(at)              // a2 = width
+        sll     a2, a2, 0x0003              // a2 = (width) * NUM_PIXELS
+        addiu   a2, a2, 0x0004              // a2 - (width) * NUM_PIXELS + 4
+        move    a3, v0                      // ~
+        addiu   a3, a3, 0x0004              // a3 - height
+        jal     Overlay.draw_rectangle_     // draw rectangle
+        nop
 
         // draw first entry
-//      move    a0, a0                      // a0 - entry
-//      move    a1, a1                      // a1 - ulx
-//      move    a2, a2                      // a2 - uly
+        lw      at, 0x0010(sp)              // at = address of info()
+        lw      a0, 0x0000(at)              // a0 - entry
+        lw      a1, 0x0004(at)              // ~
+        addiu   a1, a1, 0x0008              // a1 - ulx
+        lw      a2, 0x0008(at)              // a2 - uly
+        move    a3, at                      // a3 - address of info()
         jal     draw_entry_                 // draw first entry
         nop
 
         // draw following entries
-        lw      s0, 0x0010(sp)              // s0 = entry_head
-        lw      t0, 0x0018(sp)              // t0 = uly
+        lw      a0, 0x0010(sp)              // a0 = address of info
+        lw      s0, 0x0000(a0)              // s0 = head (aka current_entry)
+        lw      t0, 0x0008(a0)              // t0 = uly
 
         _loop:
         lw      s0, 0x001C(s0)              // s0 = entry->next
         beqz    s0, _end                    // if (entry->next == NULL), end
         nop
         addiu   t0, t0, ROW_HEIGHT          // increment height
+        lw      at, 0x0010(sp)              // at = address of Menu.info()
         move    a0, s0                      // a0 - entry
-        lw      a1, 0x0014(sp)              // a1 - ulx
-        move    a2, t0                      // a2 - uly
+        lw      a1, 0x0004(at)              // ~
+        addiu   a1, a1, 0x0008              // a1 - ulx
+        move    a2, t0                      // a2 - ulx
+        move    a3, at                      // a3 - address of info()
         jal     draw_entry_
         nop
         b       _loop
@@ -185,15 +242,14 @@ scope Menu {
 
         _end:
         // draw ">"
-        lw      t0, 0x001C(sp)              // t0 = address of selection
-        lw      t0, 0x0000(t0)              // t0 = selection
+        lw      at, 0x0010(sp)              // at = address of Menu.info()
+        lw      t0, 0x000C(at)              // t0 = selecion
         lli     s0, ROW_HEIGHT              // ~
         mult    t0, s0                      // ~
         mflo    a1                          // a1 = height of row
 
-        lw      a0, 0x0014(sp)              // ~
-        addiu   a0, a0,-0x0008              // a0 - ulx
-        lw      t0, 0x0018(sp)              // t0 = menu uly
+        lw      a0, 0x0004(at)              // a0 - ulx
+        lw      t0, 0x0008(at)              // t0 = menu uly
         addu    a1, a1, t0                  // a1 - uly
         lli     a2, '>'                     // a2 - char
         jal     Overlay.draw_char_          // draw '>'
@@ -205,8 +261,9 @@ scope Menu {
         lw      a0, 0x0010(sp)              // ~
         lw      a1, 0x0014(sp)              // ~
         lw      a2, 0x0018(sp)              // ~
-        lw      a3, 0x001C(sp)              // restore registers
-        addiu   sp, sp, 0x0020              // deallocate stack space
+        lw      a3, 0x001C(sp)              // ~
+        lw      at, 0x0020(sp)              // restore registers
+        addiu   sp, sp, 0x0028              // deallocate stack space
         jr      ra                          // return
         nop
     }
@@ -214,8 +271,7 @@ scope Menu {
     // @ Description
     // Checks for various button presses and updates the menu accordingly
     // @ Arguments
-    // a0 - address of entry_linked_list head
-    // a1 - address of selection
+    // a0 - address of info()
     scope update_: {
         addiu   sp, sp,-0x0020              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -231,12 +287,13 @@ scope Menu {
         nop
         beqz    v0, _up                     // if not pressed, check c-up
         nop
-        lw      t0, 0x0018(sp)              // t0 = address of selection
-        lw      t1, 0x0000(t0)              // t1 = selection
-        lw      a0, 0x0014(sp)              // a0 - head
+        lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_num_entries_            // v0 = num_entries
         nop        
         addiu   v0, v0,-0x0001              // v0 = num_entries - 1
+        lw      t0, 0x0014(sp)              // t0 = address of info()
+        addiu   t0, t0, 0x000C              // t0 = address of selection
+        lw      t1, 0x0000(t0)              // t1 = selection
         sltu    at, t1, v0                  // ~
         beqz    at, _wrap_down              // if (selection == (num_entries - 1), wrap
         nop
@@ -251,12 +308,13 @@ scope Menu {
         nop
 
         _up:
-        lli     a0, DEADZONE               // a0 - min coordinate (deadzone)
+        lli     a0, DEADZONE                // a0 - min coordinate (deadzone)
         jal     Joypad.check_stick_up_      // check if stick pressed up
         nop
         beqz    v0, _right                  // if not pressed, check right
         nop
-        lw      t0, 0x0018(sp)              // t0 = address of selection
+        lw      at, 0x0014(sp)              // at = address of info()
+        addiu   t0, at, 0x000C              // t0 = address of selection
         lw      t1, 0x0000(t0)              // t1 = selection
         beqz    t1, _wrap_up                // if (selection == 0), go to bottom option
         nop
@@ -266,7 +324,7 @@ scope Menu {
         nop
 
         _wrap_up:
-        lw      a0, 0x0014(sp)              // a0 - head
+        lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_num_entries_            // v0 = num_entries
         nop
         addiu   v0, v0,-0x0001              // ~
@@ -280,8 +338,7 @@ scope Menu {
         nop
         beqz    v0, _left                   // if not pressed, check left
         nop
-        lw      a0, 0x0014(sp)              // a0 - head
-        lw      a1, 0x0018(sp)              // a1 = address of selection
+        lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_selected_entry_         // v0 = selected entry
         nop
         lw      t0, 0x0004(v0)              // t0 = entry.current_value
@@ -300,8 +357,7 @@ scope Menu {
         nop
         beqz    v0, _a                      // if not pressed, check A
         nop
-        lw      a0, 0x0014(sp)              // a0 - head
-        lw      a1, 0x0018(sp)              // a1 = address of selection
+        lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_selected_entry_         // v0 = selected entry
         nop
         lw      t0, 0x0004(v0)              // t0 = entry.current_value
@@ -322,8 +378,7 @@ scope Menu {
         nop
         beqz    v0, _end                    // if (a was pressed (p1/p2/p3/p4) == false), skip
         nop
-        lw      a0, 0x0014(sp)              // a0 - head
-        lw      a1, 0x0018(sp)              // a1 = address of selection
+        lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_selected_entry_         // v0 = selected entry
         nop
         lw      t0, 0x0010(v0)              // t0 = function address
@@ -347,18 +402,19 @@ scope Menu {
     // @ Description
     // Gets an entry based on selection. Helper function
     // @ Arguments
-    // a0 - head
-    // a1 - address of selection
+    // a0 - address of info()
     // @ Returns
     // v0 - address of entry
     scope get_selected_entry_: {
         addiu   sp, sp,-0x0010              // alloc stack space
         sw      at, 0x0004(sp)              // ~
-        sw      t0, 0x0008(sp)              // save registers
+        sw      t0, 0x0008(sp)              // ~
+        sw      a0, 0x000C(sp)              // save registers
 
         // init
         lli     at, 0x0000                  // at = i = 0
-        lw      t0, 0x0000(a1)              // t0 = selection
+        lw      t0, 0x000C(a0)              // t0 = selection
+        lw      a0, 0x0000(a0)              // a0 = head
 
         _loop:
         beqz    a0, _fail                   // if (entry = null), end
@@ -371,10 +427,11 @@ scope Menu {
         nop
 
         _end:
+        move    v0, a0                      // v0 = entry
         lw      at, 0x0004(sp)              // ~
-        lw      t0, 0x0008(sp)              // restore registers
+        lw      t0, 0x0008(sp)              // ~
+        lw      a0, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack space
-        or      v0, a0, r0                  // v0 = ret = entry
         jr      ra                          // return
         nop
 
@@ -409,10 +466,14 @@ scope Menu {
     // @ Description
     // Returns the number of entires for a menu
     // @ Arguments
-    // a0 - head
+    // a0 - info
     // @ Returns
     // v0 - num_entries
     scope get_num_entries_: {
+        addiu   sp, sp,-0x0008              // allocate stack space
+        sw      a0, 0x0004(sp)              // save a0
+
+        lw      a0, 0x0000(a0)              // a0 = head
         lli     v0, 0x0000                  // ret = 0
         
         _loop:
@@ -424,6 +485,8 @@ scope Menu {
         nop
 
         _end:
+        lw      a0, 0x0004(sp)              // restore a0
+        addiu   sp, sp, 0x0008              // deallocate stack space
         jr      ra
         nop
     }

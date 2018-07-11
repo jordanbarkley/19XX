@@ -7,6 +7,7 @@ if {defined __CE__} {
 // This file contains functions and defines structs intended to assist training mode modifications.
 
 include "Character.asm"
+include "Color.asm"
 include "Global.asm"
 include "Menu.asm"
 include "OS.asm"
@@ -493,17 +494,13 @@ scope Training {
         OS.save_registers()
 
         // update menu
-        li      a0, head                    // a0 - head
-        li      a1, selection               // a1 - address of selection
+        li      a0, info                    // a0 - address of Menu.info()
         jal     Menu.update_                // check for updates
         nop
 
         // draw menu
-        li      a0, head
-        li      a1, 28
-        li      a2, 20
-        li      a3, selection
-        jal     Menu.draw_
+        li      a0, info                    // a0 - address of Menu.inf()
+        jal     Menu.draw_                  // draw menu
         nop
 
         OS.restore_registers()
@@ -569,8 +566,8 @@ scope Training {
     dw spawn_4
     dw spawn_5
 
-    selection:
-    dw 0x00000000
+    info:
+    Menu.info(head, 62, 62, Color.low.GREY, 24)
 
     head:
     entry_port_x:

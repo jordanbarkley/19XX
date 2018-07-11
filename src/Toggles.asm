@@ -2,13 +2,12 @@
 if !{defined __TOGGLES__} {
 define __TOGGLES__()
 
+include "Color.asm"
 include "Menu.asm"
 include "OS.asm"
 
 scope Toggles {
 
-    selection:
-    dw 0x00000000
     
     // @ Description
     // Allows function 
@@ -71,16 +70,12 @@ scope Toggles {
         nop
 
         // update menu
-        li      a0, head                    // a0 - head
-        li      a1, selection               // a1 - address of selection
+        li      a0, info
         jal     Menu.update_                // check for updates
         nop
 
         // draw menu
-        li      a0, head                    // a0 - menu head
-        lli     a1, 000028                  // a1 - ulx
-        lli     a2, 000020                  // a2 - uly
-        li      a3, selection               // a3 - selection
+        li      a0, info                    // a0 - info
         jal     Menu.draw_                  // draw menu
         nop
 
@@ -101,6 +96,9 @@ scope Toggles {
         jr      ra
         nop
     }
+
+    info:
+    Menu.info(head, 20, 20, Color.low.BLACK, 32)
 
     head:
     entry_practice_overlay:
