@@ -81,8 +81,9 @@ scope Toggles {
 
         // check for exit
         lli     a0, Joypad.B                // a0 - button_mask
-        lli     a1, 0x0000                  // a1 - player
-        jal     Joypad.was_pressed_         // check if B pressed
+        lli     a1, 000069                  // a1 - whatever you like!
+        lli     a2, Joypad.PRESSED          // a2 - type
+        jal     Joypad.check_buttons_all_   // check if B pressed
         nop 
         beqz    v0, _end                    // nop
         nop

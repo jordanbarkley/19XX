@@ -9,6 +9,7 @@ if {defined __CE__} {
 include "Character.asm"
 include "Color.asm"
 include "Global.asm"
+include "Joypad.asm"
 include "Menu.asm"
 include "OS.asm"
 include "Overlay.asm"
@@ -18,6 +19,9 @@ scope Training {
     // Byte, determines whether the player is able to control the training mode menu, regardless of
     // if it is currently being displayed. 01 = disable control, 02 = enable control
     constant toggle_menu(0x80190979)
+    constant BOTH_DOWN(0x01)
+    constant SSB_UP(0x02)
+    constant CUSTOM_UP(0x03)
     
     // @ Description
     // Byte, contains the training mode stage id
@@ -493,6 +497,36 @@ scope Training {
     scope run_: {
         OS.save_registers()
 
+        li      t0, toggle_menu             // t0 = address of toggle_menu
+        lbu     t0, 0x0000(t0)              // t0 = toggle_menu
+
+        // check if the ssb menu is up
+        lli     t1, SSB_UP                  // t1 = ssb menu is up
+        beq     t0, t1, _ssb_up             // branch accordingly
+        nop
+        
+        // check if the custom menu is up
+        lli     t1, CUSTOM_UP               // t1 = custom menu is up
+        beq     t0, t1, _custom_up          // branch accordingly
+        nop
+
+        // otherwise skip
+        b       _end
+        nop
+
+        _custom_up:
+        // the first option in the custom training menu has it's next pointer modified for the
+        // rest of the option based on the value it holds. this block updates the next pointer
+        li      t0, info                    // t0 = info
+        lw      t0, 0x0000(t0)              // t0 = address of head (entry)
+        lw      t1, 0x0004(t0)              // t1 = entry.curr
+        addiu   t1, t1,-0x0001              // t1 = entry.curr-- (p1 = 0, p2 = 1 etc.)
+        sll     t1, t1, 0x0002              // t1 = offset
+        li      t2, head_table              // t2 = address of head_table
+        addu    t2, t2, t1                  // t2 = address of head_table + offset
+        lw      t2, 0x0000(t2)              // t2 = address of head
+        sw      t2, 0x001C(t0)              // entry.next = address of head
+
         // update menu
         li      a0, info                    // a0 - address of Menu.info()
         jal     Menu.update_                // check for updates
@@ -503,10 +537,49 @@ scope Training {
         jal     Menu.draw_                  // draw menu
         nop
 
+        // check for b press
+        lli     a0, Joypad.B                // a0 - button_mask
+        lli     a1, 000069                  // a1 - whatever you like!
+        lli     a2, Joypad.PRESSED          // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 - bool z_pressed
+        nop
+        beqz    v0, _end                    // if (!z_pressed), end
+        nop
+        li      t0, toggle_menu             // t0 = toggle_menu
+        lli     t1, SSB_UP                  // ~
+        sb      t1, 0x0000(t0)              // toggle menu = SSB_UP
+        b       _end                        // end execution
+        nop
+
+        _ssb_up:
+        // tell the user they can bring up the custom menu
+        lli     a0, 000068                  // a0 - ulx
+        lli     a1, 000050                  // a1 - uly
+        li      a2, press_z                 // a2 - address of string
+        jal     Overlay.draw_string_        // draw custom menu instructions
+        nop
+
+        // check for z press
+        lli     a0, Joypad.Z                // a0 - button_mask
+        lli     a1, 000069                  // a1 - whatever you like!
+        lli     a2, Joypad.PRESSED          // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 - bool z_pressed
+        nop
+        beqz    v0, _end                    // if (!z_pressed), end
+        nop
+        li      t0, toggle_menu             // t0 = toggle_menu
+        lli     t1, CUSTOM_UP               // ~
+        sb      t1, 0x0000(t0)              // toggle menu = CUSTOM_UP
+
+        _end:
         OS.restore_registers()
         jr      ra
         nop
     }
+
+    // @ Description
+    // Message/visual indicator to press Z for custom menu
+    press_z:; db "PRESS Z FOR CUSTOM MENU", 0x00
 
     // @ Description
     // Type strings
@@ -567,12 +640,13 @@ scope Training {
     dw spawn_5
 
     info:
-    Menu.info(head, 62, 62, Color.low.GREY, 24)
+    Menu.info(head, 62, 50, Color.low.GREY, 24)
 
     head:
     entry_port_x:
     Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, head_p1)
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     head_p1:
     entry_type_1:
     Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_1)
@@ -586,11 +660,10 @@ scope Training {
     entry_percentage_1:
     Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     head_p2:
-    head_p3:
-    head_p4:
     entry_type_2:
-    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_char, entry_character_2)
+    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_2)
 
     entry_character_2:
     Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_2)
@@ -600,6 +673,41 @@ scope Training {
 
     entry_percentage_2:
     Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    head_p3:
+    entry_type_3:
+    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_3)
+
+    entry_character_3:
+    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_3)
+
+    entry_costume_3:
+    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_3)
+
+    entry_percentage_3:
+    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    head_p4:
+    entry_type_4:
+    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_4)
+
+    entry_character_4:
+    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_4)
+
+    entry_costume_4:
+    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_4)
+
+    entry_percentage_4:
+    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
+
+    head_table:
+    dw head_p1
+    dw head_p2
+    dw head_p3
+    dw head_p4
+
 
 }
 
