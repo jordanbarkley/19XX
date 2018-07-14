@@ -36,39 +36,19 @@ scope GameEnd {
         lli     t6, 0x0018                  // original line 1
         sb      t6, 0x0000(v0)              // original line 2
         Toggles.guard(Toggles.entry_salty_runback, _skip_results_screen)
-        addiu   sp, sp,-0x0010              // allocate stack space
+        addiu   sp, sp,-0x0020              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      v0, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      ra, 0x000C(sp)              // ~ 
+        sw      a0, 0x0010(sp)              // ~
+        sw      a1, 0x0014(sp)              // ~
+        sw      a2, 0x0018(sp)              // save registers
 
         // p1
-        lli     a0, BUTTON_MASK
-        lli     a1, 0x0000                  // a1 = player 1
-        jal     Joypad.is_held_             // check buttons
-        nop
-        bnez    v0, _success                // if held, restart
-        nop
-
-        // p2
-        lli     a0, BUTTON_MASK
-        lli     a1, 0x0001                  // a1 = player 2
-        jal     Joypad.is_held_             // check buttons
-        nop
-        bnez    v0, _success                // if held, restart
-        nop
-
-        // p3
-        lli     a0, BUTTON_MASK
-        lli     a1, 0x0002                  // a1 = player 3
-        jal     Joypad.is_held_             // check buttons
-        nop
-        bnez    v0, _success                // if held, restart
-        nop
-
-        // p4
-        lli     a0, BUTTON_MASK
-        lli     a1, 0x0003                  // a1 = player 4
-        jal     Joypad.is_held_             // check buttons
+        lli     a0, BUTTON_MASK             // a0 - button masks
+        lli     a1, 000069                  // a1 - whatever you want
+        lli     a2, Joypad.HELD             // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 = bool
         nop
         bnez    v0, _success                // if held, restart
         nop
@@ -76,7 +56,11 @@ scope GameEnd {
         // end
         lw      t0, 0x0004(sp)              // ~
         lw      v0, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
+        lw      ra, 0x000C(sp)              // ~
+        lw      a0, 0x0010(sp)              // ~
+        lw      a1, 0x0014(sp)              // ~
+        lw      a2, 0x0018(sp)              // restore registers
+        addiu   sp, sp, 0x0020              // deallocate stack space
         j       update_screen_              // check skip results
         nop
 
