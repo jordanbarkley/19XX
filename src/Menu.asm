@@ -39,15 +39,15 @@ scope Menu {
 
     // @ Description
     // Struct for menu entries
-    macro entry(title, type, default, min, max, function_address, string_table, next) {
+    macro entry(title, type, default, min, max, a_function, string_table, function, next) {
         define address(pc())
         dw {type}                           // 0x0000 - type (int, bool, etc.)
         dw {default}                        // 0x0004 - current value
         dw {min}                            // 0x0008 - minimum value
         dw {max}                            // 0x000C - maximum value
-        dw {function_address}               // 0x0010 - if (!null), function ran when A is pressed
+        dw {a_function}                     // 0x0010 - if (!null), function ran when A is pressed
         dw {string_table}                   // 0x0014 - if (!null), use table of string pointers
-        dw {address}                        // 0x0018 - address of entry, passed as argument a0
+        dw {function}                       // 0x0018 - if (!null), function ran on update_
         dw {next}                           // 0x001C - if !(null), address of next entry
         db {title}                          // 0x0020 - title
         db 0x00
@@ -84,7 +84,7 @@ scope Menu {
     OS.align(4)
 
     macro entry_bool(title, default, next) {
-        Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_table, {next})
+        Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_table, OS.NULL, {next})
     }
 
     macro entry_title(title, function_address) {
@@ -300,12 +300,12 @@ scope Menu {
         nop
         addiu   t1, t1, 0x0001              // t1 = selection++
         sw      t1, 0x0000(t0)              // update selection
-        b       _end                        // only allow one update
+        b       _func                       // only allow one update
         nop
 
         _wrap_down:
         sw      r0, 0x0000(t0)              // update selction
-        b       _end                        // exit
+        b       _func                       // only allow one update
         nop
 
         _up:
@@ -321,7 +321,7 @@ scope Menu {
         nop
         addiu   t1, t1,-0x0001              // t1 = selection--
         sw      t1, 0x0000(t0)              // update selection
-        b       _end                        // only allow one update
+        b       _func                       // only allow one update
         nop
 
         _wrap_up:
@@ -330,7 +330,7 @@ scope Menu {
         nop
         addiu   v0, v0,-0x0001              // ~
         sw      v0, 0x0000(t0)              // update selection to bottom option
-        b       _end                        // exit
+        b       _func                       // only allow one update
         nop
 
         _right:
@@ -345,11 +345,11 @@ scope Menu {
         lw      t0, 0x0004(v0)              // t0 = entry.current_value
         lw      t1, 0x000C(v0)              // t1 = entry.max_value
         sltu    at, t0, t1                  // if (entry.current_value < entry.max_value)
-        beqz    at, _end                    // then, skip
+        beqz    at, _func                   // then, skip
         nop                                 // else, continue
         addiu   t0, t0, 0x0001              // ~
         sw      t0, 0x0004(v0)              // entry.current_value++
-        b       _end                        // only allow one update
+        b       _func                       // only allow one update
         nop
 
         _left:
@@ -364,11 +364,11 @@ scope Menu {
         lw      t0, 0x0004(v0)              // t0 = entry.current_value
         lw      t1, 0x0008(v0)              // t1 = entry.min_value
         sltu    at, t1, t0                  // if (entry.min_value < entry.curr_value)
-        beqz    at, _end                    // then, skip
+        beqz    at, _func                   // then, skip
         nop                                 // else, continue
         addiu   t0, t0,-0x0001              // ~
         sw      t0, 0x0004(v0)              // entry.current_value--
-        b       _end                        // only allow one update
+        b       _func                       // only allow one update
         nop
 
         _a:
@@ -377,16 +377,25 @@ scope Menu {
         lli     a2, Joypad.PRESSED          // a2 - type
         jal     Joypad.check_buttons_all_   // v0 = someone pressed a?
         nop
-        beqz    v0, _end                    // if (a was pressed (p1/p2/p3/p4) == false), skip
+        beqz    v0, _func                   // if (a was pressed (p1/p2/p3/p4) == false), skip
         nop
         lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_selected_entry_         // v0 = selected entry
         nop
         lw      t0, 0x0010(v0)              // t0 = function address
-        beqz    t0, _end                    // if (function == null), skip
+        beqz    t0, _func                   // if (function == null), skip
         nop
         lw      a0, 0x0018(v0)              // a0 - address
         jalr    t0                          // go to function address
+        nop
+
+        _func:
+        // this block executes {function}
+        lw      a0, 0x0014(sp)              // a0 - address of info()
+        lw      t0, 0x0018(a0)              // t0 = address of funciton
+        beqz    t0, _end                    // if (function == null), skip
+        nop
+        jalr    t0                          // go to funciton (a0 holds address of info)
         nop
 
         _end:

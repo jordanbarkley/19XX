@@ -644,63 +644,24 @@ scope Training {
 
     head:
     entry_port_x:
-    Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, head_p1)
+    Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, OS.NULL, head_p1)
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     head_p1:
+    head_p2:
+    head_p3:
+    head_p4:
     entry_type_1:
-    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_1)
+    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, OS.NULL, entry_character_1)
 
     entry_character_1:
-    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_1)
+    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, OS.NULL, entry_costume_1)
 
     entry_costume_1:
-    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_1)
+    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, OS.NULL, entry_percentage_1)
 
     entry_percentage_1:
-    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    head_p2:
-    entry_type_2:
-    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_2)
-
-    entry_character_2:
-    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_2)
-
-    entry_costume_2:
-    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_2)
-
-    entry_percentage_2:
-    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    head_p3:
-    entry_type_3:
-    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_3)
-
-    entry_character_3:
-    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_3)
-
-    entry_costume_3:
-    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_3)
-
-    entry_percentage_3:
-    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    head_p4:
-    entry_type_4:
-    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, entry_character_4)
-
-    entry_character_4:
-    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, entry_costume_4)
-
-    entry_costume_4:
-    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, entry_percentage_4)
-
-    entry_percentage_4:
-    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL)
+    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL, OS.NULL)
 
     head_table:
     dw head_p1
