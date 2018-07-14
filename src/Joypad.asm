@@ -61,7 +61,8 @@ scope Joypad {
     scope check_buttons_: {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // save registers
+        sw      t1, 0x0008(sp)              // ~
+        sw      at, 0x000C(sp)              // save registers
 
         lli     at, 000010                  // ~
         mult    a1, at                      // ~
@@ -77,7 +78,8 @@ scope Joypad {
 
         _end:
         lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // restore registers
+        lw      t1, 0x0008(sp)              // ~
+        lw      at, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // return
         nop
