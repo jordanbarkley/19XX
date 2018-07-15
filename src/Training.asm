@@ -522,9 +522,9 @@ scope Training {
         lw      t1, 0x0004(t0)              // t1 = entry.curr
         addiu   t1, t1,-0x0001              // t1 = entry.curr-- (p1 = 0, p2 = 1 etc.)
         sll     t1, t1, 0x0002              // t1 = offset
-        li      t2, head_table              // t2 = address of head_table
-        addu    t2, t2, t1                  // t2 = address of head_table + offset
-        lw      t2, 0x0000(t2)              // t2 = address of head
+        li      t2, tail_table              // t2 = address of tail_table
+        addu    t2, t2, t1                  // t2 = address of tail_table + offset
+        lw      t2, 0x0000(t2)              // t2 = address of tail
         sw      t2, 0x001C(t0)              // entry.next = address of head
 
         // update menu
@@ -642,32 +642,32 @@ scope Training {
     info:
     Menu.info(head, 62, 50, Color.low.GREY, 24)
 
+    macro tail_px(player) {
+        Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, OS.NULL, pc() + 16)
+        Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, OS.NULL, pc() + 12)
+        Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, OS.NULL, pc() + 12)
+        Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL, OS.NULL)
+    }
+
+    tail_p1:; tail_px(1)
+    tail_p2:; tail_px(2)
+    tail_p3:; tail_px(3)
+    tail_p4:; tail_px(4)
+
+    tail_table:
+    dw tail_p1
+    dw tail_p2
+    dw tail_p3
+    dw tail_p4
+
     head:
     entry_port_x:
-    Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, OS.NULL, head_p1)
+    Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, OS.NULL, tail_p1)
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    head_p1:
-    head_p2:
-    head_p3:
-    head_p4:
-    entry_type_1:
-    Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, OS.NULL, entry_character_1)
 
-    entry_character_1:
-    Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, OS.NULL, entry_costume_1)
 
-    entry_costume_1:
-    Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, OS.NULL, entry_percentage_1)
 
-    entry_percentage_1:
-    Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL, OS.NULL)
 
-    head_table:
-    dw head_p1
-    dw head_p2
-    dw head_p3
-    dw head_p4
 
 
 }
