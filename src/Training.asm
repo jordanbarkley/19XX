@@ -642,11 +642,20 @@ scope Training {
     info:
     Menu.info(head, 62, 50, Color.low.GREY, 24)
 
+    update_: {
+
+    }
+
     macro tail_px(player) {
-        Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, OS.NULL, pc() + 16)
-        Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, OS.NULL, pc() + 12)
-        Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, OS.NULL, pc() + 12)
-        Menu.entry("PERCENTAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, OS.NULL, OS.NULL)
+        define character(Training.struct.port_{player}.ID)
+        define costume(Training.struct.port_{player}.costume)
+        define type(Training.struct.port_{player}.type)
+        define damage(Training.struct.port_{player}.percent)
+
+        Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, {character}, pc() + 16)
+        Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, {costume}, pc() + 12)
+        Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, {type}, pc() + 12)
+        Menu.entry("DAMAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {damage}, OS.NULL)
     }
 
     tail_p1:; tail_px(1)

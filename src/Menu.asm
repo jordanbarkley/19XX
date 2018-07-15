@@ -39,7 +39,7 @@ scope Menu {
 
     // @ Description
     // Struct for menu entries
-    macro entry(title, type, default, min, max, a_function, string_table, function, next) {
+    macro entry(title, type, default, min, max, a_function, string_table, copy_address, next) {
         define address(pc())
         dw {type}                           // 0x0000 - type (int, bool, etc.)
         dw {default}                        // 0x0004 - current value
@@ -47,7 +47,7 @@ scope Menu {
         dw {max}                            // 0x000C - maximum value
         dw {a_function}                     // 0x0010 - if (!null), function ran when A is pressed
         dw {string_table}                   // 0x0014 - if (!null), use table of string pointers
-        dw {function}                       // 0x0018 - if (!null), function ran on update_
+        dw {copy_address}                   // 0x0018 - if (!null), copies curr_value to address
         dw {next}                           // 0x001C - if !(null), address of next entry
         db {title}                          // 0x0020 - title
         db 0x00
@@ -300,12 +300,12 @@ scope Menu {
         nop
         addiu   t1, t1, 0x0001              // t1 = selection++
         sw      t1, 0x0000(t0)              // update selection
-        b       _func                       // only allow one update
+        b       _copy                       // only allow one update
         nop
 
         _wrap_down:
         sw      r0, 0x0000(t0)              // update selction
-        b       _func                       // only allow one update
+        b       _copy                       // only allow one update
         nop
 
         _up:
@@ -321,7 +321,7 @@ scope Menu {
         nop
         addiu   t1, t1,-0x0001              // t1 = selection--
         sw      t1, 0x0000(t0)              // update selection
-        b       _func                       // only allow one update
+        b       _copy                       // only allow one update
         nop
 
         _wrap_up:
@@ -330,7 +330,7 @@ scope Menu {
         nop
         addiu   v0, v0,-0x0001              // ~
         sw      v0, 0x0000(t0)              // update selection to bottom option
-        b       _func                       // only allow one update
+        b       _copy                       // only allow one update
         nop
 
         _right:
@@ -345,11 +345,11 @@ scope Menu {
         lw      t0, 0x0004(v0)              // t0 = entry.current_value
         lw      t1, 0x000C(v0)              // t1 = entry.max_value
         sltu    at, t0, t1                  // if (entry.current_value < entry.max_value)
-        beqz    at, _func                   // then, skip
+        beqz    at, _copy                   // then, skip
         nop                                 // else, continue
         addiu   t0, t0, 0x0001              // ~
         sw      t0, 0x0004(v0)              // entry.current_value++
-        b       _func                       // only allow one update
+        b       _copy                       // only allow one update
         nop
 
         _left:
@@ -364,11 +364,11 @@ scope Menu {
         lw      t0, 0x0004(v0)              // t0 = entry.current_value
         lw      t1, 0x0008(v0)              // t1 = entry.min_value
         sltu    at, t1, t0                  // if (entry.min_value < entry.curr_value)
-        beqz    at, _func                   // then, skip
+        beqz    at, _copy                   // then, skip
         nop                                 // else, continue
         addiu   t0, t0,-0x0001              // ~
         sw      t0, 0x0004(v0)              // entry.current_value--
-        b       _func                       // only allow one update
+        b       _copy                       // only allow one update
         nop
 
         _a:
@@ -377,26 +377,58 @@ scope Menu {
         lli     a2, Joypad.PRESSED          // a2 - type
         jal     Joypad.check_buttons_all_   // v0 = someone pressed a?
         nop
-        beqz    v0, _func                   // if (a was pressed (p1/p2/p3/p4) == false), skip
+        beqz    v0, _copy                   // if (a was pressed (p1/p2/p3/p4) == false), skip
         nop
         lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_selected_entry_         // v0 = selected entry
         nop
-        lw      t0, 0x0010(v0)              // t0 = function address
-        beqz    t0, _func                   // if (function == null), skip
+        lw      t0, 0x0010(v0)              // t0 = a_function address
+        beqz    t0, _copy                   // if (a_function == null), skip
         nop
-        lw      a0, 0x0018(v0)              // a0 - address
-        jalr    t0                          // go to function address
+        jalr    t0                          // go to a_function address
         nop
 
-        _func:
-        // this block executes {function}
-        lw      a0, 0x0014(sp)              // a0 - address of info()
-        lw      t0, 0x0018(a0)              // t0 = address of funciton
-        beqz    t0, _end                    // if (function == null), skip
+        _copy:
+        // this block executes {function} FOR ALL (todo)
+        lw      at, 0x0014(sp)              // at - address of info()
+        lw      at, 0x0000(at)              // at = address of head
+
+        _loop:
+        beqz    at, _end                    // if (entry == null), end
         nop
-        jalr    t0                          // go to funciton (a0 holds address of info)
+        lw      t0, 0x0000(at)              // t0 = type
+        sll     t0, t0, 0x0002              // t0 = type * 4 = offset
+        li      t1, type_table              // t1 = type table
+        addu    t1, t1, t0                  // t1 = type table + offset
+        lw      t1, 0x0000(t1)              // t1 = type jump
+        jr      t1                          // jump to function
         nop
+
+        _u8:
+        _s8:
+        lw      t0, 0x0018(at)              // t0 = copy address
+        lw      t1, 0x0004(at)              // t1 = curr val
+        sb      t1, 0x0003(t0)              // copy curr val
+        b       _loop
+        lw      at, 0x001C(at)              // at = entry->next
+
+        _u16:
+        _s16:
+        lw      t0, 0x0018(at)              // t0 = copy address
+        lw      t1, 0x0004(at)              // t1 = curr val
+        sh      t1, 0x0002(t0)              // copy curr val
+        b       _loop
+        lw      at, 0x001C(at)              // at = entry->next
+
+        _u32:
+        _s32:
+        _bool:
+        _title:
+        lw      t0, 0x0018(at)              // t0 = copy address
+        lw      t1, 0x0004(at)              // t1 = curr val
+        sw      t1, 0x0000(t0)              // copy curr val
+        b       _loop
+        lw      at, 0x001C(at)              // at = entry->next
 
         _end:
         lw      t0, 0x0004(sp)              // ~
@@ -408,6 +440,16 @@ scope Menu {
         addiu   sp, sp, 0x0020              // deallocate stack space
         jr      ra                          // return
         nop
+
+        type_table:
+        dw _u8
+        dw _u16
+        dw _u32
+        dw _s8
+        dw _s16
+        dw _s32
+        dw _bool
+        dw _title
     }
 
     // @ Description
