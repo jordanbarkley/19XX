@@ -55,19 +55,19 @@ scope Training {
             // @ Description
             // stage id, see stages.asm for list
             stage:
-            dw OS.NULL
+            dw 0
         }
         scope port_1: {
             ID:
-            dw OS.NULL
+            dw 0
             type:
-            dw OS.NULL
+            dw 0
             costume:
-            dw OS.NULL
+            dw 0
             percent:
-            dw OS.NULL
+            dw 0
             spawn_id:
-            dw OS.NULL
+            dw 0
             spawn_pos:
             float32 0,0
             spawn_dir:
@@ -75,15 +75,15 @@ scope Training {
         }
         scope port_2: {
             ID:
-            dw OS.NULL
+            dw 0
             type:
-            dw OS.NULL
+            dw 0
             costume:
-            dw OS.NULL
+            dw 0
             percent:
-            dw OS.NULL
+            dw 0
             spawn_id:
-            dw OS.NULL
+            dw 0
             spawn_pos:
             float32 0,0
             spawn_dir:
@@ -91,15 +91,15 @@ scope Training {
         }
         scope port_3: {
             ID:
-            dw OS.NULL
+            dw 0
             type:
-            dw OS.NULL
+            dw 0
             costume:
-            dw OS.NULL
+            dw 0
             percent:
-            dw OS.NULL
+            dw 0
             spawn_id:
-            dw OS.NULL
+            dw 0
             spawn_pos:
             float32 0,0
             spawn_dir:
@@ -107,15 +107,15 @@ scope Training {
         }
         scope port_4: {
             ID:
-            dw OS.NULL
+            dw 0
             type:
-            dw OS.NULL
+            dw 0
             costume:
-            dw OS.NULL
+            dw 0
             percent:
-            dw OS.NULL
+            dw 0
             spawn_id:
-            dw OS.NULL
+            dw 0
             spawn_pos:
             float32 0,0
             spawn_dir:
@@ -476,10 +476,10 @@ scope Training {
     // This could be displayed on-screen, but is also useful for differentiating between loads from
     // stage select and loads from the reset function
     reset_counter:
-    dw OS.NULL
+    dw 0
 
     // @ Description
-    //
+    // Sets percent on death/reset. This hook runs in all modes.
     scope init_percent_: {
         OS.patch_start(0x0005321C, 0x800D7A24)
 //      beq     t8, at, 0x800D7A4C          // original line 1
@@ -521,7 +521,6 @@ scope Training {
         j       0x800D7A4C                  // return (take branch)
         nop
     }
-
 
     // @ Description
     // Runs the menu
@@ -670,28 +669,60 @@ scope Training {
     dw spawn_4
     dw spawn_5
 
-    info:
-    Menu.info(head, 62, 50, Color.low.GREY, 24)
+
 
     // @ Description
     // The menu structure writes to these addresses because the percent in the struct is read only.
-    // These are applied in load_from_reset_.
+    // These are applied in init_percent_.
     percent_table:
     percent_p1:; dw 0
     percent_p2:; dw 0
     percent_p3:; dw 0
     percent_p4:; dw 0
 
+    // @ Description
+    // macro to call set_custom_spawn.
+    macro set_custom_spawn(player) {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      a0, 0x0004(sp)              // ~
+        sw      v0, 0x0008(sp)              // ~
+        sw      ra, 0x000C(sp)              // save registers
+
+        lli     a0, {player} - 1            // a0 - player (p1 = 0, p4 = 3)
+        jal     Character.get_struct_       // v0 = address of player struct
+        nop
+        move    a0, v0                      // t0 = player pointer
+        jal     set_custom_spawn_
+        nop
+
+        lw      a0, 0x0004(sp)              // ~
+        lw      v0, 0x0008(sp)              // 
+        lw      ra, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra
+        nop
+    }
+
+    spawn_func_1_:; set_custom_spawn(1)
+    spawn_func_2_:; set_custom_spawn(2)
+    spawn_func_3_:; set_custom_spawn(3)
+    spawn_func_4_:; set_custom_spawn(4)
+
     macro tail_px(player) {
         define character(Training.struct.port_{player}.ID)
         define costume(Training.struct.port_{player}.costume)
         define type(Training.struct.port_{player}.type)
         define percent(Training.percent_p{player})
+        define spawn_id(Training.struct.port_{player}.spawn_id)
+        define spawn_func(Training.spawn_func_{player}_)
+
 
         Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, {character}, pc() + 16)
         Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, {costume}, pc() + 12)
         Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, {type}, pc() + 12)
-        Menu.entry("PERCENT", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {percent}, OS.NULL)
+        Menu.entry("PERCENT", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {percent}, pc() + 12)
+        Menu.entry("SPAWN", Menu.type.U8, 0, 0, 4, OS.NULL, string_table_spawn, {spawn_id}, pc() + 12)
+        Menu.entry_title("SET CUSTOM SPAWN", {spawn_func}, OS.NULL)
     }
 
     tail_p1:; tail_px(1)
@@ -704,6 +735,9 @@ scope Training {
     dw tail_p2
     dw tail_p3
     dw tail_p4
+
+    info:
+    Menu.info(head, 62, 50, Color.low.GREY, 24)
 
     head:
     entry_port_x:

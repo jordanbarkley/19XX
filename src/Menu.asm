@@ -3,6 +3,7 @@ if !{defined __MENU__} {
 define __MENU__()
 
 include "Color.asm"
+include "FGM.asm"
 include "Global.asm"
 include "Joypad.asm"
 include "OS.asm"
@@ -87,8 +88,8 @@ scope Menu {
         Menu.entry({title}, Menu.type.BOOL, {default}, 0, 1, OS.NULL, Menu.bool_string_table, OS.NULL, {next})
     }
 
-    macro entry_title(title, function_address) {
-        Menu.entry({title}), Menu.type.TITLE, 0, 1, OS.NULL, OS.NULL, {next})
+    macro entry_title(title, a_function, next) {
+        Menu.entry({title}, Menu.type.TITLE, 0, 0, 0, {a_function}, OS.NULL, OS.NULL, {next})
     }
 
     // @ Description
@@ -119,6 +120,11 @@ scope Menu {
         move    a1, s2                      // a1 - uly
         addiu   a2, s0, 0x0020              // a2 - address of string (title = entry + 0x0020)
         jal     Overlay.draw_string_
+        nop
+
+        lli     t0, Menu.type.TITLE         // t0 = title type
+        lw      t1, 0x0000(s0)              // t1 = type
+        beq     t0, t1, _end                // if (type == title), end
         nop
 
         lw      t0, 0x0014(s0)              // at = entry.string_table
@@ -288,6 +294,9 @@ scope Menu {
         nop
         beqz    v0, _up                     // if not pressed, check c-up
         nop
+        lli     a0, FGM.menu.SCROLL         // a0 - fgm_id
+        jal     FGM.play_                   // play menu sound
+        nop
         lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_num_entries_            // v0 = num_entries
         nop        
@@ -314,6 +323,9 @@ scope Menu {
         nop
         beqz    v0, _right                  // if not pressed, check right
         nop
+        lli     a0, FGM.menu.SCROLL         // a0 - fgm_id
+        jal     FGM.play_                   // play menu sound
+        nop
         lw      at, 0x0014(sp)              // at = address of info()
         addiu   t0, at, 0x000C              // t0 = address of selection
         lw      t1, 0x0000(t0)              // t1 = selection
@@ -339,6 +351,9 @@ scope Menu {
         nop
         beqz    v0, _left                   // if not pressed, check left
         nop
+        lli     a0, FGM.menu.TOGGLE         // a0 - fgm_id
+        jal     FGM.play_                   // play menu sound
+        nop
         lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_selected_entry_         // v0 = selected entry
         nop
@@ -357,6 +372,9 @@ scope Menu {
         jal     Joypad.check_stick_left_    // check if stick pressed left
         nop
         beqz    v0, _a                      // if not pressed, check A
+        nop
+        lli     a0, FGM.menu.TOGGLE         // a0 - fgm_id
+        jal     FGM.play_                   // play menu sound
         nop
         lw      a0, 0x0014(sp)              // a0 - address of info()
         jal     get_selected_entry_         // v0 = selected entry
@@ -386,6 +404,9 @@ scope Menu {
         beqz    t0, _copy                   // if (a_function == null), skip
         nop
         jalr    t0                          // go to a_function address
+        nop
+        lli     a0, FGM.menu.CONFIRM        // a0 - fgm_id
+        jal     FGM.play_                   // play menu sound
         nop
 
         _copy:
