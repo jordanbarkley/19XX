@@ -108,6 +108,7 @@ scope Global {
     // @ Description
     // player struct list head
     constant p_struct_head(0x80130D84)
+    constant P_STRUCT_LENGTH(0x0B50)
 }
 
 }

@@ -273,7 +273,7 @@ scope Training {
         OS.patch_end()
         lw      t7, 0x0024(a1)              // original line 1
         or      s0, a0, r0                  // original line 2
-        addiu   sp, sp,-0x000C              // allocate stack space
+        addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // store t0, t1
         li      t0, struct.table            // t0 = struct table
@@ -291,7 +291,7 @@ scope Training {
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // load t0, t1
-        addiu   sp, sp, 0x000C              // deallocate stack space       
+        addiu   sp, sp, 0x0010              // deallocate stack space       
         j       _load_spawn_dir_return
         nop
         }
@@ -306,7 +306,7 @@ scope Training {
         _update_character_return:
         OS.patch_end()
         _update_percent:
-        addiu   sp, sp,-0x000C              // allocate stack space
+        addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // store t0, t1
         li      t0, Global.current_screen   // ~
@@ -321,26 +321,11 @@ scope Training {
         lw      t0, 0x0000(t0)              // t0 = port struct address
         lhu     t1, 0x002E(s0)              // t1 = current percentage
         sw      t1, 0x000C(t0)              // save percentage to struct
-        
-        ///////DPAD DOWN to call custom spawn function (used for testing)///////
-        //lbu     t0, 0x01BE(s0)              // t0 = dpad_pressed adress
-        //andi    t0, t0, 0x0008              // ~
-        //beq     t0, r0, _end                // skip if dpad up is not being pressed
-        //nop
-        //addiu   sp, sp,-0x000C              // allocate stack space
-        //sw      a0, 0x0004(sp)              // ~
-        //sw      ra, 0x0008(sp)              // store a0, ra
-        //or      a0, s0, r0                  // a0 = struct address
-        //jal     set_custom_spawn_           // set custom spawn position
-        //nop
-        //lw      a0, 0x0004(sp)              // ~
-        //lw      ra, 0x0008(sp)              // load a0, ra
-        //addiu   sp, sp, 0x000C              // deallocate stack space
-        
+
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // load t0, t1
-        addiu   sp, sp, 0x000C              // deallocate stack space
+        addiu   sp, sp, 0x0010              // deallocate stack space
         lw      s0, 0x0020(sp)              // original line 1
         addiu   sp, sp, 0x00A0              // original line 2
         j       _update_character_return
@@ -359,7 +344,7 @@ scope Training {
         addiu   t6, t6, 0x5240              // original line 1
         addiu   a0, a0, 0x0870              // original line 2
         
-        addiu   sp, sp,-0x000C              // allocate stack space
+        addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // store t0, t1
         
@@ -382,7 +367,7 @@ scope Training {
         
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // load t0, t1
-        addiu   sp, sp, 0x000C              // deallocate stack space
+        addiu   sp, sp, 0x0010              // deallocate stack space
         j       _load_from_sss_return
         nop
     }
@@ -401,7 +386,7 @@ scope Training {
         // bnez    t2, 0x80190654           // original line 1
         // nop                              // original line 2
         
-        addiu   sp, sp,-0x000C              // allocate stack space
+        addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // store t0, t1
         
@@ -415,14 +400,14 @@ scope Training {
         sw      r0, 0x0000(t0)              // reset reset_counter value
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // load t0, t1
-        addiu   sp, sp, 0x000C              // deallocate stack space
+        addiu   sp, sp, 0x0010              // deallocate stack space
         j       _exit_game
         nop
         
         _reset_game:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // load t0, t1
-        addiu   sp, sp, 0x000C              // deallocate stack space
+        addiu   sp, sp, 0x0010              // deallocate stack space
         j       0x80190654
         nop
     }
@@ -431,22 +416,23 @@ scope Training {
     // This function will reset the player's % to 0
     // @ Arguments
     // a0 - address of the player struct
-    // CURRENTLY UNTESTED
     scope reset_percent_: {
-        addiu   sp, sp,-0x000C              // allocate stack space
+        addiu   sp, sp,-0x0010              // allocate stack space
         sw      a1, 0x0004(sp)              // ~
         sw      ra, 0x0008(sp)              // store a1, ra
+
         lw      a1, 0x002C(a0)              // a1 = percentage
         sub     a1, r0, a1                  // a1 = 0 - percentage
         jal     Character.add_percent_      // subtract current percentage from itself
         nop
+
         lw      a1, 0x0004(sp)              // ~
         lw      ra, 0x0008(sp)              // load a1, ra
-        addiu   sp, sp, 0x000C              // deallocate stack space
+        addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // return
         nop
     }
-    
+
     // @ Description
     // This function will copy the player's current position to Training.struct.port_x.spawn_pos
     // as well as copying the player's facing direction to Training.struct.port_x.spawn_dir
@@ -454,10 +440,10 @@ scope Training {
     // a0 - address of the player struct
     // CURRENTLY UNTESTED
     scope set_custom_spawn_: {
-        addiu   sp, sp,-0x000C              // allocate stack space
-        sw      t0, 0x0000(sp)              // ~
-        sw      t1, 0x0004(sp)              // ~
-        sw      t2, 0x0008(sp)              // store t0-t2
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      t2, 0x000C(sp)              // store t0-t2
         lw      t0, 0x0024(a0)              // t0 = current action id
         ori     t1, r0, 0x000A              // t1 = standing action id
         bne     t0, t1, _end                // skip if current action id != standing
@@ -477,10 +463,10 @@ scope Training {
         sw      t1, 0x001C(t2)              // save player facing direction to struct
     
         _end:
-        lw      t0, 0x0000(sp)              // ~
-        lw      t1, 0x0004(sp)              // ~
-        lw      t2, 0x0008(sp)              // load t0-t2, a0
-        addiu   sp, sp, 0x000C              // deallocate stack space
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      t2, 0x000C(sp)              // load t0-t2
+        addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // return
         nop
     }
@@ -491,6 +477,51 @@ scope Training {
     // stage select and loads from the reset function
     reset_counter:
     dw OS.NULL
+
+    // @ Description
+    //
+    scope init_percent_: {
+        OS.patch_start(0x0005321C, 0x800D7A24)
+//      beq     t8, at, 0x800D7A4C          // original line 1
+//      sw      t7, 0x0008(v1)              // original line 2
+        j       init_percent_
+        nop
+        OS.patch_end()
+
+        // t7 holds player percent
+        // t8 holds player port
+        // v1 holds player struct
+
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // store registers
+
+        li      t0, Global.current_screen   // ~
+        lbu     t0, 0x0000(t0)              // t0 = screen_id
+        ori     t1, r0, 0x0036              // ~
+        bne     t0, t1, _end                // skip if screen_id != training mode
+        nop
+
+        // update character percent
+        li      t0, percent_table           // t0 = address of percent table
+        sll     t1, t8, 0x0002              // t1 = offset = player * 4
+        addu    t0, t0, t1                  // t0 = address of percent table + offset
+        lw      t7, 0x0000(t0)              // t7 = new percent
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        beq     t8, at, _take_branch        // original line 1
+        sw      t7, 0x0000(v1)              // original line 2
+        j       0x800D7A24                  // return (don't take branch)
+        nop
+
+        _take_branch:
+        j       0x800D7A4C                  // return (take branch)
+        nop
+    }
+
 
     // @ Description
     // Runs the menu
@@ -642,20 +673,25 @@ scope Training {
     info:
     Menu.info(head, 62, 50, Color.low.GREY, 24)
 
-    update_: {
-
-    }
+    // @ Description
+    // The menu structure writes to these addresses because the percent in the struct is read only.
+    // These are applied in load_from_reset_.
+    percent_table:
+    percent_p1:; dw 0
+    percent_p2:; dw 0
+    percent_p3:; dw 0
+    percent_p4:; dw 0
 
     macro tail_px(player) {
         define character(Training.struct.port_{player}.ID)
         define costume(Training.struct.port_{player}.costume)
         define type(Training.struct.port_{player}.type)
-        define damage(Training.struct.port_{player}.percent)
+        define percent(Training.percent_p{player})
 
         Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, {character}, pc() + 16)
         Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, {costume}, pc() + 12)
         Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, {type}, pc() + 12)
-        Menu.entry("DAMAGE", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {damage}, OS.NULL)
+        Menu.entry("PERCENT", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {percent}, OS.NULL)
     }
 
     tail_p1:; tail_px(1)
@@ -672,13 +708,6 @@ scope Training {
     head:
     entry_port_x:
     Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, OS.NULL, tail_p1)
-
-
-
-
-
-
-
 }
 
 }
