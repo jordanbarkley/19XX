@@ -9,6 +9,7 @@ if {defined __CE__} {
 include "OS.asm"
 include "Global.asm"
 include "Color.asm"
+include "Character.asm"
 
 scope Shield {
 
@@ -25,22 +26,20 @@ scope Shield {
         or      t6, t7, t5                  // original line 1
         // t8 needs to hold rgba32 color by end of function
 
-        addiu   sp, sp,-0x0010              // allocate stack space
+        addiu   sp, sp,-0x0020              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      t2, 0x000C(sp)              // save registers
+        sw      t2, 0x000C(sp)              // ~
+        sw      a0, 0x0010(sp)              // ~
+        sw      ra, 0x0014(sp)              // ~
+        sw      v0, 0x0018(sp)              // save registers
 
-        li      t0, Global.p_struct_head    // t0 = player struct head
         lw      t1, 0x0084(a0)              // t1 = ?
         lw      t1, 0x0018(t1)              // t1 = port shielding
-        
-        _loop:
-        lw      t0, 0x0000(t0)              // t0 = player struct
-        lb      t2, 0x000D(t0)              // t2 = player port
-        bne     t2, t1, _loop               // if (port != port shielding) loop
+        move    a0, t1                      // a0 - player
+        jal     Character.get_struct_       // a0 - player (p1 = 0, p4 = 3)
         nop
-
-        // t0 now holds appropriate player pointer
+        move    t0, v0                      // t0 = player pointer
 
         _teams_check:
         li      t2, Global.vs.teams         // t2 = pointer to teams byte
@@ -76,8 +75,10 @@ scope Shield {
         _return:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      t2, 0x000C(sp)              // save registers
-        addiu   sp, sp, 0x0010              // allocate stack space
+        lw      a0, 0x0010(sp)              // ~
+        lw      ra, 0x0014(sp)              // ~
+        lw      v0, 0x0018(sp)              // restore registers
+        addiu   sp, sp, 0x0020              // deallocate stack space
         j       _color_fix_return           // return
         nop
 
