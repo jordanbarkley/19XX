@@ -22,12 +22,6 @@ scope FGM {
         nop
     }
 
-    // @ Description
-    // disable foreground sounds
-    OS.patchStart(0x000275C0, 0x800269C0)
-    // jr       ra
-    // nop
-    OS.patchEnd()
 
     // item sounds
     scope item {
@@ -129,4 +123,5 @@ scope FGM {
 
     }
 
+}
 }
