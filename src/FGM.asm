@@ -10,18 +10,12 @@ include "OS.asm"
 scope FGM {
 
     // @ Description
-    // Plays a sound effect (unsafe)
-    // @ Arguments
-    // a0 - fgm_id
-    constant play_ssb_(0x800269C0)
-
-    // @ Description
     // Plays a sound effect (safe)
     // @ Arguments
     // a0 - fgm_id
     scope play_: {
         OS.save_registers()
-        jal     play_ssb_
+        jal     0x800269C0
         nop
         OS.restore_registers()
         jr      ra
