@@ -1,6 +1,6 @@
 // FGM.asm
-if !{defined __BGM__} {
-define __BGM__()
+if !{defined __FGM__} {
+define __FGM__()
 
 // @ Description
 // This file allows FGM (forground music) to be played.
