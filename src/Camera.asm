@@ -10,6 +10,8 @@ include "Global.asm"
 include "Toggles.asm"
 include "OS.asm"
 
+// 80131470 - camera
+
 scope Camera {
 
     // @ Description
@@ -31,6 +33,18 @@ scope Camera {
         nop
 
     }
+
+    // @ Description
+    // Allows 360 control over the camera by changing the floats to check against
+    // inspired by [Gaudy (Emudigital)] 
+    OS.patch_start(0x000AC494, 0x80130C94)
+    float32 100                             // x limit
+    dw 0x39AE9681                           // x increment
+    float32 -100                            // x limit
+    float32 100                             // y limit
+    dw 0x39AE9681                           // y increment
+    float32 -100                            // y limit
+    OS.patch_end()
 }
 
 }
