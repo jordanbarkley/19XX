@@ -51,6 +51,7 @@ scope Spawn {
 
         lui     t6, 0x8013                  // original line 1
         lw      t6, 0x1368(t6)              // original line 2
+
         if {defined __CE__} {
             addiu   sp, sp,-0x0020          // allocate stack space
             sw      t0, 0x0004(sp)          // ~
@@ -63,6 +64,28 @@ scope Spawn {
             lw      t0, 0x0004(sp)          // ~
             lw      t1, 0x0008(sp)          // restore registers
             addiu   sp, sp, 0x0020          // deallocate stack space
+        }
+
+        if {defined __TE__} {
+            addiu   sp, sp,-0x0010          // allocate stack space
+            sw      t0, 0x0004(sp)          // ~
+            sw      t1, 0x0008(sp)          // save registers
+
+            lbu     t0, 0x0000(t0)          // t0 = screen_id
+            ori     t1, r0, 0x0016          // ~
+            beq     t0, t1, _continue       // branch if screen_id = vs mode
+            nop
+
+            lw      t0, 0x0004(sp)          // ~
+            lw      t1, 0x0008(sp)          // save registers
+            addiu   sp, sp, 0x0010          // deallocate stack space
+            j       _load_neutral_return
+            nop
+
+            _continue:
+            lw      t0, 0x0004(sp)          // ~
+            lw      t1, 0x0008(sp)          // save registers
+            addiu   sp, sp, 0x0010          // deallocate stack space
         }
         
         Toggles.guard(Toggles.entry_neutral_spawns, _load_neutral_return)
