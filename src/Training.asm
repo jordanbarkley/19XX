@@ -267,7 +267,7 @@ scope Training {
     // v1 = player struct address
     scope load_spawn_dir_: {
         OS.patch_start(0x00053210, 0x800D7A10)
-        j   load_spawn_dir_
+        j       load_spawn_dir_
         nop
         _load_spawn_dir_return:
         OS.patch_end()
@@ -481,7 +481,7 @@ scope Training {
     // @ Description
     // Sets percent on death/reset. This hook runs in all modes.
     scope init_percent_: {
-        OS.patch_start(0x0005321C, 0x800D7A24)
+        OS.patch_start(0x0005321C, 0x800D7A1C)
 //      beq     t8, at, 0x800D7A4C          // original line 1
 //      sw      t7, 0x0008(v1)              // original line 2
         j       init_percent_
@@ -489,7 +489,7 @@ scope Training {
         OS.patch_end()
 
         // t7 holds player percent
-        // t8 holds player port
+        // 0x000D(v1) player port
         // v1 holds player struct
 
         addiu   sp, sp,-0x0010              // allocate stack space
@@ -504,7 +504,8 @@ scope Training {
 
         // update character percent
         li      t0, percent_table           // t0 = address of percent table
-        sll     t1, t8, 0x0002              // t1 = offset = player * 4
+        lbu     t1, 0x000D(v1)              // t1 = player port
+        sll     t1, t1, 0x0002              // t1 = offset = player port * 4
         addu    t0, t0, t1                  // t0 = address of percent table + offset
         lw      t7, 0x0000(t0)              // t7 = new percent
 
