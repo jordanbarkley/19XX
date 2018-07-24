@@ -7,6 +7,20 @@ define __SRAM__()
 
 scope SRAM {
     // @ Description
+    // Variable to hold current SRAM address. SSB only used 0x05EC bytes out of 0x8000 available.
+    // address starts at 0x1000 for simplicity.
+    variable address(0x1000)
+
+    // @ Description
+    // Struct that holds information for a block of save data. 
+    macro block(ram_address, size) {
+        dw SRAM.address
+        dw {ram_address}
+        dw {size}
+        SRAM.address = SRAM.address + {size}
+    }
+
+    // @ Description
     // Read from SRAM (load)
     // @ Arguments
     // a0 - SRAM source

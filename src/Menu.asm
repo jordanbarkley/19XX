@@ -540,7 +540,7 @@ scope Menu {
     // @ Description
     // Returns the number of entires for a menu
     // @ Arguments
-    // a0 - info
+    // a0 - address of info
     // @ Returns
     // v0 - num_entries
     scope get_num_entries_: {
@@ -561,6 +561,68 @@ scope Menu {
         _end:
         lw      a0, 0x0004(sp)              // restore a0
         addiu   sp, sp, 0x0008              // deallocate stack space
+        jr      ra
+        nop
+    }
+
+    // @ Description
+    // Exports every entry of curr_value as a 32 bit value to ram_address
+    // a0 - address of head
+    // a1 - ram_address
+    scope export_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      a1, 0x000C(sp)              // save registers
+
+        lw      t0, 0x0000(a0)              // t0 = head
+        
+        _loop:
+        beqz    t0, _end                    // if (entry = null), end
+        nop
+        lw      t1, 0x0004(t0)              // t1 = entry.curr_value
+        sw      t1, 0x0000(a1)              // export
+        lw      t0, 0x001C(t0)              // t0 = entry->next
+        addiu   a1, a1, 0x0004              // increment ram_address
+        b       _loop                       // check again
+        nop
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      a1, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra
+        nop
+    }
+
+    // @ Description
+    // Imports a set of given 32 bit values to each entry's curr_value 
+    // a0 - address of head
+    // a1 - ram_address
+    scope import_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      a1, 0x000C(sp)              // save registers
+
+        lw      t0, 0x0000(a0)              // t0 = head
+        
+        _loop:
+        beqz    t0, _end                    // if (entry = null), end
+        nop
+        lw      t1, 0x0000(a1)              // t1 = value at ram_address
+        sw      t1, 0x0000(t0)              // update curr_value
+        lw      t0, 0x001C(t0)              // t0 = entry->next
+        addiu   a1, a1, 0x0001              // increment ram_address
+        b       _loop                       // check again
+        nop
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      a1, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra
         nop
     }

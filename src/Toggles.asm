@@ -5,10 +5,10 @@ define __TOGGLES__()
 include "Color.asm"
 include "Menu.asm"
 include "OS.asm"
+include "SRAM.asm"
 
 scope Toggles {
 
-    
     // @ Description
     // Allows function 
     macro guard(entry_address, exit_address) {
@@ -166,7 +166,6 @@ scope Toggles {
     Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
     Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, OS.NULL)
 
-
     // @ Description
     // Random Stage Toggles
     head_random_stage_settings:
@@ -202,6 +201,19 @@ scope Toggles {
         Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, pc() + 20)
         Menu.entry_bool("YOSHI'S ISLAND CLOUDLESS", OS.TRUE, OS.NULL)
     }
+
+    // @ Description
+    // ram_address for toggle saves.
+    save_misc:; fill (12 * 4)
+    save_music:; fill (15 * 4)
+    save_stages:; fill (16 * 4)
+
+    // @ Description
+    // SRAM blocks for toggle saving.
+    block_misc:; SRAM.block(save_misc, (12 * 4))
+    block_music:; SRAM.block(save_music, (15 * 4))
+    block_stages:; SRAM.block(save_stages, (16 * 4))
+
 }
 
 
