@@ -93,6 +93,7 @@ scope BGM {
         db stage.CONGO_JUNGLE
         db stage.PEACHS_CASTLE
         db stage.SAFFRON_CITY
+        db stage.YOSHIS_ISLAND
         db stage.HYRULE_CASTLE
         db stage.FINAL_DESTINATION
         db stage.HOW_TO_PLAY
