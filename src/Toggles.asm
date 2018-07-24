@@ -120,7 +120,6 @@ scope Toggles {
     set_info_2:; set_info_head(head_19xx_settings)
     set_info_3:; set_info_head(head_random_music_settings)
     set_info_4:; set_info_head(head_random_stage_settings)
-    set_info_5:; set_info_head(head_stage_hazard_setting)
 
     info:
     Menu.info(head_super_menu, 20, 30, Color.low.BLACK, 32)
