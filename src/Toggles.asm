@@ -87,6 +87,19 @@ scope Toggles {
         nop 
         beqz    v0, _end                    // nop
         nop
+        li      t0, info                    // t0 = address of info
+        lw      t1, 0x0000(t0)              // t1 = address of head
+        li      t2, head_super_menu         // t2 = address of head_super_menu
+        beq     t1, t2, _exit_super_menu    // if (in super menu), exit
+        nop                                 // else, exit sub menu
+
+        _exit_sub_menu:
+        jal     set_info_1_                 // bring up super menu
+        nop
+        b       _end                        // end menu execution
+        nop
+
+        _exit_super_menu:
         lli     a0, 0x0007                  // a0 - screen_id (main menu)
         jal     Menu.change_screen_
         nop
@@ -105,7 +118,8 @@ scope Toggles {
 
         li      t0, info                    // t0 = info
         li      t1, {address_of_head}       // t1 = address of head
-        sw      t1, 0x0000(t0)              // update info.head
+        sw      t1, 0x0000(t0)              // update info->head
+        sw      r0, 0x000C(t0)              // update info.selection
 
         lw      t0, 0x0004(sp)              // restore t0
         lw      t1, 0x0008(sp)              // restore t1
@@ -116,10 +130,10 @@ scope Toggles {
 
     // @ Description
     // Functions to change the menu currently displayed.
-    set_info_1:; set_info_head(head_super_menu)
-    set_info_2:; set_info_head(head_19xx_settings)
-    set_info_3:; set_info_head(head_random_music_settings)
-    set_info_4:; set_info_head(head_random_stage_settings)
+    set_info_1_:; set_info_head(head_super_menu)
+    set_info_2_:; set_info_head(head_19xx_settings)
+    set_info_3_:; set_info_head(head_random_music_settings)
+    set_info_4_:; set_info_head(head_random_stage_settings)
 
     info:
     Menu.info(head_super_menu, 20, 30, Color.low.BLACK, 32)
@@ -127,9 +141,9 @@ scope Toggles {
     // @ Description
     // Contains list of submenus.
     head_super_menu:
-    Menu.entry_title("19XX SETTINGS", OS.NULL, pc() + 20)
-    Menu.entry_title("RANDOM MUSIC SETTINGS", OS.NULL, pc() + 28)
-    Menu.entry_title("RANDOM STAGE SETTINGS", OS.NULL, OS.NULL)
+    Menu.entry_title("19XX SETTINGS", set_info_2_, pc() + 20)
+    Menu.entry_title("RANDOM MUSIC SETTINGS", set_info_3_, pc() + 28)
+    Menu.entry_title("RANDOM STAGE SETTINGS", set_info_4_, OS.NULL)
 
     // @ Description 
     // Miscellaneous Toggles
