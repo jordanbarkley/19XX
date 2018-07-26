@@ -128,6 +128,9 @@ scope Toggles {
         nop
     } 
 
+    info:
+    Menu.info(head_super_menu, 20, 30, Color.low.BLACK, 32)
+
     // @ Description
     // Functions to change the menu currently displayed.
     set_info_1_:; set_info_head(head_super_menu)
@@ -135,15 +138,28 @@ scope Toggles {
     set_info_3_:; set_info_head(head_random_music_settings)
     set_info_4_:; set_info_head(head_random_stage_settings)
 
-    info:
-    Menu.info(head_super_menu, 20, 30, Color.low.BLACK, 32)
+    // @ Description
+    // This function will transition to "SCREEN ADJUST"
+    scope load_screen_adjust_: {
+        addiu   sp, sp,-0x0008              // allocate stack space
+        sw      ra, 0x0004(sp)              // save ra
+        lli     a0, 0x000F                  // a0 - int next_screen
+        jal     Menu.change_screen_         // go to SCREEN ADJUST
+        nop
+        lw      ra, 0x0004(sp)              // restore ra
+        addiu   sp, sp, 0x0008              // deallocate stack sapce
+        jr      ra                          // return 
+        nop
+    }
+
 
     // @ Description
     // Contains list of submenus.
     head_super_menu:
     Menu.entry_title("19XX SETTINGS", set_info_2_, pc() + 20)
     Menu.entry_title("RANDOM MUSIC SETTINGS", set_info_3_, pc() + 28)
-    Menu.entry_title("RANDOM STAGE SETTINGS", set_info_4_, OS.NULL)
+    Menu.entry_title("RANDOM STAGE SETTINGS", set_info_4_, pc() + 28)
+    Menu.entry_title("SCREEN ADJUST", load_screen_adjust_, OS.NULL)
 
     // @ Description 
     // Miscellaneous Toggles
