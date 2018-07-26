@@ -963,6 +963,7 @@ scope Stages {
         add_to_list(Toggles.entry_random_stage_hyrule_castle, id.HYRULE_CASTLE)
         add_to_list(Toggles.entry_random_stage_yoshis_island, id.YOSHIS_ISLAND)
         add_to_list(Toggles.entry_random_stage_dream_land, id.DREAM_LAND)
+        add_to_list(Toggles.entry_random_stage_saffron_city, id.SAFFRON_CITY)
         add_to_list(Toggles.entry_random_stage_mushroom_kingdom, id.MUSHROOM_KINGDOM)
         add_to_list(Toggles.entry_random_stage_battlefield, id.BATTLEFIELD)
         add_to_list(Toggles.entry_random_stage_final_destination, id.FINAL_DESTINATION)
