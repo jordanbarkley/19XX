@@ -163,58 +163,61 @@ scope Toggles {
     // @ Description
     // Random Music Toggles
     head_random_music_settings:
-    entry_random_music:
-    Menu.entry_bool("RANDOM MUSIC", OS.FALSE, pc() + 20)
-    Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
-    Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
-    Menu.entry_bool("DATA", OS.TRUE, pc() + 12)
-    Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
-    Menu.entry_bool("FINAL DESTINATION", OS.TRUE, pc() + 24)
-    Menu.entry_bool("HOW TO PLAY", OS.TRUE, pc() + 16)
-    Menu.entry_bool("HYRULE CASTLE", OS.TRUE, pc() + 20)
-    Menu.entry_bool("META CRYSTAL", OS.TRUE, pc() + 20)
-    Menu.entry_bool("MUSHROOM KINGDOM", OS.TRUE, pc() + 24)
-    Menu.entry_bool("PEACH'S CASTLE", OS.TRUE, pc() + 20)
-    Menu.entry_bool("PLANET ZEBES", OS.TRUE, pc() + 20)
-    Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
-    Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
-    Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, OS.NULL)
+    entry_random_music:;                    Menu.entry_bool("RANDOM MUSIC", OS.FALSE, pc() + 20)
+    entry_random_music_battlefield:;        Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
+    entry_random_music_congo_jungle:;       Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
+    entry_random_music_data:;               Menu.entry_bool("DATA", OS.TRUE, pc() + 12)
+    entry_random_music_dream_land:;         Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
+    entry_random_music_final_destination:;  Menu.entry_bool("FINAL DESTINATION", OS.TRUE, pc() + 24)
+    entry_random_music_how_to_play:;        Menu.entry_bool("HOW TO PLAY", OS.TRUE, pc() + 16)
+    entry_random_music_hyrule_castle:;      Menu.entry_bool("HYRULE CASTLE", OS.TRUE, pc() + 20)
+    entry_random_music_meta_crystal:;       Menu.entry_bool("META CRYSTAL", OS.TRUE, pc() + 20)
+    entry_random_music_mushroom_kingdom:;   Menu.entry_bool("MUSHROOM KINGDOM", OS.TRUE, pc() + 24)
+    entry_random_music_peachs_castle:;      Menu.entry_bool("PEACH'S CASTLE", OS.TRUE, pc() + 20)
+    entry_random_music_planet_zebes:;       Menu.entry_bool("PLANET ZEBES", OS.TRUE, pc() + 20)
+    entry_random_music_saffron_city:;       Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
+    entry_random_music_sector_z:;           Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
+    entry_random_music_yoshis_island:;      Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, OS.NULL)
 
     // @ Description
     // Random Stage Toggles
     head_random_stage_settings:
     if {defined __TE__} {
-        Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
-        Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
-        Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
-        Menu.entry_bool("FINAL DESTINATION", OS.TRUE, pc() + 24)
-        Menu.entry_bool("HYRULE CASTLE", OS.TRUE, pc() + 20)
-        Menu.entry_bool("MUSHROOM KINGDOM", OS.TRUE, pc() + 24)
-        Menu.entry_bool("PEACH'S CASTLE", OS.TRUE, pc() + 20)
-        Menu.entry_bool("PLANET ZEBES", OS.TRUE, pc() + 20)
-        Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
-        Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
-        Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, OS.NULL)
-    }
+
+    entry_random_stage_battlefield:;                Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
+    entry_random_stage_congo_jungle:;               Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
+    entry_random_stage_dream_land:;                 Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
+    entry_random_stage_final_destination:;          Menu.entry_bool("FINAL DESTINATION", OS.TRUE, pc() + 24)
+    entry_random_stage_hyrule_castle:;              Menu.entry_bool("HYRULE CASTLE", OS.TRUE, pc() + 20)
+    entry_random_stage_mushroom_kingdom:;           Menu.entry_bool("MUSHROOM KINGDOM", OS.TRUE, pc() + 24)
+    entry_random_stage_peachs_castle:;              Menu.entry_bool("PEACH'S CASTLE", OS.TRUE, pc() + 20)
+    entry_random_stage_planet_zebes:;               Menu.entry_bool("PLANET ZEBES", OS.TRUE, pc() + 20)
+    entry_random_stage_saffron_city:;               Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
+    entry_random_stage_sector_z:;                   Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
+    entry_random_stage_yoshis_island:;              Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, OS.NULL)
+
+    } // __TE__
 
     if {defined __CE__} {
-        Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
-        Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
-        Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
-        Menu.entry_bool("DREAM LAND BETA 1", OS.TRUE, pc() + 24)
-        Menu.entry_bool("DREAM LAND BETA 2", OS.TRUE, pc() + 24)
-        Menu.entry_bool("FINAL DESTINATION", OS.TRUE, pc() + 24)
-        Menu.entry_bool("HOW TO PLAY", OS.TRUE, pc() + 16)
-        Menu.entry_bool("HYRULE CASTLE", OS.TRUE, pc() + 20)
-        Menu.entry_bool("META CRYSTAL", OS.TRUE, pc() + 20)
-        Menu.entry_bool("MUSHROOM KINGDOM", OS.TRUE, pc() + 24)
-        Menu.entry_bool("PEACH'S CASTLE", OS.TRUE, pc() + 20)
-        Menu.entry_bool("PLANET ZEBES", OS.TRUE, pc() + 20)
-        Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
-        Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
-        Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, pc() + 20)
-        Menu.entry_bool("YOSHI'S ISLAND CLOUDLESS", OS.TRUE, OS.NULL)
-    }
+    
+    entry_random_stage_battlefield:;                Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
+    entry_random_stage_congo_jungle:;               Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
+    entry_random_stage_dream_land:;                 Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
+    entry_random_stage_dream_land_beta_1:;          Menu.entry_bool("DREAM LAND BETA 1", OS.TRUE, pc() + 24)
+    entry_random_stage_dream_land_beta_2:;          Menu.entry_bool("DREAM LAND BETA 2", OS.TRUE, pc() + 24)
+    entry_random_stage_final_destination:;          Menu.entry_bool("FINAL DESTINATION", OS.TRUE, pc() + 24)
+    entry_random_stage_how_to_play:;                Menu.entry_bool("HOW TO PLAY", OS.TRUE, pc() + 16)
+    entry_random_stage_hyrule_castle:;              Menu.entry_bool("HYRULE CASTLE", OS.TRUE, pc() + 20)
+    entry_random_stage_meta_crystal:;               Menu.entry_bool("META CRYSTAL", OS.TRUE, pc() + 20)
+    entry_random_stage_mushroom_kingdom:;           Menu.entry_bool("MUSHROOM KINGDOM", OS.TRUE, pc() + 24)
+    entry_random_stage_peachs_castle:;              Menu.entry_bool("PEACH'S CASTLE", OS.TRUE, pc() + 20)
+    entry_random_stage_planet_zebes:;               Menu.entry_bool("PLANET ZEBES", OS.TRUE, pc() + 20)
+    entry_random_stage_saffron_city:;               Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
+    entry_random_stage_sector_z:;                   Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
+    entry_random_stage_yoshis_island:;              Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, pc() + 20)
+    entry_random_stage_yoshis_island_cloudless:;    Menu.entry_bool("YOSHI'S ISLAND CLOUDLESS", OS.TRUE, OS.NULL)
+    
+    } // __CE__
 
     // @ Description
     // ram_address for toggle saves.

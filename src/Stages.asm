@@ -877,6 +877,56 @@ scope Stages {
     }
 
     // @ Descirption
+    // Adds a stage to the random list if it's toggled on.
+    // @ Arguments
+    // a0 - address of entry (random stage entry)
+    // a1 - stage id to add
+    // @ Returns
+    // v0 - bool was_added?
+    // v1 - num_stages
+    scope add_stage_to_random_list_: {
+        addiu   sp, sp,-0x0010              // allocate stack sapce
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // save registers
+
+        // this block checks to see if a stage should be added to the table. 
+        _check_add:
+        lw      t0, 0x0004(a0)              // t0 = curr_value
+        lli     v0, OS.FALSE                // v0 = false
+        li      v1, random_count            // ~
+        lw      v1, 0x0000(v1)              // v1 = random_count
+        beqz    t0, _end                    // end, return false and count
+        nop
+
+        // if the stage should be added, it is added here. count is also incremented here
+        li      t0, random_count            // t0 = address of random_count
+        lw      v1, 0x0000(t0)              // v1 = random_count
+        sll     t1, v1, 0x0002              // t1 = offset = random_count * 4
+        addiu   v1, v1, 0x0001              // v1 = random_count++
+        sw      v1, 0x0000(t0)              // update random_count
+        li      t0, random_table            // t0 = address of random_table
+        addu    t0, t0, t1                  // t0 = random_table + offset
+        sw      a1, 0x0000(t0)              // add stage
+        or      v0, OS.TRUE                 // v0 = true
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack sapce
+        jr      ra                          // return
+        nop
+    }
+
+    // @ Descirption
+    // Macro to (maybe) add a stage to the random list.
+    macro add_to_list(entry, stage_id) {
+        li      a0, {entry}                 // a0 - address of entry
+        lli     a1, {stage_id}              // a1 - stage id to add
+        jal     add_stage_to_random_list_   // add stage
+        nop
+    }
+
+    // @ Descirption
     // This function replaces the logic to convert the default cursor_id to a stage_id.
     // @ Returns
     // v0 - stage_id
@@ -893,17 +943,46 @@ scope Stages {
         sw      ra, 0x0008(sp)              // ~
         sw      at, 0x000C(sp)              // save registers
 
-        jal     get_stage_id_
+        jal     get_stage_id_               // v0 = stage_id
         nop
 
+        // this block checks if random is selected (if not stage_id is returned)
         _check_random:
         lli     t0, id.RANDOM               // t0 = id.RANDOM
         bne     v0, t0, _end                // if (stage_id != id.RANDOM), end
         nop
-        lli     a0, NUM_ICONS               // a0 - N
+
+        li      t0, random_count            // ~
+        sw      r0, 0x0000(t0)              // reset count
+
+        // this block builds the list of stages available in the random list (using macro above)
+        add_to_list(Toggles.entry_random_stage_peachs_castle, id.PEACHS_CASTLE)
+        add_to_list(Toggles.entry_random_stage_sector_z, id.SECTOR_Z)
+        add_to_list(Toggles.entry_random_stage_congo_jungle, id.CONGO_JUNGLE)
+        add_to_list(Toggles.entry_random_stage_planet_zebes, id.PLANET_ZEBES)
+        add_to_list(Toggles.entry_random_stage_hyrule_castle, id.HYRULE_CASTLE)
+        add_to_list(Toggles.entry_random_stage_yoshis_island, id.YOSHIS_ISLAND)
+        add_to_list(Toggles.entry_random_stage_dream_land, id.DREAM_LAND)
+        add_to_list(Toggles.entry_random_stage_mushroom_kingdom, id.MUSHROOM_KINGDOM)
+        add_to_list(Toggles.entry_random_stage_battlefield, id.BATTLEFIELD)
+        add_to_list(Toggles.entry_random_stage_final_destination, id.FINAL_DESTINATION)
+        if {defined __CE__} {
+        add_to_list(Toggles.entry_random_stage_dream_land_beta_1, id.DREAM_LAND_BETA_1)
+        add_to_list(Toggles.entry_random_stage_dream_land_beta_2, id.DREAM_LAND_BETA_2)
+        add_to_list(Toggles.entry_random_stage_how_to_play, id.HOW_TO_PLAY)
+        add_to_list(Toggles.entry_random_stage_yoshis_island_cloudless, id.YOSHIS_ISLAND_CLOUDLESS)
+        add_to_list(Toggles.entry_random_stage_meta_crystal, id.META_CRYSTAL)
+        } // __CE__
+
+        // this block loads from the random list using a random int
+        move    a0, v1                      // a0 - range (0, N-1)
         jal     Global.get_random_int_      // v0 = (0, N-1)
         nop
-        b       _check_random               // get a new stage id based off of random offset
+        li      t0, random_table            // t0 = random_table
+        sll     v0, v0, 0x0002              // v0 = offset = random_int * 4
+        addu    t0, t0, v0                  // t0 = random_table + offset
+        lw      v0, 0x0000(t0)              // v0 = stage_id
+        b       _end                        // get a new stage id based off of random offset
         nop
 
         _end:
@@ -914,6 +993,17 @@ scope Stages {
         jr      ra                          // return
         nop
     }
+
+    // @ Descirption
+    // Table of stage IDs (as words, 32 bit values)
+    random_table:
+    fill 4 * 32                             // assumes there will never be more than 32 stages
+
+    // @ Descirption
+    // number of stages in random_table.
+    random_count:
+    dw 0
+
 
     // @ Description
     // This function fixes a bug that does not allow single player stages to be loaded in training.
