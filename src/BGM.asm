@@ -42,6 +42,66 @@ scope BGM {
     }
     } // __CE__
 
+    // @ Descirption
+    // Adds a song to the random list if it's toggled on.
+    // @ Arguments
+    // a0 - address of entry (random music entry)
+    // a1 - bgm_id to add
+    // @ Returns
+    // v0 - bool was_added?
+    // v1 - num_songs
+    scope add_song_to_random_list_: {
+        addiu   sp, sp,-0x0010              // allocate stack sapce
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // save registers
+
+        // this block checks to see if a song should be added to the table. 
+        _check_add:
+        lw      t0, 0x0004(a0)              // t0 = curr_value
+        lli     v0, OS.FALSE                // v0 = false
+        li      v1, random_count            // ~
+        lw      v1, 0x0000(v1)              // v1 = random_count
+        beqz    t0, _end                    // end, return false and count
+        nop
+
+        // if the song should be added, it is added here. count is also incremented here
+        li      t0, random_count            // t0 = address of random_count
+        lw      v1, 0x0000(t0)              // v1 = random_count
+        sll     t1, v1, 0x0002              // t1 = offset = random_count * 4
+        addiu   v1, v1, 0x0001              // v1 = random_count++
+        sw      v1, 0x0000(t0)              // update random_count
+        li      t0, random_table            // t0 = address of random_table
+        addu    t0, t0, t1                  // t0 = random_table + offset
+        sw      a1, 0x0000(t0)              // add song
+        or      v0, OS.TRUE                 // v0 = true
+
+        _end:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack sapce
+        jr      ra                          // return
+        nop
+    }
+
+    // @ Descirption
+    // Macro to (maybe) add a song to the random list.
+    macro add_to_list(entry, bgm_id) {
+        li      a0, {entry}                 // a0 - address of entry
+        lli     a1, {bgm_id}                // a1 - bgm_id to add
+        jal     add_song_to_random_list_    // add song
+        nop
+    }
+
+    // @ Descirption
+    // Table of bgm_id (as words, 32 bit values)
+    random_table:
+    fill 4 * 32                             // assumes there will never be more than 32 songs
+
+    // @ Descirption
+    // number of stages in random_table.
+    random_count:
+    dw 0
+
     // @ Description
     // a1 holds BGM_id. This function replaces a1 with a random id from the table
     scope random_music_: {
@@ -54,7 +114,7 @@ scope BGM {
         constant TABLE_SIZE(13)
 
         or      v0, a1, r0                  // original line 1
-        addu    t3, t1, t2                   // original line 2
+        addu    t3, t1, t2                  // original line 2
         Toggles.guard(Toggles.entry_random_music, _random_music_return)
 
         addiu   sp, sp,-0x0018              // allocate stack space
@@ -69,12 +129,31 @@ scope BGM {
         bne     t0, v0, _end                // if not fight screen, end
         nop
 
-        lli     a0, TABLE_SIZE              // ~
-        jal     Global.get_random_int_      // v0 = table offset
+        // this block builds the list of stages available in the random list (using macro above)
+        add_to_list(Toggles.entry_random_music_peachs_castle, stage.PEACHS_CASTLE)
+        add_to_list(Toggles.entry_random_music_sector_z, stage.SECTOR_Z)
+        add_to_list(Toggles.entry_random_music_congo_jungle, stage.CONGO_JUNGLE)
+        add_to_list(Toggles.entry_random_music_planet_zebes, stage.PLANET_ZEBES)
+        add_to_list(Toggles.entry_random_music_hyrule_castle, stage.HYRULE_CASTLE)
+        add_to_list(Toggles.entry_random_music_yoshis_island, stage.YOSHIS_ISLAND)
+        add_to_list(Toggles.entry_random_music_dream_land, stage.DREAM_LAND)
+        add_to_list(Toggles.entry_random_stage_saffron_city, stage.SAFFRON_CITY)
+        add_to_list(Toggles.entry_random_music_mushroom_kingdom, stage.MUSHROOM_KINGDOM)
+        add_to_list(Toggles.entry_random_music_battlefield, stage.BATTLEFIELD)
+        add_to_list(Toggles.entry_random_music_final_destination, stage.FINAL_DESTINATION)
+        add_to_list(Toggles.entry_random_music_how_to_play, stage.HOW_TO_PLAY)
+        add_to_list(Toggles.entry_random_music_data, menu.DATA)
+        add_to_list(Toggles.entry_random_music_meta_crystal, stage.META_CRYSTAL)
+
+
+        // this block loads from the random list using a random int
+        move    a0, v1                      // a0 - range (0, N-1)
+        jal     Global.get_random_int_      // v0 = (0, N-1)
         nop
-        li      t0, table                   // t0 = table
-        addu    t0, t0, v0                  // t0 = table + offset
-        lb      a1, 0x0000(t0)              // a1 = new_song
+        li      t0, random_table            // t0 = random_table
+        sll     v0, v0, 0x0002              // v0 = offset = random_int * 4
+        addu    t0, t0, v0                  // t0 = random_table + offset
+        lw      a1, 0x0000(t0)              // a1 = bgm_id
 
         _end:
         lw      a0, 0x0004(sp)              // ~
@@ -84,23 +163,6 @@ scope BGM {
         addiu   sp, sp, 0x0018              // deallocate stack space
         j       _random_music_return        // return
         nop
-
-        table:
-        db stage.DREAM_LAND
-        db stage.PLANET_ZEBES
-        db stage.MUSHROOM_KINGDOM
-        db stage.SECTOR_Z
-        db stage.CONGO_JUNGLE
-        db stage.PEACHS_CASTLE
-        db stage.SAFFRON_CITY
-        db stage.YOSHIS_ISLAND
-        db stage.HYRULE_CASTLE
-        db stage.FINAL_DESTINATION
-        db stage.HOW_TO_PLAY
-        db stage.BATTLEFIELD
-        db stage.META_CRYSTAL
-        db menu.DATA
-        OS.align(4)
     }
 
     scope stage {
