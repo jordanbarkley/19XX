@@ -55,9 +55,50 @@ scope Toggles {
     }
 
     scope run_: {
-        addiu   sp, sp,-0x0008              // allocate stack space
-        sw      ra, 0x0004(sp)              // save ra
+        addiu   sp, sp,-0x0020              // allocate stack space
+        sw      ra, 0x0004(sp)              // ~
+        sw      a0, 0x0008(sp)              // ~
+        sw      a1, 0x000C(sp)              // ~
+        sw      a2, 0x0010(sp)              // ~
+        sw      a3, 0x0014(sp)              // ~
+        sw      t0, 0x0018(sp)              // ~
+        sw      t1, 0x001C(sp)              // save registers
 
+        // this block checks if data has been loaded
+        li      t0, loaded                  // t0 = address of loaded
+        lw      t1, 0x0000(t0)              // t0 = loaded
+        bnez    t1, _skip_load              // don't load twice!
+        nop
+        lli     t1, OS.TRUE                 // t1 = true
+        sw      t1, 0x0000(t0)              // loaded = true
+
+        // this block loads data from SRAM
+        li      a0, block_misc              // a0 - address of block (misc)
+        jal     SRAM.load_                  // load data
+        nop
+        li      a0, head_19xx_settings      // a0 - address of head
+        li      a1, block_misc              // a1 - address of block
+        jal     Menu.import_
+        nop
+
+        li      a0, block_music             // a0 - address of block (music)
+        jal     SRAM.load_                  // load data
+        nop
+        li      a0, head_random_music_settings 
+        li      a1, block_music             // a1 - address of block
+        jal     Menu.import_
+        nop
+
+        li      a0, block_stages            // a0 - address of block (stages)
+        jal     SRAM.load_                  // load data
+        nop
+        li      a0, head_random_stage_settings
+        li      a1, block_stages            // a1 - address of block
+        jal     Menu.import_
+        nop
+
+        // this block draws a black background
+        _skip_load:
         lli     a0, Color.low.BLACK         // a0 - color
         jal     Overlay.set_color_          // set fill color to black
         nop
@@ -100,15 +141,54 @@ scope Toggles {
         nop
 
         _exit_super_menu:
+        // this block saves toggles
+        li      a0, head_19xx_settings      // a0 - address of head
+        li      a1, block_misc              // a1 - address of block
+        jal     Menu.export_                // export data
+        nop
+        li      a0, block_misc              // ~
+        jal     SRAM.save_                  // save data
+        nop
+
+        li      a0, head_random_music_settings
+        li      a1, block_music             // a1 - address of block
+        jal     Menu.export_                // export data
+        nop
+        li      a0, block_music             // ~
+        jal     SRAM.save_                  // save data
+        nop
+
+        li      a0, head_random_stage_settings
+        li      a1, block_stages            // a1 - address of block
+        jal     Menu.export_                // export data
+        nop
+        li      a0, block_stages            // ~
+        jal     SRAM.save_                  // save data
+        nop
+
+        li      t0, loaded                  // ~
+        sw      r0, 0x0000(t0)              // loaded = OS.FALSE
+
+        // this block actually exits
         lli     a0, 0x0007                  // a0 - screen_id (main menu)
         jal     Menu.change_screen_
         nop
 
         _end:
+        lw      ra, 0x0004(sp)              // ~
+        lw      a0, 0x0008(sp)              // ~
+        lw      a1, 0x000C(sp)              // ~
+        lw      a2, 0x0010(sp)              // ~
+        lw      a3, 0x0014(sp)              // ~
+        lw      t0, 0x0018(sp)              // ~
+        lw      t1, 0x001C(sp)              // restore registers
         lw      ra, 0x0004(sp)              // restore ra
-        addiu   sp, sp, 0x0008              // deallocate stack space
-        jr      ra
+        addiu   sp, sp, 0x0020              // deallocate stack space
+        jr      ra                          // return
         nop
+
+        loaded:
+        dw OS.FALSE
     }
 
     macro set_info_head(address_of_head) {
@@ -141,13 +221,26 @@ scope Toggles {
     // @ Description
     // This function will transition to "SCREEN ADJUST"
     scope load_screen_adjust_: {
-        addiu   sp, sp,-0x0008              // allocate stack space
-        sw      ra, 0x0004(sp)              // save ra
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      ra, 0x0004(sp)              // ~
+        sw      t0, 0x0008(sp)              // ~
+        sw      t1, 0x000C(sp)              // ~
+        sw      a0, 0x0010(sp)              // save registers
+
+        // this block resets the arrow to 0
+        li      t0, info                    // t0 = info
+        sw      r0, 0x000C(t0)              // update info.selection
+
+        // this block changes screens
         lli     a0, 0x000F                  // a0 - int next_screen
         jal     Menu.change_screen_         // go to SCREEN ADJUST
         nop
-        lw      ra, 0x0004(sp)              // restore ra
-        addiu   sp, sp, 0x0008              // deallocate stack sapce
+
+        lw      ra, 0x0004(sp)              // ~
+        lw      t0, 0x0008(sp)              // ~
+        lw      t1, 0x000C(sp)              // ~
+        lw      a0, 0x0010(sp)              // restore registers
+        addiu   sp, sp, 0x0018              // deallocate stack sapce
         jr      ra                          // return 
         nop
     }
@@ -236,17 +329,10 @@ scope Toggles {
     } // __CE__
 
     // @ Description
-    // ram_address for toggle saves.
-    save_misc:; fill (12 * 4)
-    save_music:; fill (15 * 4)
-    save_stages:; fill (16 * 4)
-
-    // @ Description
     // SRAM blocks for toggle saving.
-    block_misc:; SRAM.block(save_misc, (12 * 4))
-    block_music:; SRAM.block(save_music, (15 * 4))
-    block_stages:; SRAM.block(save_stages, (16 * 4))
-
+    block_misc:; SRAM.block(12 * 4)
+    block_music:; SRAM.block(15 * 4)
+    block_stages:; SRAM.block(16 * 4)
 }
 
 

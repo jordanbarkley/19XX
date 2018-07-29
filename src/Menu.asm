@@ -566,17 +566,18 @@ scope Menu {
     }
 
     // @ Description
-    // Exports every entry of curr_value as a 32 bit value to ram_address
+    // Exports every entry of curr_value as a 32 bit value to SRAM block
     // a0 - address of head
-    // a1 - ram_address
+    // a1 - address of block
     scope export_: {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
         sw      a1, 0x000C(sp)              // save registers
 
-        lw      t0, 0x0000(a0)              // t0 = head
-        
+        move    t0, a0                      // t0 = first entry
+        addiu   a1, a1, 0x000C              // a1 = address of SRAM block data
+
         _loop:
         beqz    t0, _end                    // if (entry = null), end
         nop
@@ -599,22 +600,23 @@ scope Menu {
     // @ Description
     // Imports a set of given 32 bit values to each entry's curr_value 
     // a0 - address of head
-    // a1 - ram_address
+    // a1 - address of block
     scope import_: {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
         sw      a1, 0x000C(sp)              // save registers
 
-        lw      t0, 0x0000(a0)              // t0 = head
+        move    t0, a0                      // t0 = first entry
+        addiu   a1, a1, 0x000C              // a1 = address of SRAM block data
         
         _loop:
         beqz    t0, _end                    // if (entry = null), end
         nop
         lw      t1, 0x0000(a1)              // t1 = value at ram_address
-        sw      t1, 0x0000(t0)              // update curr_value
+        sw      t1, 0x0004(t0)              // update curr_value
         lw      t0, 0x001C(t0)              // t0 = entry->next
-        addiu   a1, a1, 0x0001              // increment ram_address
+        addiu   a1, a1, 0x0004              // increment ram_address
         b       _loop                       // check again
         nop
 
