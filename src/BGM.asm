@@ -102,10 +102,26 @@ scope BGM {
     random_count:
     dw 0
 
+    // @ Descirption
+    // This function is an implementation of a play music tooggle
+    scope play_music_: {
+        OS.patch_start(0x000216B4, 0x80020AB4)
+        j       play_music_
+        nop
+        _play_music_return:
+        OS.patch_end()
+
+        Toggles.guard(Toggles.entry_play_music, OS.NULL)
+        lui     t6, 0x800A                  // original line 1
+        lw      t6, 0xD95C(t6)              // original line 2
+        j       _play_music_return
+        nop
+    }
+
     // @ Description
     // a1 holds BGM_id. This function replaces a1 with a random id from the table
     scope random_music_: {
-        OS.patch_start(0x000216F0, 0x80020AF4)
+        OS.patch_start(0x000216F0, 0x80020AF0)
         j       random_music_
         nop
         _random_music_return:

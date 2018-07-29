@@ -84,7 +84,7 @@ scope Toggles {
         li      a0, block_music             // a0 - address of block (music)
         jal     SRAM.load_                  // load data
         nop
-        li      a0, head_random_music_settings 
+        li      a0, head_music_settings     // a0 - address of head 
         li      a1, block_music             // a1 - address of block
         jal     Menu.import_
         nop
@@ -150,7 +150,7 @@ scope Toggles {
         jal     SRAM.save_                  // save data
         nop
 
-        li      a0, head_random_music_settings
+        li      a0, head_music_settings     // a0 - address of head
         li      a1, block_music             // a1 - address of block
         jal     Menu.export_                // export data
         nop
@@ -215,7 +215,7 @@ scope Toggles {
     // Functions to change the menu currently displayed.
     set_info_1_:; set_info_head(head_super_menu)
     set_info_2_:; set_info_head(head_19xx_settings)
-    set_info_3_:; set_info_head(head_random_music_settings)
+    set_info_3_:; set_info_head(head_music_settings)
     set_info_4_:; set_info_head(head_random_stage_settings)
 
     // @ Description
@@ -250,7 +250,7 @@ scope Toggles {
     // Contains list of submenus.
     head_super_menu:
     Menu.entry_title("19XX SETTINGS", set_info_2_, pc() + 20)
-    Menu.entry_title("RANDOM MUSIC SETTINGS", set_info_3_, pc() + 28)
+    Menu.entry_title("MUSIC SETTINGS", set_info_3_, pc() + 20)
     Menu.entry_title("RANDOM STAGE SETTINGS", set_info_4_, pc() + 28)
     Menu.entry_title("SCREEN ADJUST", load_screen_adjust_, OS.NULL)
 
@@ -271,7 +271,8 @@ scope Toggles {
 
     // @ Description
     // Random Music Toggles
-    head_random_music_settings:
+    head_music_settings:
+    entry_play_music:;                      Menu.entry_bool("PLAY MUSIC", OS.FALSE, pc() + 16)
     entry_random_music:;                    Menu.entry_bool("RANDOM MUSIC", OS.FALSE, pc() + 20)
     entry_random_music_battlefield:;        Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
     entry_random_music_congo_jungle:;       Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
@@ -331,7 +332,7 @@ scope Toggles {
     // @ Description
     // SRAM blocks for toggle saving.
     block_misc:; SRAM.block(12 * 4)
-    block_music:; SRAM.block(15 * 4)
+    block_music:; SRAM.block(16 * 4)
     block_stages:; SRAM.block(16 * 4)
 }
 
