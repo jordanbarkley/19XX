@@ -44,6 +44,8 @@ scope Boot {
         nop
         OS.patch_end()
 
+        jal     Toggles.load_           // load toggles
+        nop
         lui     a0, 0x0140              // load rom address (0x01400000)
         lui     a1, 0x8040              // load ram address (0x80400000)
         jal     Global.dma_copy_        // add custom functions

@@ -71,30 +71,7 @@ scope Toggles {
         nop
         lli     t1, OS.TRUE                 // t1 = true
         sw      t1, 0x0000(t0)              // loaded = true
-
-        // this block loads data from SRAM
-        li      a0, block_misc              // a0 - address of block (misc)
-        jal     SRAM.load_                  // load data
-        nop
-        li      a0, head_19xx_settings      // a0 - address of head
-        li      a1, block_misc              // a1 - address of block
-        jal     Menu.import_
-        nop
-
-        li      a0, block_music             // a0 - address of block (music)
-        jal     SRAM.load_                  // load data
-        nop
-        li      a0, head_music_settings     // a0 - address of head 
-        li      a1, block_music             // a1 - address of block
-        jal     Menu.import_
-        nop
-
-        li      a0, block_stages            // a0 - address of block (stages)
-        jal     SRAM.load_                  // load data
-        nop
-        li      a0, head_random_stage_settings
-        li      a1, block_stages            // a1 - address of block
-        jal     Menu.import_
+        jal     load_                       // load toggles
         nop
 
         // this block draws a black background
@@ -141,7 +118,43 @@ scope Toggles {
         nop
 
         _exit_super_menu:
-        // this block saves toggles
+        jal     save_                       // save toggles
+        nop
+        lli     a0, 0x0007                  // a0 - screen_id (main menu)
+        jal     Menu.change_screen_         // exit to main menu
+        nop
+
+        _end:
+        lw      ra, 0x0004(sp)              // ~
+        lw      a0, 0x0008(sp)              // ~
+        lw      a1, 0x000C(sp)              // ~
+        lw      a2, 0x0010(sp)              // ~
+        lw      a3, 0x0014(sp)              // ~
+        lw      t0, 0x0018(sp)              // ~
+        lw      t1, 0x001C(sp)              // restore registers
+        lw      ra, 0x0004(sp)              // restore ra
+        addiu   sp, sp, 0x0020              // deallocate stack space
+        jr      ra                          // return
+        nop
+
+
+    }
+
+    // @ Description
+    // Boolean for if toggles have been loaded from SRAM.
+    loaded:
+    dw OS.FALSE
+
+    // @ Description
+    // Save toggles to SRAM
+    scope save_: {
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      a0, 0x0004(sp)              // ~
+        sw      a1, 0x0008(sp)              // ~
+        sw      a2, 0x000C(sp)              // ~
+        sw      t0, 0x0010(sp)              // ~
+        sw      ra, 0x0014(sp)              // save registers
+
         li      a0, head_19xx_settings      // a0 - address of head
         li      a1, block_misc              // a1 - address of block
         jal     Menu.export_                // export data
@@ -169,26 +182,58 @@ scope Toggles {
         li      t0, loaded                  // ~
         sw      r0, 0x0000(t0)              // loaded = OS.FALSE
 
-        // this block actually exits
-        lli     a0, 0x0007                  // a0 - screen_id (main menu)
-        jal     Menu.change_screen_
-        nop
-
-        _end:
-        lw      ra, 0x0004(sp)              // ~
-        lw      a0, 0x0008(sp)              // ~
-        lw      a1, 0x000C(sp)              // ~
-        lw      a2, 0x0010(sp)              // ~
-        lw      a3, 0x0014(sp)              // ~
-        lw      t0, 0x0018(sp)              // ~
-        lw      t1, 0x001C(sp)              // restore registers
-        lw      ra, 0x0004(sp)              // restore ra
-        addiu   sp, sp, 0x0020              // deallocate stack space
+        lw      a0, 0x0004(sp)              // ~
+        lw      a1, 0x0008(sp)              // ~
+        lw      a2, 0x000C(sp)              // ~
+        lw      t0, 0x0010(sp)              // ~
+        lw      ra, 0x0014(sp)              // save registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra                          // return
         nop
+    }
 
-        loaded:
-        dw OS.FALSE
+    // @ Description
+    // Loads toggles from SRAM
+    scope load_: {
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      a0, 0x0004(sp)              // ~
+        sw      a1, 0x0008(sp)              // ~
+        sw      a2, 0x000C(sp)              // ~
+        sw      t0, 0x0010(sp)              // ~
+        sw      ra, 0x0014(sp)              // save registers
+
+        li      a0, block_misc              // a0 - address of block (misc)
+        jal     SRAM.load_                  // load data
+        nop
+        li      a0, head_19xx_settings      // a0 - address of head
+        li      a1, block_misc              // a1 - address of block
+        jal     Menu.import_
+        nop
+
+        li      a0, block_music             // a0 - address of block (music)
+        jal     SRAM.load_                  // load data
+        nop
+        li      a0, head_music_settings     // a0 - address of head 
+        li      a1, block_music             // a1 - address of block
+        jal     Menu.import_
+        nop
+
+        li      a0, block_stages            // a0 - address of block (stages)
+        jal     SRAM.load_                  // load data
+        nop
+        li      a0, head_random_stage_settings
+        li      a1, block_stages            // a1 - address of block
+        jal     Menu.import_
+        nop
+
+        lw      a0, 0x0004(sp)              // ~
+        lw      a1, 0x0008(sp)              // ~
+        lw      a2, 0x000C(sp)              // ~
+        lw      t0, 0x0010(sp)              // ~
+        lw      ra, 0x0014(sp)              // save registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        jr      ra                          // return
+        nop
     }
 
     macro set_info_head(address_of_head) {
