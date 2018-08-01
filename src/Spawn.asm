@@ -423,8 +423,8 @@ scope Spawn {
     // 0B - How to Play Stage
     float32  0660,  0000
     float32  1440,  0000
-    float32  0000,  0000                    // missing from stage file 
-    float32  0000,  0000                    // missing from stage file
+    float32 -0660,  0000                    // missing from stage file 
+    float32 -1440,  0000                    // missing from stage file
 
     // 0C - Yoshi's Island (1P)
     float32  0629, -0180
@@ -526,8 +526,8 @@ scope Spawn {
     // 0B - How to Play Stage
     float32  0660,  0000
     float32  1440,  0000
-    float32  0000,  0000
-    float32  0000,  0000
+    float32 -0660,  0000
+    float32 -1440,  0000
 
     // 0C - Yoshi's Island (1P)
     float32  0629, -0180
