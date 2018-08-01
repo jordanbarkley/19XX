@@ -681,6 +681,9 @@ scope Stages {
         // this block draws "<stage_name>"
         jal     get_stage_id_               // v0 = stage_id
         nop
+        lli     a0, id.RANDOM               // a0 = random
+        beq     a0, v0, _end                // don't draw RANDOM
+        nop
         sll     v0, v0, 0x0002              // v0 = offset = stage_id * 4
         li      a0, string_x_pos_table      // a0 = address of string_x_pos_table
         addu    a0, a0, v0                  // a0 = address of string_x_pos_table + offset
@@ -692,6 +695,7 @@ scope Stages {
         jal     Overlay.draw_string_        // draw string
         nop
 
+        _end:
         lw      a0, 0x0004(sp)              // ~
         lw      a1, 0x0008(sp)              // ~
         lw      a2, 0x000C(sp)              // ~
