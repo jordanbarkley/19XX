@@ -31,7 +31,7 @@ scope Stages {
         constant DREAM_LAND_BETA_1(0x09)
         constant DREAM_LAND_BETA_2(0x0A)
         constant HOW_TO_PLAY(0x0B)
-        constant YOSHIS_ISLAND_CLOUDLESS(0x0C)
+        constant MINI_YOSHIS_ISLAND(0x0C)
         constant META_CRYSTAL(0x0D)
         constant BATTLEFIELD(0x0E)
         constant RACE_TO_THE_FINISH(0x0F)
@@ -55,7 +55,7 @@ scope Stages {
         constant DREAM_LAND_BETA_1(0x14)
         constant DREAM_LAND_BETA_2(0x14)
         constant HOW_TO_PLAY(0x00)
-        constant YOSHIS_ISLAND_CLOUDLESS(0x14)
+        constant MINI_YOSHIS_ISLAND(0x14)
         constant META_CRYSTAL(0x14)
         constant BATTLEFIELD(0x14)
         constant RACE_TO_THE_FINISH(0x00)
@@ -77,7 +77,7 @@ scope Stages {
         constant DREAM_LAND_BETA_1(0x0100)
         constant DREAM_LAND_BETA_2(0x0102)
         constant HOW_TO_PLAY(0x010B)
-        constant YOSHIS_ISLAND_CLOUDLESS(0x010E)
+        constant MINI_YOSHIS_ISLAND(0x010E)
         constant META_CRYSTAL(0x10D)
         constant BATTLEFIELD(0x010C)
         constant RACE_TO_THE_FINISH(0x0127)
@@ -146,7 +146,7 @@ scope Stages {
     dw OS.NULL                              // Dream Land Beta 1
     dw OS.NULL                              // Dream Land Beta 2
     dw OS.NULL                              // How To Play
-    dw OS.NULL                              // Yoshi's Island Cloudless
+    dw OS.NULL                              // Mini Yoshi's Island
     dw OS.NULL                              // Meta Crystal
     dw icon_battlefield
     dw OS.NULL                              // Race to the Finish (Placeholder)
@@ -203,7 +203,7 @@ scope Stages {
     db id.CONGO_JUNGLE                      // 07
     db id.META_CRYSTAL                      // 08
     db id.HYRULE_CASTLE                     // 09
-    db id.YOSHIS_ISLAND_CLOUDLESS           // 0A
+    db id.MINI_YOSHIS_ISLAND                // 0A
     db id.SAFFRON_CITY                      // 0B
     db id.RANDOM                            // RR
     db id.PLANET_ZEBES                      // 0C
@@ -254,7 +254,7 @@ scope Stages {
     dw Data.icon_dream_land_beta_1
     dw Data.icon_dream_land_beta_2
     dw Data.icon_how_to_play
-    dw Data.icon_yoshis_island_cloudless
+    dw Data.icon_mini_yoshis_island
     dw Data.icon_meta_crystal
     dw Data.icon_battlefield
     dw OS.NULL                              // Race to the Finish (Placeholder)
@@ -1083,7 +1083,7 @@ scope Stages {
         add_to_list(Toggles.entry_random_stage_dream_land_beta_1, id.DREAM_LAND_BETA_1)
         add_to_list(Toggles.entry_random_stage_dream_land_beta_2, id.DREAM_LAND_BETA_2)
         add_to_list(Toggles.entry_random_stage_how_to_play, id.HOW_TO_PLAY)
-        add_to_list(Toggles.entry_random_stage_yoshis_island_cloudless, id.YOSHIS_ISLAND_CLOUDLESS)
+        add_to_list(Toggles.entry_random_stage_mini_yoshis_island, id.MINI_YOSHIS_ISLAND)
         add_to_list(Toggles.entry_random_stage_meta_crystal, id.META_CRYSTAL)
         } // __CE__
 
@@ -1179,7 +1179,7 @@ scope Stages {
     float32 0.5                         // Dream Land Beta 1
     float32 0.3                         // Dream Land Beta 2
     float32 0.5                         // How to Play
-    float32 0.5                         // Yoshi's Island Cloudless
+    float32 0.5                         // Mini Yoshi's Island
     float32 0.5                         // Meta Crystal
     float32 0.5                         // Battlefield
     float32 0.5                         // Race to the Finish (Placeholder)
@@ -1218,7 +1218,7 @@ scope Stages {
     dw file.DREAM_LAND_BETA_1
     dw file.DREAM_LAND_BETA_2
     dw file.HOW_TO_PLAY
-    dw file.YOSHIS_ISLAND_CLOUDLESS
+    dw file.MINI_YOSHIS_ISLAND
     dw file.META_CRYSTAL
     dw file.BATTLEFIELD
     dw file.RACE_TO_THE_FINISH
@@ -1237,7 +1237,7 @@ scope Stages {
     dw type.DREAM_LAND_BETA_1
     dw type.DREAM_LAND_BETA_2
     dw type.HOW_TO_PLAY
-    dw type.YOSHIS_ISLAND_CLOUDLESS
+    dw type.MINI_YOSHIS_ISLAND
     dw type.META_CRYSTAL
     dw type.BATTLEFIELD
     dw type.RACE_TO_THE_FINISH
