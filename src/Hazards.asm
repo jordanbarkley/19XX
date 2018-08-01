@@ -79,6 +79,17 @@ scope Hazards {
     }
 
     // @ Description
+    // Toggle for Planet Zebes acid
+    scope planet_zebes_acid_: {
+        OS.patch_start(0x00083C10, 0x80108410)
+        jal     planet_zebes_acid_
+        nop
+        OS.patch_end()
+
+        hazard_toggle(0x801082B4)
+    }
+
+    // @ Description
     // Toggle for Hyrule Castle tornadoes
     scope hyrule_castle_tornadoes_: {
         OS.patch_start(0x00086160, 0x8010A960)
