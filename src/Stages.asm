@@ -193,23 +193,23 @@ scope Stages {
     // Stage IDs in order
     // Viable Stage (Most Viable at the Top)
     stage_table:
-    db id.DREAM_LAND                        // 00
-    db id.BATTLEFIELD                       // 01
-    db id.DREAM_LAND_BETA_1                 // 02
-    db id.HOW_TO_PLAY                       // 03
-    db id.FINAL_DESTINATION                 // 04
-    db id.DREAM_LAND_BETA_2                 // 05
-    db id.PEACHS_CASTLE                     // 06
-    db id.CONGO_JUNGLE                      // 07
-    db id.META_CRYSTAL                      // 08
-    db id.HYRULE_CASTLE                     // 09
-    db id.MINI_YOSHIS_ISLAND                // 0A
-    db id.SAFFRON_CITY                      // 0B
+    db id.PEACHS_CASTLE                     // 00
+    db id.CONGO_JUNGLE                      // 01
+    db id.HYRULE_CASTLE                     // 02
+    db id.PLANET_ZEBES                      // 03
+    db id.MUSHROOM_KINGDOM                  // 04
+    db id.BATTLEFIELD                       // 05
+    db id.YOSHIS_ISLAND                     // 06
+    db id.DREAM_LAND                        // 07
+    db id.SECTOR_Z                          // 08
+    db id.SAFFRON_CITY                      // 09
+    db id.FINAL_DESTINATION                 // 0A
+    db id.META_CRYSTAL                      // 0B
     db id.RANDOM                            // RR
-    db id.PLANET_ZEBES                      // 0C
-    db id.MUSHROOM_KINGDOM                  // 0D
-    db id.SECTOR_Z                          // 0E
-    db id.YOSHIS_ISLAND                     // 0F
+    db id.DREAM_LAND_BETA_1                 // 0C
+    db id.DREAM_LAND_BETA_2                 // 0D
+    db id.HOW_TO_PLAY                       // 0E
+    db id.MINI_YOSHIS_ISLAND                // 0F
     db id.RANDOM                            // RR
     OS.align(4)
 
