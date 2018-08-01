@@ -61,7 +61,7 @@ scope Training {
             ID:
             dw 0
             type:
-            dw 0
+            dw 2
             costume:
             dw 0
             percent:
@@ -77,7 +77,7 @@ scope Training {
             ID:
             dw 0
             type:
-            dw 0
+            dw 2
             costume:
             dw 0
             percent:
@@ -93,7 +93,7 @@ scope Training {
             ID:
             dw 0
             type:
-            dw 0
+            dw 2
             costume:
             dw 0
             percent:
@@ -109,7 +109,7 @@ scope Training {
             ID:
             dw 0
             type:
-            dw 0
+            dw 2
             costume:
             dw 0
             percent:
@@ -248,6 +248,9 @@ scope Training {
         lbu     t1, 0x0006(t0)              // t1 = costume id
         li      t2, struct.port_4.costume   // t2 = struct type pointer
         sw      t1, 0x0000(t2)              // store costume id in struct
+
+        jal     struct_to_tail_             // update menu
+        nop
         
         _end:
         lw      t0, 0x0008(sp)              // ~
@@ -364,7 +367,7 @@ scope Training {
         li      t0, struct.port_4.spawn_id  // t0 = port 4 spawn id address
         addiu   t1, t1, 0x0001              // t1 = port 4 id
         sw      t1, 0x0000(t0)              // save port id as spawn id
-        
+
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // load t0, t1
         addiu   sp, sp, 0x0010              // deallocate stack space
@@ -669,8 +672,6 @@ scope Training {
     dw spawn_4
     dw spawn_5
 
-
-
     // @ Description
     // The menu structure writes to these addresses because the percent in the struct is read only.
     // These are applied in init_percent_.
@@ -716,10 +717,9 @@ scope Training {
         define spawn_id(Training.struct.port_{player}.spawn_id)
         define spawn_func(Training.spawn_func_{player}_)
 
-
         Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, {character}, pc() + 16)
         Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, {costume}, pc() + 12)
-        Menu.entry("TYPE", Menu.type.U8, 0, 0, 2, OS.NULL, string_table_type, {type}, pc() + 12)
+        Menu.entry("TYPE", Menu.type.U8, 2, 0, 2, OS.NULL, string_table_type, {type}, pc() + 12)
         Menu.entry("PERCENT", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {percent}, pc() + 12)
         Menu.entry("SPAWN", Menu.type.U8, 0, 0, 4, OS.NULL, string_table_spawn, {spawn_id}, pc() + 12)
         Menu.entry_title("SET CUSTOM SPAWN", {spawn_func}, OS.NULL)
@@ -735,6 +735,52 @@ scope Training {
     dw tail_p2
     dw tail_p3
     dw tail_p4
+
+    // @ Description
+    // Updates tail_px struct with values Training.struct
+    macro struct_to_tail(player) {
+        li      t0, struct.port_{player}
+        li      t1, tail_p{player}
+
+        lw      t2, 0x0000(t0)              // t2 = struct.port_{player}.ID
+        sw      t2, 0x0004(t1)              // update curr_val
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+        
+        lw      t2, 0x0008(t0)              // t2 = struct.port_{player}.costume
+        sw      t2, 0x0004(t1)              // update curr_val
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+
+        lw      t2, 0x0004(t0)              // t2 = struct.port_{player}.type
+        sw      t2, 0x0004(t1)              // update curr_val
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+
+        lw      t2, 0x000C(t0)              // t2 = struct.port_{player}.percent
+        sw      t2, 0x0004(t1)              // update curr_val
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+
+        lw      t2, 0x0010(t0)              // t2 = struct.port_{player}.spawn_id
+        sw      t2, 0x0004(t1)              // update curr_val
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+    }
+
+    scope struct_to_tail_: {
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // ~
+        sw      t2, 0x000C(sp)              // save registers
+
+        struct_to_tail(1)
+        struct_to_tail(2)
+        struct_to_tail(3)
+        struct_to_tail(4)
+
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // ~
+        lw      t2, 0x000C(sp)              // restore registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        jr      ra
+        nop
+    }
 
     info:
     Menu.info(head, 62, 50, Color.low.GREY, 24)
