@@ -671,13 +671,6 @@ scope Stages {
         jal     Overlay.draw_string_        // draw string
         nop
 
-        // this block draws "Stage Select"
-        lli     a0, 182                     // a0 - ulx
-        lli     a1, 140                     // a1 - uly
-        li      a2, string_stage            // a2 - address of string
-        jal     Overlay.draw_string_        // draw string
-        nop
-
         // this block draws "<stage_name>"
         jal     get_stage_id_               // v0 = stage_id
         nop
@@ -707,9 +700,6 @@ scope Stages {
 
         string_title:
         String.insert("19XX 1.0 BETA")
-
-        string_stage:
-        String.insert("Stage Select")
     }
 
     // @ Descirption
