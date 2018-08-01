@@ -279,6 +279,11 @@ scope Training {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // store t0, t1
+        li      t0, Global.current_screen   // ~
+        lbu     t0, 0x0000(t0)              // t0 = current screen
+        lli     t1, 0x0036                  // t1 = training mode screen
+        beq     t0, t1, _end                // only apply in training mode
+        nop
         li      t0, struct.table            // t0 = struct table
         lbu     t1, 0x000D(v1)              // ~
         sll     t1, t1, 0x2                 // t1 = offset (player port * 4)
