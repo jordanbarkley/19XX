@@ -7,6 +7,8 @@ define __BOOT__()
 
 include "OS.asm"
 include "Global.asm"
+include "Toggles.asm"
+include "SRAM.asm"
 
 scope Boot {
     // @ Description
@@ -44,8 +46,14 @@ scope Boot {
         nop
         OS.patch_end()
 
+        jal     SRAM.check_saved_       // v0 = has_saved
+        nop
+        beqz    v0, _continue           // if (!has_saved), skip
+        nop
         jal     Toggles.load_           // load toggles
         nop
+
+        _continue:
         lui     a0, 0x0140              // load rom address (0x01400000)
         lui     a1, 0x8040              // load ram address (0x80400000)
         jal     Global.dma_copy_        // add custom functions

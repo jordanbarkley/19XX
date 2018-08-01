@@ -64,22 +64,10 @@ scope Toggles {
         sw      t0, 0x0018(sp)              // ~
         sw      t1, 0x001C(sp)              // save registers
 
-        // this block checks if data has been loaded
-        li      t0, loaded                  // t0 = address of loaded
-        lw      t1, 0x0000(t0)              // t0 = loaded
-        bnez    t1, _skip_load              // don't load twice!
-        nop
-        lli     t1, OS.TRUE                 // t1 = true
-        sw      t1, 0x0000(t0)              // loaded = true
-        jal     load_                       // load toggles
-        nop
-
-        // this block draws a black background
-        _skip_load:
+        // this block draws a black rectangle to fill the screen
         lli     a0, Color.low.BLACK         // a0 - color
         jal     Overlay.set_color_          // set fill color to black
         nop
-
         lli     a0, 000000                  // a0 - ulx
         lli     a1, 000000                  // a1 - uly
         lli     a2, 000320                  // a2 - width
@@ -136,14 +124,7 @@ scope Toggles {
         addiu   sp, sp, 0x0020              // deallocate stack space
         jr      ra                          // return
         nop
-
-
     }
-
-    // @ Description
-    // Boolean for if toggles have been loaded from SRAM.
-    loaded:
-    dw OS.FALSE
 
     // @ Description
     // Save toggles to SRAM
@@ -178,9 +159,6 @@ scope Toggles {
         li      a0, block_stages            // ~
         jal     SRAM.save_                  // save data
         nop
-
-        li      t0, loaded                  // ~
-        sw      r0, 0x0000(t0)              // loaded = OS.FALSE
 
         lw      a0, 0x0004(sp)              // ~
         lw      a1, 0x0008(sp)              // ~
@@ -317,7 +295,7 @@ scope Toggles {
     // @ Description
     // Random Music Toggles
     head_music_settings:
-    entry_play_music:;                      Menu.entry_bool("PLAY MUSIC", OS.FALSE, pc() + 16)
+    entry_play_music:;                      Menu.entry_bool("PLAY MUSIC", OS.TRUE, pc() + 16)
     entry_random_music:;                    Menu.entry_bool("RANDOM MUSIC", OS.FALSE, pc() + 20)
     entry_random_music_battlefield:;        Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
     entry_random_music_congo_jungle:;       Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
