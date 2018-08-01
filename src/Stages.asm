@@ -7,6 +7,7 @@ define __STAGES__()
 
 include "Color.asm"
 include "Data.asm"
+include "FGM.asm"
 include "Global.asm"
 include "OS.asm"
 include "Overlay.asm"
@@ -276,6 +277,11 @@ scope Stages {
     // column the cursor is on
     column:
     dw 0
+
+    // @ Descirption
+    // Toggle for frozen mode.
+    frozen_mode:
+    dw OS.FALSE
 
     // @ Descirption
     // Prevents series logo from being drawn on wood circle
@@ -578,7 +584,7 @@ scope Stages {
     scope draw_cursor_: {
 
         // @ Descirption
-        // Set cursor position.
+        // Set original cursor position.
         OS.patch_start(0x0014E5C8, 0x80132A58)
         // not used, for documentation only
         OS.patch_end()
@@ -601,16 +607,24 @@ scope Stages {
         sw      t0, 0x0004(sp)              // ~
         sw      ra, 0x0008(sp)              // save registesr
 
+        // this block gets the position
         jal     get_index_                  // v0 = index
         nop
         sll     v0, v0, 0x0003              // v0 = index *= sizeof(position_table entry) = offset
         li      t0, position_table          // ~
         addu    t0, t0, v0                  // t0 = position_table + offset
 
-        lli     a0, Color.low.RED           // ~
+        // this block selects color based of rectangle (based on frozen mode)
+        li      at, frozen_mode             // ~
+        lw      at, 0x0000(at)              // t0 = frozen mode
+        beqz    at, _skip
+        lli     a0, Color.low.RED           // a0 - fill color
+        lli     a0, Color.low.BLUE          // a0 - fill color
+
+        _skip:
+        // this block draws the cursor (with a border of 2)
         jal     Overlay.set_color_          // fill color = RED
         nop
-
         lw      a0, 0x0000(t0)              // a0 - ulx
         addiu   a0, a0,-0x0002              // decrement ulx
         lw      a1, 0x0004(t0)              // a1 - uly
@@ -679,17 +693,45 @@ scope Stages {
     // @ Descirption
     // This is what Overlay.HOOKS_GO_HERE_ calls. It is the main() of Stages.asm
     scope run_: {
-        addiu   sp, sp,-0x0008              // allocate stack space
-        sw      ra, 0x0004(sp)              // save ra
+        addiu   sp, sp,-0x0020              // allocate stack space
+        sw      ra, 0x0004(sp)              // ~
+        sw      a0, 0x0008(sp)              // ~
+        sw      a1, 0x000C(sp)              // ~
+        sw      a2, 0x0010(sp)              // ~
+        sw      v0, 0x0014(sp)              // ~
+        sw      t0, 0x0018(sp)              // ~
+        sw      t1, 0x001C(sp)              // save registers
 
+        // check for z/r press to toggle frozen mode
+        li      a0, Joypad.Z                // a0 - button mask
+        li      a2, Joypad.PRESSED          // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 = l/r pressed
+        nop
+        beqz    v0, _draw                   // if not pressed, skip
+        nop
+        li      t0, frozen_mode             // t0 = address of frozen mode
+        lw      t1, 0x0000(t0)              // t1 = frozen_mode
+        xori    t1, t1, 0x0001              // 0 -> 1 or 1 -> 0
+        sw      t1, 0x0000(t0)
+        lli     a0, FGM.menu.TOGGLE         // a0 - fgm_id
+        jal     FGM.play_                   // play menu sound
+        nop
+
+        _draw:
         jal     draw_cursor_                // draw selection cursor
         nop
 
         jal     draw_icons_                 // draw stage icons
         nop
 
-        lw      ra, 0x0004(sp)              // restore ra
-        addiu   sp, sp, 0x0008              // deallocate stack space
+        lw      ra, 0x0004(sp)              // ~
+        lw      a0, 0x0008(sp)              // ~
+        lw      a1, 0x000C(sp)              // ~
+        lw      a2, 0x0010(sp)              // ~
+        lw      v0, 0x0014(sp)              // ~
+        lw      t0, 0x0018(sp)              // ~
+        lw      t1, 0x001C(sp)              // restore registers
+        addiu   sp, sp, 0x0020              // deallocate stack space
         jr      ra
         nop
     }
