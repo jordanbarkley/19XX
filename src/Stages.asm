@@ -11,6 +11,7 @@ include "FGM.asm"
 include "Global.asm"
 include "OS.asm"
 include "Overlay.asm"
+include "String.asm"
 include "Texture.asm"
 
 scope Stages {
@@ -295,6 +296,20 @@ scope Stages {
     OS.patch_start(0x0014E098, 0x80132528)
     jr      ra                              // return
     nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Prevents "Stage Select" texture from being drawn.
+    OS.patch_start(0x0014DDF8, 0x80132288)
+    jr      ra                              // return immediately
+    nop
+    OS.patch_end()
+
+    // @ Descirption
+    // Prevents the wooden circle from being drawn.
+    OS.patch_start(0x0014DBB8, 0x80132048)
+    //jr      ra                              // return immediately
+    //nop
     OS.patch_end()
 
     // @ Descirption
@@ -641,6 +656,58 @@ scope Stages {
         nop
     }
 
+    scope draw_names_: {
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      a0, 0x0004(sp)              // ~
+        sw      a1, 0x0008(sp)              // ~
+        sw      a2, 0x000C(sp)              // ~
+        sw      v0, 0x0010(sp)              // ~
+        sw      ra, 0x0014(sp)              // save registers
+
+        // this block draws "19XX <version>"
+        lli     a0, 178                     // a0 - ulx
+        lli     a1, 130                     // a1 - uly
+        li      a2, string_title            // a2 - address of string
+        jal     Overlay.draw_string_        // draw string
+        nop
+
+        // this block draws "Stage Select"
+        lli     a0, 182                     // a0 - ulx
+        lli     a1, 140                     // a1 - uly
+        li      a2, string_stage            // a2 - address of string
+        jal     Overlay.draw_string_        // draw string
+        nop
+
+        // this block draws "<stage_name>"
+        jal     get_stage_id_               // v0 = stage_id
+        nop
+        sll     v0, v0, 0x0002              // v0 = offset = stage_id * 4
+        li      a0, string_x_pos_table      // a0 = address of string_x_pos_table
+        addu    a0, a0, v0                  // a0 = address of string_x_pos_table + offset
+        lw      a0, 0x0000(a0)              // a0 - ulx
+        lli     a1, 195                     // a1 - uly
+        li      a2, string_table            // a2 = address of string_table
+        addu    a2, a2, v0                  // a2 = address of string_table + offset
+        lw      a2, 0x0000(a2)              // a2 - adress of string
+        jal     Overlay.draw_string_        // draw string
+        nop
+
+        lw      a0, 0x0004(sp)              // ~
+        lw      a1, 0x0008(sp)              // ~
+        lw      a2, 0x000C(sp)              // ~
+        lw      v0, 0x0010(sp)              // ~
+        lw      ra, 0x0014(sp)              // restore registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        jr      ra                          // return
+        nop
+
+        string_title:
+        String.insert("19XX 1.0 BETA")
+
+        string_stage:
+        String.insert("Stage Select")
+    }
+
     // @ Descirption
     // Returns an index based on column and row
     // @ Returns
@@ -724,6 +791,9 @@ scope Stages {
         jal     draw_icons_                 // draw stage icons
         nop
 
+        jal     draw_names_                 // draw stage names
+        nop
+
         lw      ra, 0x0004(sp)              // ~
         lw      a0, 0x0008(sp)              // ~
         lw      a1, 0x000C(sp)              // ~
@@ -732,7 +802,7 @@ scope Stages {
         lw      t0, 0x0018(sp)              // ~
         lw      t1, 0x001C(sp)              // restore registers
         addiu   sp, sp, 0x0020              // deallocate stack space
-        jr      ra
+        jr      ra                          // return
         nop
     }
 
@@ -1172,6 +1242,61 @@ scope Stages {
     dw type.BATTLEFIELD
     dw type.RACE_TO_THE_FINISH
     dw type.FINAL_DESTINATION
+
+    string_peachs_castle:;          String.insert("Peach's Castle")
+    string_sector_z:;               String.insert("Sector Z")
+    string_congo_jungle:;           String.insert("Congo Jungle")
+    string_planet_zebes:;           String.insert("Planet Zebes")
+    string_hyrule_castle:;          String.insert("Hyrule Castle")
+    string_yoshis_island:;          String.insert("Yoshi's Island")
+    string_dream_land:;             String.insert("Dream Land")
+    string_saffron_city:;           String.insert("Saffron City")
+    string_mushroom_kingdom:;       String.insert("Mushroom Kingdom")
+    string_dream_land_beta_1:;      String.insert("Dream Land Beta 1")
+    string_dream_land_beta_2:;      String.insert("Dream Land Beta 2")
+    string_how_to_play:;            String.insert("How to Play")
+    string_mini_yoshis_island:;     String.insert("Mini Yoshi's Island")
+    string_meta_crystal:;           String.insert("Meta Crystal")
+    string_battlefield:;            String.insert("Battlefield")
+    string_final_destination:;      String.insert("Final Destination")
+
+    string_table:
+    dw string_peachs_castle
+    dw string_sector_z
+    dw string_congo_jungle
+    dw string_planet_zebes
+    dw string_hyrule_castle
+    dw string_yoshis_island
+    dw string_dream_land
+    dw string_saffron_city
+    dw string_mushroom_kingdom
+    dw string_dream_land_beta_1
+    dw string_dream_land_beta_2
+    dw string_how_to_play
+    dw string_mini_yoshis_island
+    dw string_meta_crystal
+    dw string_battlefield
+    dw string_dream_land                    // Race to the Finish (Placeholder)
+    dw string_final_destination
+
+    string_x_pos_table:
+    dw 174                              // Peach's Castle
+    dw 194                              // Sector Z
+    dw 182                              // Congo Jungle
+    dw 182                              // Planet Zebes
+    dw 178                              // Hyrule Castle
+    dw 174                              // Yoshi's Island
+    dw 190                              // Dream Land
+    dw 182                              // Saffron City
+    dw 166                              // Mushroom Kingdom
+    dw 162                              // Dream Land Beta 1
+    dw 162                              // Dream Land Beta 2
+    dw 186                              // How to Play
+    dw 158                              // Mini Yoshi's Island
+    dw 182                              // Meta Crystal
+    dw 186                              // Battlefield
+    dw 190                              // Dream Land (Race to the Finish Placeholder)
+    dw 162                              // Final Destination
 }
 
 }
