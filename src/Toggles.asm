@@ -159,6 +159,9 @@ scope Toggles {
         li      a0, block_stages            // ~
         jal     SRAM.save_                  // save data
         nop
+    
+        jal     SRAM.mark_saved_            // mark save file present
+        nop
 
         lw      a0, 0x0004(sp)              // ~
         lw      a1, 0x0008(sp)              // ~

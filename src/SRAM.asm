@@ -8,8 +8,8 @@ define __SRAM__()
 scope SRAM {
     // @ Description
     // Variable to hold current SRAM address. SSB only used 0x05EC bytes out of 0x8000 available.
-    // address starts at 0x3000 for simplicity.
-    variable address(0x3000)
+    // address starts at 0x7000 for simplicity.
+    variable address(0x7000)
 
     // @ Description
     // Struct that holds information for a block of save data. 
@@ -55,7 +55,7 @@ scope SRAM {
     // @ Description
     // Function to check if the user has saved
     // @ Returns
-    // bool has_saved
+    // v0 - bool has_saved
     scope check_saved_: {
         addiu   sp, sp,-0x0018              // allocate stack space
         sw      a0, 0x0004(sp)              // ~
