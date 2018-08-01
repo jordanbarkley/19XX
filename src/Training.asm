@@ -438,7 +438,6 @@ scope Training {
     // as well as copying the player's facing direction to Training.struct.port_x.spawn_dir
     // @ Arguments
     // a0 - address of the player struct
-    // CURRENTLY UNTESTED
     scope set_custom_spawn_: {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~

@@ -53,40 +53,40 @@ scope Spawn {
         lw      t6, 0x1368(t6)              // original line 2
 
         if {defined __CE__} {
-            addiu   sp, sp,-0x0020          // allocate stack space
-            sw      t0, 0x0004(sp)          // ~
-            sw      t1, 0x0008(sp)          // save registers
-            li      t0, Global.current_screen
-            lbu     t0, 0x0000(t0)          // t0 = screen_id
-            ori     t1, r0, 0x0036          // ~
-            beq     t0, t1, _training       // branch if screen_id = training mode
-            nop
-            lw      t0, 0x0004(sp)          // ~
-            lw      t1, 0x0008(sp)          // restore registers
-            addiu   sp, sp, 0x0020          // deallocate stack space
-        }
+        addiu   sp, sp,-0x0020              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // save registers
+        li      t0, Global.current_screen
+        lbu     t0, 0x0000(t0)              // t0 = screen_id
+        ori     t1, r0, 0x0036              // ~
+        beq     t0, t1, _training           // branch if screen_id = training mode
+        nop
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // restore registers
+        addiu   sp, sp, 0x0020              // deallocate stack space
+        } // __CE__ 
 
         if {defined __TE__} {
-            addiu   sp, sp,-0x0010          // allocate stack space
-            sw      t0, 0x0004(sp)          // ~
-            sw      t1, 0x0008(sp)          // save registers
+        addiu   sp, sp,-0x0010              // allocate stack space
+        sw      t0, 0x0004(sp)              // ~
+        sw      t1, 0x0008(sp)              // save registers
 
-            lbu     t0, 0x0000(t0)          // t0 = screen_id
-            ori     t1, r0, 0x0016          // ~
-            beq     t0, t1, _continue       // branch if screen_id = vs mode
-            nop
+        lbu     t0, 0x0000(t0)              // t0 = screen_id
+        ori     t1, r0, 0x0016              // ~
+        beq     t0, t1, _continue           // branch if screen_id = vs mode
+        nop
 
-            lw      t0, 0x0004(sp)          // ~
-            lw      t1, 0x0008(sp)          // save registers
-            addiu   sp, sp, 0x0010          // deallocate stack space
-            j       _load_neutral_return
-            nop
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // save registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        j       _load_neutral_return
+        nop
 
-            _continue:
-            lw      t0, 0x0004(sp)          // ~
-            lw      t1, 0x0008(sp)          // save registers
-            addiu   sp, sp, 0x0010          // deallocate stack space
-        }
+        _continue:
+        lw      t0, 0x0004(sp)              // ~
+        lw      t1, 0x0008(sp)              // save registers
+        addiu   sp, sp, 0x0010              // deallocate stack space
+        } // __TE__
         
         Toggles.guard(Toggles.entry_neutral_spawns, _load_neutral_return)
 
@@ -171,6 +171,7 @@ scope Spawn {
         _load_spawn:
         li      t0, neutral_table           // t0 = spawn table
         li      t1, Global.vs.stage         // ~
+
         _load_spawn_training:
         lb      t1, 0x0000(t1)              // t1 = stageID
         sll     t1, t1, 0x0005              // t0 = stage offset
@@ -230,7 +231,8 @@ scope Spawn {
         addiu   t0, t3, 0x0014              // t0 = spawn_pos address
         j       _update                     // update spawn position
         nop 
-        }
+        } // __CE__
+        
         team_table:
         db 0x00                             // p1 team
         db 0x00                             // p2 team
