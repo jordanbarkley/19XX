@@ -10,6 +10,13 @@ include "OS.asm"
 scope String {
 
     // @ Description
+    // Inserts a null terminated, 32 bit aligned string
+    macro insert(str) {
+        db {str}, 0x00
+        OS.align(4)
+    }
+
+    // @ Description
     // This function populates a string buffer from an integer in base 10.
     // @ Arguments
     // a0 - int to convert
