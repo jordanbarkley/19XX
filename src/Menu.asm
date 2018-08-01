@@ -428,6 +428,8 @@ scope Menu {
         _u8:
         _s8:
         lw      t0, 0x0018(at)              // t0 = copy address
+        beql    t0, r0, _loop               // if null, loop and at = entry->next
+        lw      at, 0x001C(at)              // at = entry->next
         lw      t1, 0x0004(at)              // t1 = curr val
         sb      t1, 0x0003(t0)              // copy curr val
         b       _loop
@@ -436,6 +438,8 @@ scope Menu {
         _u16:
         _s16:
         lw      t0, 0x0018(at)              // t0 = copy address
+        beql    t0, r0, _loop               // if null, loop and at = entry->next
+        lw      at, 0x001C(at)              // at = entry->next
         lw      t1, 0x0004(at)              // t1 = curr val
         sh      t1, 0x0002(t0)              // copy curr val
         b       _loop
@@ -446,6 +450,8 @@ scope Menu {
         _bool:
         _title:
         lw      t0, 0x0018(at)              // t0 = copy address
+        beql    t0, r0, _loop               // if null, loop and at = entry->next
+        lw      at, 0x001C(at)              // at = entry->next
         lw      t1, 0x0004(at)              // t1 = curr val
         sw      t1, 0x0000(t0)              // copy curr val
         b       _loop
