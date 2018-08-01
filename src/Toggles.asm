@@ -43,16 +43,16 @@ scope Toggles {
         jr      ra
         nop
         OS.patch_end()
-
-        // @ Description
-        // This patch disables back (press B) on Main Menu
-        OS.patch_start(0x0011D768, 0x801327D8)
-        nop
-        nop
-        nop
-        nop
-        OS.patch_end()
     }
+
+    // @ Description
+    // This patch disables back (press B) on Main Menu
+    OS.patch_start(0x0011D768, 0x801327D8)
+    nop
+    nop
+    nop
+    nop
+    OS.patch_end()
 
     scope run_: {
         addiu   sp, sp,-0x0020              // allocate stack space
