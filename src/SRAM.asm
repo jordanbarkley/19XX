@@ -137,9 +137,9 @@ scope SRAM {
         sw      a2, 0x000C(sp)              // ~
         sw      ra, 0x0010(sp)              // save registers
 
-        lw      a1, 0x0000(a0)              // a1 = SRAM source
+        lw      a1, 0x0000(a0)              // a1 = SRAM destination
         lw      a2, 0x0008(a0)              // a2 - size
-        lw      a0, 0x0004(a0)              // a0 - RAM destination
+        lw      a0, 0x0004(a0)              // a0 - RAM source
         jal     write_                      // write
         nop
 
