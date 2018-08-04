@@ -36,9 +36,8 @@ scope Training {
     // 0x00 = MAN, 0x01 = COM, 0x02 = NOT
     // @ costume    [read/write]
     // Contains the costume ID.
-    // @ percent    [read only]
-    // Contains the current percentage.
-    // Read only. Use Character.add_percent_ and Training.reset_percent_ to write.
+    // @ percent    [read/write]
+    // Contains the percentage to be applied to the character through custom menu functions.
     // @ spawn_id    [read/write]
     // Contains the player's spawn id.
     // 0x00 = port 1, 0x01 = port 2, 0x02 = port 3, 0x03 = port 4, 0x04 = custom
@@ -51,12 +50,6 @@ scope Training {
     constant FACE_RIGHT(0x00000001)
     // 0xFFFFFFFF = left, 0x00000001 = right
     scope struct {
-        scope main: {
-            // @ Description
-            // stage id, see stages.asm for list
-            stage:
-            dw 0
-        }
         scope port_1: {
             ID:
             dw 0
@@ -132,7 +125,7 @@ scope Training {
     }
 
     // @ Description
-    // This function loads various character properties when training mode is loaded
+    // This hook loads various character properties when training mode is loaded
     scope load_character_: {
         OS.patch_start(0x00116AA0, 0x80190280)
         jal load_character_
@@ -203,52 +196,60 @@ scope Training {
         _initialize_p1:
         addiu   t0, Global.vs.P_OFFSET      // t0 = p1 info
         lbu     t1, 0x0003(t0)              // t1 = char id
-        li      t2, struct.port_1.ID        // t2 = struct id pointer
+        li      t2, struct.port_1.ID        // t2 = struct id address
         bnel    t1, t3, _initialize_p1+0x18 // ~
         sw      t1, 0x0000(t2)              // if id != NONE, store in struct
         lbu     t1, 0x0002(t0)              // t1 = type
-        li      t2, struct.port_1.type      // t2 = struct type pointer
+        li      t2, struct.port_1.type      // t2 = struct type address
         sw      t1, 0x0000(t2)              // store type in struct
         lbu     t1, 0x0006(t0)              // t1 = costume id
-        li      t2, struct.port_1.costume   // t2 = struct type pointer
+        li      t2, struct.port_1.costume   // t2 = struct costume address
         sw      t1, 0x0000(t2)              // store costume id in struct
+        li      t2, struct.port_1.percent   // t2 = struct percent address
+        sw      r0, 0x0000(t2)              // reset percent
         _initialize_p2:
         addiu   t0, Global.vs.P_DIFF        // t0 = p2 info
         lbu     t1, 0x0003(t0)              // t1 = char id
-        li      t2, struct.port_2.ID        // t2 = struct id pointer
+        li      t2, struct.port_2.ID        // t2 = struct id address
         bnel    t1, t3, _initialize_p2+0x18 // ~
         sw      t1, 0x0000(t2)              // if id != NONE, store in struct
         lbu     t1, 0x0002(t0)              // t1 = type
-        li      t2, struct.port_2.type      // t2 = struct type pointer
+        li      t2, struct.port_2.type      // t2 = struct type address
         sw      t1, 0x0000(t2)              // store type in struct
         lbu     t1, 0x0006(t0)              // t1 = costume id
-        li      t2, struct.port_2.costume   // t2 = struct type pointer
+        li      t2, struct.port_2.costume   // t2 = struct costume address
         sw      t1, 0x0000(t2)              // store costume id in struct
+        li      t2, struct.port_2.percent   // t2 = struct percent address
+        sw      r0, 0x0000(t2)              // reset percent
         _initialize_p3:
         addiu   t0, Global.vs.P_DIFF        // t0 = p3 info
         lbu     t1, 0x0003(t0)              // t1 = char id
-        li      t2, struct.port_3.ID        // t2 = struct id pointer
+        li      t2, struct.port_3.ID        // t2 = struct id address
         bnel    t1, t3, _initialize_p3+0x18 // ~
         sw      t1, 0x0000(t2)              // if id != NONE, store in struct
         lbu     t1, 0x0002(t0)              // t1 = type
-        li      t2, struct.port_3.type      // t2 = struct type pointer
+        li      t2, struct.port_3.type      // t2 = struct type address
         sw      t1, 0x0000(t2)              // store type in struct
         lbu     t1, 0x0006(t0)              // t1 = costume id
-        li      t2, struct.port_3.costume   // t2 = struct type pointer
+        li      t2, struct.port_3.costume   // t2 = struct costume address
         sw      t1, 0x0000(t2)              // store costume id in struct
+        li      t2, struct.port_3.percent   // t2 = struct percent address
+        sw      r0, 0x0000(t2)              // reset percent
         _initialize_p4:
         addiu   t0, Global.vs.P_DIFF        // t0 = p4 info
         lbu     t1, 0x0003(t0)              // t1 = char id
-        li      t2, struct.port_4.ID        // t2 = struct id pointer
+        li      t2, struct.port_4.ID        // t2 = struct id address
         bnel    t1, t3, _initialize_p4+0x18 // ~
         sw      t1, 0x0000(t2)              // if id != NONE, store in struct
         lbu     t1, 0x0002(t0)              // t1 = type
-        li      t2, struct.port_4.type      // t2 = struct type pointer
+        li      t2, struct.port_4.type      // t2 = struct type address
         sw      t1, 0x0000(t2)              // store type in struct
         lbu     t1, 0x0006(t0)              // t1 = costume id
-        li      t2, struct.port_4.costume   // t2 = struct type pointer
+        li      t2, struct.port_4.costume   // t2 = struct costume address
         sw      t1, 0x0000(t2)              // store costume id in struct
-
+        li      t2, struct.port_4.percent   // t2 = struct percent address
+        sw      r0, 0x0000(t2)              // reset percent
+        
         jal     struct_to_tail_             // update menu
         nop
         
@@ -266,82 +267,70 @@ scope Training {
     }    
     
     // @ Description
-    // This function loads the facing direction when a custom spawn position is used
-    // v1 = player struct address
-    scope load_spawn_dir_: {
-        OS.patch_start(0x00053210, 0x800D7A10)
-        j       load_spawn_dir_
+    // Initializes character properties on death/reset. This hook runs in all modes.
+   scope init_character_: {
+      OS.patch_start(0x0005321C, 0x800D7A1C)
+//      beq     t8, at, 0x800D7A4C          // original line 1
+//      sw      t7, 0x0008(v1)              // original line 2
+        j       init_character_
         nop
-        _load_spawn_dir_return:
         OS.patch_end()
-        lw      t7, 0x0024(a1)              // original line 1
-        or      s0, a0, r0                  // original line 2
+
+        // t7 holds player percent
+        // 0x000D(v1) player port
+        // v1 holds player struct
+
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // store t0, t1
-        li      t0, Global.current_screen   // ~
-        lbu     t0, 0x0000(t0)              // t0 = current screen
-        lli     t1, 0x0036                  // t1 = training mode screen
-        bne     t0, t1, _end                // only apply in training mode
-        nop
-        li      t0, struct.table            // t0 = struct table
-        lbu     t1, 0x000D(v1)              // ~
-        sll     t1, t1, 0x2                 // t1 = offset (player port * 4)
-        add     t0, t0, t1                  // t0 = struct table + offset
-        lw      t0, 0x0000(t0)              // t0 = port struct address
-        lw      t1, 0x0010(t0)              // ~
-        slti    t1, t1, 0x4                 // t1 = 1 if spawn_id > 0x4; else t1 = 0
-        bnez    t1, _end                    // skip if spawn_id != custom
-        nop
-        lw      t1, 0x001C(t0)              // t1 = spawn_dir
-        sw      t1, 0x0044(v1)              // player facing direction = spawn_dir
-        
-        _end:
-        lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // load t0, t1
-        addiu   sp, sp, 0x0010              // deallocate stack space       
-        j       _load_spawn_dir_return
-        nop
-        }
-    
-    // @ Description
-    // This function runs once per frame, per character. Can be used to update character info
-    // s0 = player struct address
-    scope update_character_: {
-        OS.patch_start(0x000621B4, 0x800E69B4)
-        j   update_character_
-        nop
-        _update_character_return:
-        OS.patch_end()
-        _update_percent:
-        addiu   sp, sp,-0x0010              // allocate stack space
-        sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // store t0, t1
+        sw      t1, 0x0008(sp)              // ~
+        sw      t2, 0x000C(sp)              // store registers
+
         li      t0, Global.current_screen   // ~
         lbu     t0, 0x0000(t0)              // t0 = screen_id
         ori     t1, r0, 0x0036              // ~
         bne     t0, t1, _end                // skip if screen_id != training mode
         nop
+        li      t1, 0x800D86B4              // ~
+        bne     ra, t1, _end                // skip if ra != 800D86B4
+        nop
+
+        _update_spawn_dir:
         li      t0, struct.table            // t0 = struct table
-        lbu     t1, 0x000D(s0)              // ~
+        lbu     t1, 0x000D(v1)              // ~
         sll     t1, t1, 0x2                 // t1 = offset (player port * 4)
-        add     t0, t0, t1                  // t0 = struct table + offset
-        lw      t0, 0x0000(t0)              // t0 = port struct address
-        lhu     t1, 0x002E(s0)              // t1 = current percentage
-        sw      t1, 0x000C(t0)              // save percentage to struct
+        add     t2, t0, t1                  // t0 = struct table + offset
+        lw      t2, 0x0000(t2)              // t0 = port struct address
+        lw      t0, 0x0010(t2)              // ~
+        slti    t0, t0, 0x4                 // t1 = 1 if spawn_id > 0x4; else t1 = 0
+        bnez    t0, _update_percent         // skip if spawn_id != custom
+        nop
+        lw      t0, 0x001C(t2)              // t1 = spawn_dir
+        sw      t0, 0x0044(v1)              // player facing direction = spawn_dir
+        
+        _update_percent:
+        li      t0, toggle_table            // t0 = toggle table
+        add     t0, t0, t1                  // t0 = toggle table + offset
+        lw      t0, 0x0000(t0)              // t0 = entry_percent_toggle_px
+        lw      t1, 0x0004(t0)              // t1 = is_enabled
+        bnel    t1, r0, _end                // ~
+        lw      t7, 0x000C(t2)              // if (is_enabled), t7 = updated percent
 
         _end:
         lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // load t0, t1
+        lw      t1, 0x0008(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack space
-        lw      s0, 0x0020(sp)              // original line 1
-        addiu   sp, sp, 0x00A0              // original line 2
-        j       _update_character_return
+        beq     t8, at, _take_branch        // original line 1
+        sw      t7, 0x002C(v1)              // original line 2
+        j       0x800D7A24                  // return (don't take branch)
+        nop
+
+        _take_branch:
+        j       0x800D7A4C                  // return (take branch)
         nop
     }
-    
+      
     // @ Description
-    // This function runs when training is loaded from stage select, but not when reset is used
+    // This hook runs when training is loaded from stage select, but not when reset is used
     scope load_from_sss_: {
         OS.patch_start(0x00116E20, 0x80190600)
         j   load_from_sss_
@@ -381,7 +370,7 @@ scope Training {
     }
     
     // @ Description
-    // This function runs when training is loaded from reset, but not from the stage select screen
+    // This hook runs when training is loaded from reset, but not from the stage select screen
     // it also runs when training mode exit is used
     scope load_from_reset_: {
         OS.patch_start(0x00116E88, 0x80190668)
@@ -484,51 +473,6 @@ scope Training {
     // stage select and loads from the reset function
     reset_counter:
     dw 0
-
-    // @ Description
-    // Sets percent on death/reset. This hook runs in all modes.
-    scope init_percent_: {
-        OS.patch_start(0x0005321C, 0x800D7A1C)
-//      beq     t8, at, 0x800D7A4C          // original line 1
-//      sw      t7, 0x0008(v1)              // original line 2
-        j       init_percent_
-        nop
-        OS.patch_end()
-
-        // t7 holds player percent
-        // 0x000D(v1) player port
-        // v1 holds player struct
-
-        addiu   sp, sp,-0x0010              // allocate stack space
-        sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // store registers
-
-        li      t0, Global.current_screen   // ~
-        lbu     t0, 0x0000(t0)              // t0 = screen_id
-        ori     t1, r0, 0x0036              // ~
-        bne     t0, t1, _end                // skip if screen_id != training mode
-        nop
-
-        // update character percent
-        li      t0, percent_table           // t0 = address of percent table
-        lbu     t1, 0x000D(v1)              // t1 = player port
-        sll     t1, t1, 0x0002              // t1 = offset = player port * 4
-        addu    t0, t0, t1                  // t0 = address of percent table + offset
-        lw      t7, 0x0000(t0)              // t7 = new percent
-
-        _end:
-        lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // restore registers
-        addiu   sp, sp, 0x0010              // deallocate stack space
-        beq     t8, at, _take_branch        // original line 1
-        sw      t7, 0x0000(v1)              // original line 2
-        j       0x800D7A24                  // return (don't take branch)
-        nop
-
-        _take_branch:
-        j       0x800D7A4C                  // return (take branch)
-        nop
-    }
 
     // @ Description
     // Runs the menu
@@ -678,15 +622,6 @@ scope Training {
     dw spawn_5
 
     // @ Description
-    // The menu structure writes to these addresses because the percent in the struct is read only.
-    // These are applied in init_percent_.
-    percent_table:
-    percent_p1:; dw 0
-    percent_p2:; dw 0
-    percent_p3:; dw 0
-    percent_p4:; dw 0
-
-    // @ Description
     // macro to call set_custom_spawn.
     macro set_custom_spawn(player) {
         addiu   sp, sp,-0x0010              // allocate stack space
@@ -697,7 +632,7 @@ scope Training {
         lli     a0, {player} - 1            // a0 - player (p1 = 0, p4 = 3)
         jal     Character.get_struct_       // v0 = address of player struct
         nop
-        move    a0, v0                      // t0 = player pointer
+        move    a0, v0                      // a0 = player pointer
         jal     set_custom_spawn_
         nop
 
@@ -713,21 +648,63 @@ scope Training {
     spawn_func_2_:; set_custom_spawn(2)
     spawn_func_3_:; set_custom_spawn(3)
     spawn_func_4_:; set_custom_spawn(4)
-
+    
+    macro set_percent(player) {
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      a0, 0x0004(sp)              // ~
+        sw      a1, 0x0008(sp)              // ~
+        sw      v0, 0x000C(sp)              // ~
+        sw      ra, 0x0010(sp)              // save registers
+    
+        lli     a0, {player} - 1            // a0 - player (p1 = 0, p4 = 3)
+        jal     Character.get_struct_       // v0 = address of player struct
+        nop
+        move    a0, v0                      // a0 = player pointer
+        jal     reset_percent_              // reset percent
+        nop
+        li      a1, struct.port_{player}.percent
+        lw      a1, 0x0000(a1)              // a1 = percent to add
+        jal     Character.add_percent_
+        nop
+        
+        lw      a0, 0x0004(sp)              // ~
+        lw      a1, 0x0008(sp)              // ~
+        lw      v0, 0x000C(sp)              // ~
+        lw      ra, 0x0010(sp)              // save registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        jr      ra
+        nop
+    }
+        
+        
+        
+    
+    percent_func_1_:; set_percent(1)
+    percent_func_2_:; set_percent(2)
+    percent_func_3_:; set_percent(3)
+    percent_func_4_:; set_percent(4)
+    
+    
     macro tail_px(player) {
         define character(Training.struct.port_{player}.ID)
         define costume(Training.struct.port_{player}.costume)
         define type(Training.struct.port_{player}.type)
-        define percent(Training.percent_p{player})
         define spawn_id(Training.struct.port_{player}.spawn_id)
         define spawn_func(Training.spawn_func_{player}_)
+        define percent(Training.struct.port_{player}.percent)
+        define percent_func(Training.percent_func_{player}_)
+
 
         Menu.entry("CHARACTER", Menu.type.U8, 0, 0, Character.id.NESS, OS.NULL, string_table_char, {character}, pc() + 16)
-        Menu.entry("COSTUME", Menu.type.U8, 0, 0, 3, OS.NULL, OS.NULL, {costume}, pc() + 12)
+        Menu.entry("COSTUME", Menu.type.U8, 0, 0, 5, OS.NULL, OS.NULL, {costume}, pc() + 12)
         Menu.entry("TYPE", Menu.type.U8, 2, 0, 2, OS.NULL, string_table_type, {type}, pc() + 12)
-        Menu.entry("PERCENT", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {percent}, pc() + 12)
         Menu.entry("SPAWN", Menu.type.U8, 0, 0, 4, OS.NULL, string_table_spawn, {spawn_id}, pc() + 12)
-        Menu.entry_title("SET CUSTOM SPAWN", {spawn_func}, OS.NULL)
+        Menu.entry_title("SET CUSTOM SPAWN", {spawn_func}, pc() + 24)
+        Menu.entry("PERCENT", Menu.type.U16, 0, 0, 999, OS.NULL, OS.NULL, {percent}, pc() + 12)
+        Menu.entry_title("SET PERCENT", {percent_func}, entry_percent_toggle_p{player})
+        entry_percent_toggle_p{player}:; Menu.entry_bool("RESET SETS PERCENT", OS.TRUE, OS.NULL)
+
+
     }
 
     tail_p1:; tail_px(1)
@@ -741,6 +718,12 @@ scope Training {
     dw tail_p3
     dw tail_p4
 
+    toggle_table:
+    dw  entry_percent_toggle_p1
+    dw  entry_percent_toggle_p2
+    dw  entry_percent_toggle_p3
+    dw  entry_percent_toggle_p4
+    
     // @ Description
     // Updates tail_px struct with values Training.struct
     macro struct_to_tail(player) {
@@ -758,14 +741,24 @@ scope Training {
         lw      t2, 0x0004(t0)              // t2 = struct.port_{player}.type
         sw      t2, 0x0004(t1)              // update curr_val
         lw      t1, 0x001C(t1)              // t1 = curr->next
-
-        lw      t2, 0x000C(t0)              // t2 = struct.port_{player}.percent
-        sw      t2, 0x0004(t1)              // update curr_val
-        lw      t1, 0x001C(t1)              // t1 = curr->next
-
+        
         lw      t2, 0x0010(t0)              // t2 = struct.port_{player}.spawn_id
         sw      t2, 0x0004(t1)              // update curr_val
         lw      t1, 0x001C(t1)              // t1 = curr->next
+        
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+        
+        lw      t2, 0x000C(t0)              // t2 = struct.port_{player}.percent
+        sw      t2, 0x0004(t1)              // update curr_val
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+        
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+        
+        lli     t2, 0x0001                  // t2 = is_enabled
+        sw      t2, 0x0004(t1)              // update curr_val
+        lw      t1, 0x001C(t1)              // t1 = curr->next
+
+
     }
 
     scope struct_to_tail_: {
@@ -797,12 +790,3 @@ scope Training {
 
 }
 }
-
-// To-Do List
-// create functions:
-// set custom spawn position (if player state = standing, set custom spawn to current x,y position)
-// freeze % toggle?
-
-// End Goal
-// create an additional menu that can be easily accessed within training mode
-// allowing players to control all of the properties that have been set up in this file
