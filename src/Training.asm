@@ -15,6 +15,7 @@ include "Joypad.asm"
 include "Menu.asm"
 include "OS.asm"
 include "Overlay.asm"
+include "String.asm"
 
 scope Training {
     // @ Description
@@ -393,6 +394,8 @@ scope Training {
         lw      t1, 0x0000(t0)              // t1 = reset_counter value
         addiu   t1, t1, 0x00001             // t1 = reset counter value + 1
         sw      t1, 0x0000(t0)              // store reset_counter value
+        li      t1, advance_frame_.freeze   // ~
+        sw      r0, 0x0000(t1)              // freeze = false
         bnez    t2, _reset_game             // modified original branch
         nop
         
@@ -409,6 +412,126 @@ scope Training {
         addiu   sp, sp, 0x0010              // deallocate stack space
         j       0x80190654
         nop
+    }
+    
+    // @ Description
+    // This hook replaces a branch which determines whether the in-game advance frame
+    // function should be called while in training mode.
+    scope advance_frame_: {
+        OS.patch_start(0x00114260, 0x8018DA40)
+        j   advance_frame_
+        nop
+        _advance_frame_return:
+        OS.patch_end()
+        
+        // the original code: skips the frame advance function if the branch is taken
+        // bnez    v0, 0x8018DA58           // original line 1
+        // lui     a0, 0x8013               // original line 2
+        // v0 = bool skip_advance
+        lui     a0, 0x8013                  // original line 2
+        OS.save_registers()
+        li      t1, freeze                  // t1 = freeze
+        li      t2, du_pressed              // t2 = du_pressed
+        li      t3, dr_pressed              // t3 = dr_pressed
+        lw      t4, 0x0000(t2)              // t4 = bool du_pressed
+        lw      t5, 0x0000(t3)              // t5 = bool dr_pressed
+        move    t6, v0                      // t6 = bool skip_advance
+        or      t0, t4, t5                  // ~
+        bnez    t0, _skip_input             // if (du_pressed) or (dr_pressed), skip checking for inputs
+        nop
+        
+        _check_du:
+        // check for a DPAD UP press and store the result
+        lli     a0, Joypad.DU               // a0 - button_mask
+        lli     a1, 000069                  // a1 - whatever you like!
+        lli     a2, Joypad.PRESSED          // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 - bool du_pressed
+        nop
+        sw      v0, 0x0000(t2)              // store bool du_pressed
+        
+        _check_dr:
+        // check for a DPAD RIGHT press and store the result
+        lli     a0, Joypad.DR               // a0 - button_mask
+        lli     a1, 000069                  // a1 - whatever you like!
+        lli     a2, Joypad.TURBO            // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 - bool dr_pressed
+        nop
+        sw      v0, 0x0000(t3)              // store bool dr_pressed
+        
+        _skip_input:
+        // replicate the original branch if skip_advance = true
+        li      ra, 0x8018DA58              // return value - skip
+        bnez    t6, _skip                   // if (skip_advance), skip
+        nop
+        
+        _load_du:
+        // toggle freeze if a dpad up input is given
+        lw      t4, 0x0000(t2)              // t4 = bool du_pressed
+        beqz    t4, _load_dr                // if (!du_pressed), load_dr
+        nop
+        lw      t0, 0x0000(t1)              // t0 = bool freeze
+        xori    t0, t0, 0x0001              // 0 -> 1 or 1 -> 0 (flip bool)
+        sw      t0, 0x0000(t1)              // store bool freeze
+       
+        _load_dr:
+        // advance one frame and freeze if a dpad right input is given
+        li      ra, _advance_frame_return   // return value - advance frame
+        lw      t5, 0x0000(t3)              // t5 = bool dr_pressed
+        beqz    t5, _check_freeze           // if !(dr_pressed), check freeze
+        nop
+        lli     t0, 0x0001                  // ~
+        sw      t0, 0x0000(t1)              // freeze = true
+        b       _end                        // force advance frame
+        nop
+        
+        _check_freeze:
+        lw      t0, 0x0000(t1)              // t0 = bool freeze
+        beqz    t0, _end                    // if (!freeze), end
+        nop
+        li      ra, 0x8018DA50              // return value - freeze
+        
+        _end:
+        sw      r0, 0x0000(t2)              // du_pressed = false
+        sw      r0, 0x0000(t3)              // dr_pressed = false
+        _skip:
+        lw      at, 0x0004(sp)              // ~
+        lw      v0, 0x0008(sp)              // ~
+        lw      v1, 0x000C(sp)              // ~
+        lw      a0, 0x0010(sp)              // ~
+        lw      a1, 0x0014(sp)              // ~
+        lw      a2, 0x0018(sp)              // ~
+        lw      a3, 0x001C(sp)              // ~
+        lw      t0, 0x0020(sp)              // ~
+        lw      t1, 0x0024(sp)              // ~
+        lw      t2, 0x0028(sp)              // ~
+        lw      t3, 0x002C(sp)              // ~
+        lw      t4, 0x0030(sp)              // ~
+        lw      t5, 0x0034(sp)              // ~
+        lw      t6, 0x0038(sp)              // ~
+        lw      t7, 0x003C(sp)              // ~
+        lw      t8, 0x0040(sp)              // ~
+        lw      t9, 0x0044(sp)              // ~
+        lw      s0, 0x0048(sp)              // ~
+        lw      s1, 0x004C(sp)              // ~
+        lw      s2, 0x0050(sp)              // ~
+        lw      s3, 0x0054(sp)              // ~
+        lw      s4, 0x0058(sp)              // ~
+        lw      s5, 0x005C(sp)              // ~
+        lw      s6, 0x0060(sp)              // ~
+        lw      s7, 0x0064(sp)              // ~
+        lw      s8, 0x0068(sp)              // restore registers (excluding ra)
+        addiu   sp, sp, 0x0070              // deallocate stack space
+        jr      ra
+        nop 
+
+        freeze:
+        dw OS.FALSE
+        
+        du_pressed:
+        dw OS.FALSE
+        
+        dr_pressed:
+        dw OS.FALSE
     }
     
     // @ Description
@@ -483,7 +606,39 @@ scope Training {
 
         li      t0, toggle_menu             // t0 = address of toggle_menu
         lbu     t0, 0x0000(t0)              // t0 = toggle_menu
-
+        
+        lli     t1, BOTH_DOWN               // t1 = both menus are down
+        beq     t0, t1, _end                // branch accordingly
+        nop
+        
+        // draw advance_frame_ instructions
+        lli     a0, 000057                  // a0 - ulx
+        lli     a1, 000205                  // a1 - uly
+        li      a2, dpad_up                 // a2 - address of string
+        jal     Overlay.draw_string_        // draw custom menu instructions
+        nop
+        lli     a0, 000057                  // a0 - ulx
+        lli     a1, 000215                  // a1 - uly
+        li      a2, dpad_right              // a2 - address of string
+        jal     Overlay.draw_string_        // draw custom menu instructions
+        nop
+        
+        // draw reset counter
+        lli     a0, 000176                  // a0 - ulx
+        lli     a1, 000015                  // a1 - uly
+        li      a2, reset_string            // a2 - address of string
+        jal     Overlay.draw_string_        // draw "reset counter" string
+        nop
+        li      a2, reset_counter           // a2 = reset_count
+        lw      a0, 0x0000(a2)              // a2 = (int) reset count
+        jal     String.itoa_                // v0 = (string) reset count
+        nop
+        lli     a0, 000300                  // a0 - urx
+        lli     a1, 000015                  // a1 - uly
+        move    a2, v0                      // a2 - address of string
+        jal     Overlay.draw_string_urx_    // draw reset count number
+        nop
+        
         // check if the ssb menu is up
         lli     t1, SSB_UP                  // t1 = ssb menu is up
         beq     t0, t1, _ssb_up             // branch accordingly
@@ -543,9 +698,9 @@ scope Training {
         lli     a0, Joypad.B                // a0 - button_mask
         lli     a1, 000069                  // a1 - whatever you like!
         lli     a2, Joypad.PRESSED          // a2 - type
-        jal     Joypad.check_buttons_all_   // v0 - bool z_pressed
+        jal     Joypad.check_buttons_all_   // v0 - bool b_pressed
         nop
-        beqz    v0, _end                    // if (!z_pressed), end
+        beqz    v0, _end                    // if (!b_pressed), end
         nop
         li      t0, toggle_menu             // t0 = toggle_menu
         lli     t1, SSB_UP                  // ~
@@ -555,7 +710,7 @@ scope Training {
 
         _ssb_up:
         // tell the user they can bring up the custom menu
-        lli     a0, 000068                  // a0 - ulx
+        lli     a0, 000069                  // a0 - ulx
         lli     a1, 000050                  // a1 - uly
         li      a2, press_z                 // a2 - address of string
         jal     Overlay.draw_string_        // draw custom menu instructions
@@ -581,7 +736,18 @@ scope Training {
         jr      ra
         nop
     }
-
+    // @ Description
+    // Strings used to explain advance_frame_ controls
+    dpad_up:; db "DPAD UP - PAUSE AND RESUME", 0x00
+    dpad_right:; db "DPAD RIGHT - FRAME ADVANCE", 0x00
+    OS.align(4)
+    
+    // @ Description
+    // String used for reset counter which appears while the training menu is up
+    reset_string:; db "RESET COUNT", 0x00
+    OS.align(4)
+    
+    
     // @ Description
     // Message/visual indicator to press Z for custom menu
     press_z:; db "PRESS Z FOR CUSTOM MENU", 0x00
