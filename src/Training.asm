@@ -8,6 +8,8 @@ if {defined __CE__} {
 
 include "Character.asm"
 include "Color.asm"
+include "Data.asm"
+include "FGM.asm"
 include "Global.asm"
 include "Joypad.asm"
 include "Menu.asm"
@@ -509,6 +511,24 @@ scope Training {
         lw      t2, 0x0000(t2)              // t2 = address of tail
         sw      t2, 0x001C(t0)              // entry.next = address of head
 
+        // draw background
+        lli     a0, Color.low.MENU_BG
+        jal     Overlay.set_color_          // set fill color
+        nop
+        lli     a0, 000062                  // a0 - ulx
+        lli     a1, 000043                  // a1 - uly
+        lli     a2, 000196                  // a2 - width
+        lli     a3, 000159                  // a3 - height
+        jal     Overlay.draw_rectangle_     // draw background rectangle
+        nop
+        
+        // draw logo
+        lli     a0, 000068                  // a0 - ulx
+        lli     a1, 000083                  // a1 - uly
+        li      a2, Data.menu_logo_info     // a2 - address of texture struct
+        jal     Overlay.draw_texture_big_   // draw logo texture
+        nop
+        
         // update menu
         li      a0, info                    // a0 - address of Menu.info()
         jal     Menu.update_                // check for updates
@@ -548,6 +568,9 @@ scope Training {
         jal     Joypad.check_buttons_all_   // v0 - bool z_pressed
         nop
         beqz    v0, _end                    // if (!z_pressed), end
+        nop
+        lli     a0, 0x0116                  // a0 - fgm_id
+        jal     FGM.play_                   // play training menu start sound
         nop
         li      t0, toggle_menu             // t0 = toggle_menu
         lli     t1, CUSTOM_UP               // ~
@@ -781,7 +804,7 @@ scope Training {
     }
 
     info:
-    Menu.info(head, 62, 50, Color.low.GREY, 24)
+    Menu.info(head, 62, 50, 0, 24)
 
     head:
     entry_port_x:

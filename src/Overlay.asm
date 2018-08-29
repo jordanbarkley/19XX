@@ -281,10 +281,10 @@ scope Overlay {
         li      a2, texture                 // a2 - address of local texture struct 
 
         _loop:
-        sltiu   at, t3, 0x0005              // if (t3 < 5), at = 1
-        bne     at, r0, _draw_last          // ...and draw rectangle with height of 4 or less
+        sltiu   at, t3, 0x0004              // if (t3 < 4), at = 1
+        bne     at, r0, _draw_last          // ...and draw rectangle with height of 3 or less
         nop
-        lli     t4, 0x0005                  // t4 = 5
+        lli     t4, 0x0004                  // t4 = 4
         sw      t4, 0x0004(t0)              // texture.height = 0
 
         _draw:
@@ -295,13 +295,13 @@ scope Overlay {
         nop
 
         _increment:
-        addiu   a1, a1, 0x0005              // increment uly by 5
+        addiu   a1, a1, 0x0004              // increment uly by 4
         mult    t1, t4                      // ~
-        mflo    at                          // at = width * 5
-        sll     at, at, 0x0001              // at = width * 5 * sizeof(rgba5551)
+        mflo    at                          // at = width * 4
+        sll     at, at, 0x0001              // at = width * 4 * sizeof(rgba5551)
         addu    t2, t2, at                  // t2 = data_pointer + offset
         sw      t2, 0x0008(t0)              // store new data_pointer to local texture struct
-        addiu   t3, t3,-0x0005              // t3 = height_left - 5
+        addiu   t3, t3,-0x0004              // t3 = height_left - 4
         b       _loop                       // prepart to draw next chunk
         nop
 

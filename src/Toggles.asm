@@ -3,6 +3,7 @@ if !{defined __TOGGLES__} {
 define __TOGGLES__()
 
 include "Color.asm"
+include "Data.asm"
 include "Menu.asm"
 include "OS.asm"
 include "SRAM.asm"
@@ -54,6 +55,7 @@ scope Toggles {
     nop
     OS.patch_end()
 
+    if {defined __CE__} {
     scope run_: {
         addiu   sp, sp,-0x0020              // allocate stack space
         sw      ra, 0x0004(sp)              // ~
@@ -64,15 +66,47 @@ scope Toggles {
         sw      t0, 0x0018(sp)              // ~
         sw      t1, 0x001C(sp)              // save registers
 
-        // this block draws a black rectangle to fill the screen
-        lli     a0, Color.low.BLACK         // a0 - color
-        jal     Overlay.set_color_          // set fill color to black
+        // draw background rectangle
+        lli     a0, Color.low.MENU_BG       // a0 - menu background color
+        jal     Overlay.set_color_          // set fill color
         nop
         lli     a0, 000000                  // a0 - ulx
         lli     a1, 000000                  // a1 - uly
         lli     a2, 000320                  // a2 - width
         lli     a3, 000240                  // a3 - height
-        jal     Overlay.draw_rectangle_     // draw black rectangle for background
+        jal     Overlay.draw_rectangle_     // draw background rectangle
+        // draw white outline
+        nop
+        lli     a0, Color.low.WHITE         // a0 - color
+        jal     Overlay.set_color_          // set fill color
+        nop
+        lli     a0, 000028                  // a0 - ulx
+        lli     a1, 000028                  // a1 - uly
+        lli     a2, 000264                  // a2 - width
+        lli     a3, 000184                  // a3 - height
+        jal     Overlay.draw_rectangle_     // draw outline rectangle
+        nop
+        // draw foreground rectangle
+        lli     a0, Color.low.MENU_BG       // a0 - color
+        jal     Overlay.set_color_          // set fill color
+        nop
+        lli     a0, 000029                  // a0 - ulx
+        lli     a1, 000029                  // a1 - uly
+        lli     a2, 000262                  // a2 - width
+        lli     a3, 000182                  // a3 - height
+        jal     Overlay.draw_rectangle_     // draw foreground rectangle
+        nop
+        // draw "options" text
+        lli     a0, 000026                  // a0 - ulx
+        lli     a1, 000011                  // a1 - uly
+        li      a2, Data.options_text_info  // a2 - address of texture struct
+        jal     Overlay.draw_texture_       // draw options text texture
+        nop
+        // draw logo
+        lli     a0, 000068                  // a0 - ulx
+        lli     a1, 000083                  // a1 - uly
+        li      a2, Data.menu_logo_info     // a2 - address of texture struct
+        jal     Overlay.draw_texture_big_   // draw logo texture
         nop
 
         // update menu
@@ -125,7 +159,8 @@ scope Toggles {
         jr      ra                          // return
         nop
     }
-
+    }
+    
     // @ Description
     // Save toggles to SRAM
     scope save_: {
@@ -235,7 +270,7 @@ scope Toggles {
     } 
 
     info:
-    Menu.info(head_super_menu, 20, 30, Color.low.BLACK, 32)
+    Menu.info(head_super_menu, 30, 35, 0, 32)
 
     // @ Description
     // Functions to change the menu currently displayed.

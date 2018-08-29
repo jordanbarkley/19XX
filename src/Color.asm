@@ -31,6 +31,7 @@ scope Color {
         constant BLACK(0x0001)
         constant GREY(0x8421)
         constant WHITE(0xFFFF)
+        constant MENU_BG(0x2993)
     }
 
     scope high {

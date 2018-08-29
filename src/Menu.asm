@@ -194,6 +194,8 @@ scope Menu {
 
         // draw rectangle
         lw      a0, 0x0010(a0)              // a0 - fill color
+        beq     a0, r0, _draw_entries       // skip if fill color = 0
+        nop
         jal     Overlay.set_color_          // set fill color
         nop
         lw      a0, 0x0010(sp)              // a0 - address of info()
@@ -216,6 +218,7 @@ scope Menu {
         jal     Overlay.draw_rectangle_     // draw rectangle
         nop
 
+         _draw_entries:
         // draw first entry
         lw      at, 0x0010(sp)              // at = address of info()
         lw      a0, 0x0000(at)              // a0 - entry
@@ -248,20 +251,42 @@ scope Menu {
         nop
 
         _end:
-        // draw ">"
+        // draw selection cursor
+        lli     a0, 0x7DFF                  // a0 - fill color (cursor blue)
+        jal     Overlay.set_color_          // set fill color
+        nop
         lw      at, 0x0010(sp)              // at = address of Menu.info()
         lw      t0, 0x000C(at)              // t0 = selecion
         lli     s0, ROW_HEIGHT              // ~
         mult    t0, s0                      // ~
         mflo    a1                          // a1 = height of row
-
-        lw      a0, 0x0004(at)              // a0 - ulx
         lw      t0, 0x0008(at)              // t0 = menu uly
         addu    a1, a1, t0                  // a1 - uly
-        lli     a2, '>'                     // a2 - char
-        jal     Overlay.draw_char_          // draw '>'
+        addiu   a1, a1, 0x0002              // a1 - uly + 2
+        lw      a0, 0x0004(at)              // a0 - menu ulx
+        addiu   a0, a0, 0x0002              // a0 - ulx + 2
+        lli     a2, 0x0004                  // a2 - cursor width
+        lli     a3, 0x0004                  // a3 - cursor height
+        jal     Overlay.draw_rectangle_     // draw cursor
         nop
-
+        //  draw selection line
+        lw      at, 0x0010(sp)              // at = address of Menu.info()
+        lw      t0, 0x000C(at)              // t0 = selecion
+        lli     s0, ROW_HEIGHT              // ~
+        mult    t0, s0                      // ~
+        mflo    a1                          // a1 = height of row
+        lw      t0, 0x0008(at)              // t0 = menu uly
+        addu    a1, a1, t0                  // a1 - uly
+        addiu   a1, a1, 0x0008              // a1 - uly + 8
+        lw      a0, 0x0004(at)              // a0 - menu ulx
+        addiu   a0, a0, 0x0002              // a0 - ulx + 2
+        lw      a2, 0x0014(at)              // a2 - width
+        sll     a2, a2, 0x0003              // a2 = (width) * NUM_PIXELS
+        addiu   a2, a2,-0x0002              // a2 - line width ((width * NUM_PIXELS) - 2)
+        lli     a3, 0x0001                  // a3 - line height
+        jal     Overlay.draw_rectangle_     // draw line
+        nop
+        
         lw      s0, 0x0004(sp)              // ~
         lw      t0, 0x0008(sp)              // ~
         lw      ra, 0x000C(sp)              // ~

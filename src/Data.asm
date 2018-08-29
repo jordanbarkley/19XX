@@ -7,6 +7,8 @@ if {defined __CE__} {
 // This file contains binary data such as images and stage files. It all gets dumped to expansion
 // RAM. This data is only available in 19XXCE.
 
+include "Texture.asm"
+
 scope Data {
 
     pushvar origin
@@ -32,6 +34,15 @@ scope Data {
     insert icon_battlefield, "../textures/icon_battlefield.rgba5551"
     insert icon_final_destination, "../textures/icon_final_destination.rgba5551"
     insert icon_random, "../textures/icon_random.rgba5551"
+    
+    // Menu Textures
+    menu_logo_info:
+    Texture.info(184,74)
+    insert menu_logo, "../textures/menu_19xx_logo.rgba5551"
+
+    options_text_info:
+    Texture.info(80,16)
+    insert options_text, "../textures/menu_options_text.rgba5551"
 
     display_list:
     fill 0x10000
