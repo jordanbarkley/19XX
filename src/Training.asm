@@ -16,6 +16,7 @@ include "Menu.asm"
 include "OS.asm"
 include "Overlay.asm"
 include "String.asm"
+include "Toggles.asm"
 
 scope Training {
     // @ Description
@@ -417,6 +418,7 @@ scope Training {
     // @ Description
     // This hook replaces a branch which determines whether the in-game advance frame
     // function should be called while in training mode.
+    // Additionally, contains a shortcut for toggling hitbox mode.
     scope advance_frame_: {
         OS.patch_start(0x00114260, 0x8018DA40)
         j   advance_frame_
@@ -430,12 +432,27 @@ scope Training {
         // v0 = bool skip_advance
         lui     a0, 0x8013                  // original line 2
         OS.save_registers()
+        move    t6, v0                      // t6 = bool skip_advance
+        _check_dl:
+        // check for a DPAD DOWN press, toggles hitbox mode if detected
+        lli     a0, Joypad.DD               // a0 - button_mask
+        lli     a1, 000069                  // a1 - whatever you like!
+        lli     a2, Joypad.PRESSED          // a2 - type
+        jal     Joypad.check_buttons_all_   // v0 - bool dd_pressed
+        nop
+        beqz    v0, _check_frame_advance    // if (!dd_pressed), skip
+        nop
+        li      t1, Toggles.entry_hitbox_mode
+        lw      t0, 0x0004(t1)              // t0 = bool hitbox_mode
+        xori    t0, t0, 0x0001              // 0 -> 1 or 1 -> 0 (flip bool)
+        sw      t0, 0x0004(t1)              // store bool hitbox_mode
+        
+        _check_frame_advance:
         li      t1, freeze                  // t1 = freeze
         li      t2, du_pressed              // t2 = du_pressed
         li      t3, dr_pressed              // t3 = dr_pressed
         lw      t4, 0x0000(t2)              // t4 = bool du_pressed
         lw      t5, 0x0000(t3)              // t5 = bool dr_pressed
-        move    t6, v0                      // t6 = bool skip_advance
         or      t0, t4, t5                  // ~
         bnez    t0, _skip_input             // if (du_pressed) or (dr_pressed), skip checking for inputs
         nop
@@ -612,20 +629,26 @@ scope Training {
         nop
         
         // draw advance_frame_ instructions
-        lli     a0, 000057                  // a0 - ulx
-        lli     a1, 000205                  // a1 - uly
+        lli     a0, 000160                  // a0 - x
+        lli     a1, 000203                  // a1 - uly
         li      a2, dpad_up                 // a2 - address of string
-        jal     Overlay.draw_string_        // draw custom menu instructions
+        jal     Overlay.draw_centered_str_  // draw shortcut instructions
         nop
-        lli     a0, 000057                  // a0 - ulx
-        lli     a1, 000215                  // a1 - uly
+        lli     a0, 000160                  // a0 - x
+        lli     a1, 000212                  // a1 - uly
         li      a2, dpad_right              // a2 - address of string
-        jal     Overlay.draw_string_        // draw custom menu instructions
+        jal     Overlay.draw_centered_str_  // draw shortcut instructions
+        nop
+        lli     a0, 000160                  // a0 - x
+        lli     a1, 000221                  // a1 - uly
+        li      a2, dpad_down               // a2 - address of string
+        jal     Overlay.draw_centered_str_  // draw shortcut instructions
         nop
         
+        
         // draw reset counter
-        lli     a0, 000176                  // a0 - ulx
-        lli     a1, 000015                  // a1 - uly
+        lli     a0, 000098                  // a0 - ulx
+        lli     a1, 000025                  // a1 - uly
         li      a2, reset_string            // a2 - address of string
         jal     Overlay.draw_string_        // draw "reset counter" string
         nop
@@ -633,8 +656,8 @@ scope Training {
         lw      a0, 0x0000(a2)              // a2 = (int) reset count
         jal     String.itoa_                // v0 = (string) reset count
         nop
-        lli     a0, 000300                  // a0 - urx
-        lli     a1, 000015                  // a1 - uly
+        lli     a0, 000222                  // a0 - urx
+        lli     a1, 000025                  // a1 - uly
         move    a2, v0                      // a2 - address of string
         jal     Overlay.draw_string_urx_    // draw reset count number
         nop
@@ -710,10 +733,10 @@ scope Training {
 
         _ssb_up:
         // tell the user they can bring up the custom menu
-        lli     a0, 000069                  // a0 - ulx
+        lli     a0, 000161                  // a0 - x
         lli     a1, 000050                  // a1 - uly
         li      a2, press_z                 // a2 - address of string
-        jal     Overlay.draw_string_        // draw custom menu instructions
+        jal     Overlay.draw_centered_str_  // draw custom menu instructions
         nop
 
         // check for z press
@@ -737,9 +760,10 @@ scope Training {
         nop
     }
     // @ Description
-    // Strings used to explain advance_frame_ controls
+    // Strings used to explain advance_frame_ shortcuts
     dpad_up:; db "DPAD UP - PAUSE AND RESUME", 0x00
     dpad_right:; db "DPAD RIGHT - FRAME ADVANCE", 0x00
+    dpad_down:; db "DPAD DOWN - HITBOX DISPLAY", 0x00
     OS.align(4)
     
     // @ Description

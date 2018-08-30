@@ -436,6 +436,40 @@ scope Overlay {
         jr      ra                          // return
         nop
     }
+    
+    // @ Description
+    // Draws a null terminated string centered on x.
+    // @ Arguments
+    // a0 - x
+    // a1 - uly
+    // a2 - address of string
+    scope draw_centered_str_: {
+        addiu   sp, sp,-0x0018              // allocate stack space
+        sw      ra, 0x0004(sp)              // ~
+        sw      a0, 0x0008(sp)              // ~
+        sw      a1, 0x000C(sp)              // ~
+        sw      a2, 0x0010(sp)              // save registers
+
+        move    a0, a2                      // a0 - address of string
+        jal     String.length_              // v0 = length of string
+        nop
+        sll     v0, v0, 0x0002              // v0 = length of string * (char_pixels / 2)
+
+        lw      a0, 0x0008(sp)              // ~
+        sub     a0, a0, v0                  // a0 - ulx
+        lw      a1, 0x000C(sp)              // a1 - uly
+        lw      a2, 0x0010(sp)              // a2 - address of string
+        jal     draw_string_
+        nop
+
+        lw      ra, 0x0004(sp)              // ~
+        lw      a0, 0x0008(sp)              // ~
+        lw      a1, 0x000C(sp)              // ~
+        lw      a2, 0x0010(sp)              // restore registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
+        jr      ra                          // return
+        nop
+    }
 
     // @ Description
     // Adds f3dex2 to end a display list.
