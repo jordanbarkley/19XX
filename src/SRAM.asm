@@ -63,7 +63,7 @@ scope SRAM {
         sw      a2, 0x000C(sp)              // ~
         sw      ra, 0x0014(sp)              // save registers 
 
-        li      a0, address                 // a0 - SRAM source
+        li      a0, ADDRESS                 // a0 - SRAM source
         li      a1, return                  // a1 - RAM destination
         li      a2, 0x0004                  // a2 - size
         jal     read_                       // read from  has_saved
