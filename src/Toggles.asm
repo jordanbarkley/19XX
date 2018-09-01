@@ -394,7 +394,7 @@ scope Toggles {
 
     // @ Description
     // SRAM blocks for toggle saving.
-    block_misc:; SRAM.block(12 * 4)
+    block_misc:; SRAM.block(13 * 4)
     block_music:; SRAM.block(16 * 4)
     block_stages:; SRAM.block(16 * 4)
 }

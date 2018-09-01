@@ -7,8 +7,7 @@ define __SRAM__()
 
 scope SRAM {
     // @ Description
-    // Variable to hold current SRAM address. SSB only used 0x05EC bytes out of 0x8000 available.
-    // address starts at 0x0BDC (the end of the SSB save).
+    // Variable to hold current SRAM address. SSB only used 0x0BDC bytes out of 0x8000 available.
     variable address(0x0BDC)
     constant ADDRESS(0x0BDC)
 
