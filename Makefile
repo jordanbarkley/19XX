@@ -45,5 +45,5 @@ clean:
 
 release:
 	# create patch files
-	xdelta3 -e -f -s roms/original.z64 roms/19XXCE.z64 patches/19XXCE.xdelta
-	xdelta3 -e -f -s roms/original.z64 roms/19XXTE.z64 patches/19XXTE.xdelta
+	xdelta3 -e -f -s roms/original.z64 roms/19XXCE.z64 19XXCE.xdelta
+	xdelta3 -e -f -s roms/original.z64 roms/19XXTE.z64 19XXTE.xdelta
