@@ -9,6 +9,7 @@ define __OVERLAY__()
 
 include "Data.asm"
 include "Global.asm"
+include "Joypad.asm"
 include "OS.asm"
 include "RCP.asm"
 include "String.asm"
@@ -54,6 +55,10 @@ scope Overlay {
         sw      t0, 0x0004(v0)              // highjack ssb display list
 
         // HOOKS GO HERE
+        lli     a0, Joypad.DEADZONE         // a0 - min coordinate (deadzone)
+        jal     Joypad.update_stick_        // update stick
+        nop
+
         li      t0, Global.current_screen   // ~
         lb      t0, 0x0000(t0)              // t0 = screen id
 

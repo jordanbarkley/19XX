@@ -13,7 +13,6 @@ include "String.asm"
 scope Menu {
 
     constant ROW_HEIGHT(000010)
-    constant DEADZONE(000020)
 
     scope type {
         constant U8(0x0000)                 // 08 bit integer (unsigned)
@@ -314,8 +313,8 @@ scope Menu {
         sw      a1, 0x0018(sp)              // save registers
 
         _down:
-        lli     a0, -DEADZONE               // a0 - min coordinate (deadzone)
-        jal     Joypad.check_stick_down_    // check if stick pressed down
+        lli     a0, Joypad.DOWN             // a1 - enum left/right/down/up
+        jal     Joypad.check_stick_         // v0 = boolean
         nop
         beqz    v0, _up                     // if not pressed, check c-up
         nop
@@ -343,8 +342,8 @@ scope Menu {
         nop
 
         _up:
-        lli     a0, DEADZONE                // a0 - min coordinate (deadzone)
-        jal     Joypad.check_stick_up_      // check if stick pressed up
+        lli     a0, Joypad.UP               // a1 - enum left/right/down/up
+        jal     Joypad.check_stick_         // v0 = boolean
         nop
         beqz    v0, _right                  // if not pressed, check right
         nop
@@ -371,8 +370,8 @@ scope Menu {
         nop
 
         _right:
-        lli     a0, DEADZONE                // a0 - min coordinate (deadzone)
-        jal     Joypad.check_stick_right_   // check if stick pressed right
+        lli     a0, Joypad.RIGHT             // a1 - enum left/right/down/up
+        jal     Joypad.check_stick_         // v0 = boolean
         nop
         beqz    v0, _left                   // if not pressed, check left
         nop
@@ -393,8 +392,8 @@ scope Menu {
         nop
 
         _left:
-        lli     a0, -DEADZONE               // a0 - min coordinate (deadzone)
-        jal     Joypad.check_stick_left_    // check if stick pressed left
+        lli     a0, Joypad.LEFT             // a1 - enum left/right/down/up
+        jal     Joypad.check_stick_         // v0 = boolean
         nop
         beqz    v0, _a                      // if not pressed, check A
         nop

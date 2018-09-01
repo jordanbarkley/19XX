@@ -24,12 +24,8 @@ scope Joypad {
     constant NONE(0x0000)
 
     // @ Description
-    // Frame cooldown for stick checks
-    constant COOLDOWN(10)
-
-    // @ Description
     // Deadzones for menu left/right/up/down
-    constant MENU_DEADZONE(20)
+    constant DEADZONE(30)
 
     // @ Description
     // This is the controller struct that game reads from. It's 10 bytes in size (per player)
@@ -49,6 +45,13 @@ scope Joypad {
     constant PRESSED(0x0002)
     constant TURBO(0x0004)
     constant RELEASED(0x0006)
+
+    // @ Description
+    // Directions
+    constant LEFT(0x0000)
+    constant RIGHT(0x0001)
+    constant DOWN(0x0002)
+    constant UP(0x0003)
 
     // @ Description
     // Determine whether a button or button combination (type) or not.
@@ -206,178 +209,138 @@ scope Joypad {
 
     // @ Arguments
     // a0 - min coordinate (deadzone)
-    // @ Returns
-    // boolean
-    scope check_stick_left_: {
-        addiu   sp, sp,-0x0010              // allocate stack space
-        sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
-
-        li      t0, cooldown                // ~
-        lw      t1, 0x0000(t0)              // t1 = cooldown
-        beqz    t1, _run                    // if (cooldown == 0), check
-        nop
-        addiu   t1, t1,-0x0001              // ~
-        sw      t1, 0x0000(t0)              // decrement cooldown
-        lli     v0, OS.FALSE                // v0 = false
-        b       _end                        // skip check this time
-        nop
-
-        _run:
-        lli     a1, 0x0000                  // a1 = left
-        jal     check_stick_x_              // check stick x
-        nop
-        beqz    v0, _end                    // if (ret == 0), skip
-        nop
-        lli     t1, COOLDOWN                // ~
-        sw      t1, 0x0000(t0)              // update cooldown
-
-        _end:
-        lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
-        addiu   sp, sp, 0x0010              // deallocate stack space
-        jr      ra                          // return
-        nop
-
-        cooldown:
-        dw      0x00000000
-    }
-
-    // @ Arguments
-    // a0 - min coordinate (deadzone)
-    // @ Returns
-    // boolean
-    scope check_stick_right_: {
-        addiu   sp, sp,-0x0010              // allocate stack space
-        sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
-
-        li      t0, cooldown                // ~
-        lw      t1, 0x0000(t0)              // t1 = cooldown
-        beqz    t1, _run                    // if (cooldown == 0), check
-        nop
-        addiu   t1, t1,-0x0001              // ~
-        sw      t1, 0x0000(t0)              // decrement cooldown
-        lli     v0, OS.FALSE                // v0 = false
-        b       _end                        // skip check this time
-        nop
-
-        _run:
-        lli     a1, 0x0001                  // a1 = right
-        jal     check_stick_x_              // check stick x
-        nop
-        beqz    v0, _end                    // if (ret == 0), skip
-        nop
-        lli     t1, COOLDOWN                // ~
-        sw      t1, 0x0000(t0)              // update cooldown
-
-        _end:
-        lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
-        addiu   sp, sp, 0x0010              // deallocate stack space
-        jr      ra                          // return
-        nop
-
-        cooldown:
-        dw      0x00000000
-    }
-
-    // @ Arguments
-    // a0 - min coordinate (deadzone)
     // a1 -enum down/up
     // @ Returns
     // v0 - boolean
     constant check_stick_y_(0x80390950)
 
-
     // @ Arguments
-    // a0 - min coordinate (deadzone)
-    // a1 -enum down/up
+    // a0 - enum left/right/down/up
     // @ Returns
     // v0 - boolean
-    scope check_stick_down_: {
+    scope check_stick_: {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      a0, 0x000C(sp)              // save registers
 
-        li      t0, cooldown                // ~
-        lw      t1, 0x0000(t0)              // t1 = cooldown
-        beqz    t1, _run                    // if (cooldown == 0), check
-        nop
-        addiu   t1, t1,-0x0001              // ~
-        sw      t1, 0x0000(t0)              // decrement cooldown
-        lli     v0, OS.FALSE                // v0 = false
-        b       _end                        // skip check this time
-        nop
+        li      t0, frames_held             // t0 = address of frames_held
+        sll     t1, a0, 0x0002              // t1 = enum left/right/dow/up * 4
+        addu    t0, t0, t1                  // t0 = address of frames_held + offset
+        lw      t0, 0x0000(t0)              // t0 = frames_held
 
-        _run:
-        lli     a1, 0x0000                  // a1 = down
-        jal     check_stick_y_              // check stick y 
-        nop
-        beqz    v0, _end                    // if (ret == 0), skip
-        nop
-        lli     t1, COOLDOWN                // ~
-        sw      t1, 0x0000(t0)              // update cooldown
+        // case 1: frames_held = 0, return false
+        beqz    t0, _end                    // if (frames_held == 0), end
+        lli     v0, OS.FALSE                // and return false
 
+        // case 2: frames_held = 1, return true
+        lli     t1, OS.TRUE                 // t1 = OS.TRUE
+        beq     t0, t1, _end                // if (frames_held == 1), end
+        lli     v0, OS.TRUE                 // and return true
+
+        // case 3: frames_held > 1 and frames_held < 28, return false
+        sltiu   t1, t0, 000028              // if (frames_held < 28), t0 = OS.TRUE, else OS.FALSE
+        bnez    t1, _end                    // end
+        lli     v0, OS.FALSE                // and return false 
+
+        // case 4: frames_held >= 28 and frames_held % 4 == 0, return true
+        lli     t1, 0x0004                  // t1 = 4
+        divu    t0, t1                      // ~
+        mfhi    t1                          // t1 = frames_held % 4
+        beqz    t1, _end                    // if (frames_held % 4 == 0), end
+        lli     v0, OS.TRUE                 // and return true
+
+        // else: return false
+        lli     v0, OS.FALSE                // return false
 
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
+        lw      a0, 0x000C(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // return
         nop
-
-        cooldown:
-        dw      0x00000000
     }
 
+    // @ Description
+    // Function to update how many frames a direction has been held (should be called once a frame)
     // @ Arguments
-    // a0 - min coordinate (deadzone)
-    // @ Returns
-    // boolean
-    scope check_stick_up_: {
-        addiu   sp, sp,-0x0010              // allocate stack space
+    // a0 - POSITIVE/uint min coordinate (deadzone)
+    scope update_stick_: {
+        addiu   sp, sp,-0x0018              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
-        sw      ra, 0x000C(sp)              // save registers
+        sw      ra, 0x000C(sp)              // ~
+        sw      a0, 0x0010(sp)              // ~
+        sw      a1, 0x0014(sp)              // save registers
 
-        li      t0, cooldown                // ~
-        lw      t1, 0x0000(t0)              // t1 = cooldown
-        beqz    t1, _run                    // if (cooldown == 0), check
+        _left:
+//      lw      a0, 0x0010(sp)              // a0 - min coordinate (deadzone)
+        subu    a0, r0, a0                  // a0 - min coordinate (deadzone) (negated)
+        lli     a1, 0x0000                  // a1 - enum left/right
+        jal     check_stick_x_              // check stick x
         nop
-        addiu   t1, t1,-0x0001              // ~
-        sw      t1, 0x0000(t0)              // decrement cooldown
-        lli     v0, OS.FALSE                // v0 = false
-        b       _end                        // skip check this time
-        nop
+        li      t0, frames_held             // t0 = address of frames_held
+        beqzl   v0, _right                  // if (ret == 0), skip
+        sw      r0, 0x0000(t0)              // if (ret == 0), frames_held.left = 0
+        lw      t1, 0x0000(t0)              // t1 = frames_held.left
+        addiu   t1, t1, 0x0001              // ~
+        sw      t1, 0x0000(t0)              // frames_held.left++
 
-        _run:
-        lli     a1, 0x0001                  // a1 = up
-        jal     check_stick_y_              // check stick y 
+        _right:
+        lw      a0, 0x0010(sp)              // a0 - min coordinate (deadzone)
+        lli     a1, 0x0001                  // a1 - enum left/right
+        jal     check_stick_x_              // check stick x
         nop
-        beqz    v0, _end                    // if (ret == 0), skip
+        li      t0, frames_held             // t0 = address of frames_held
+        beqzl   v0, _down                   // if (ret == 0), skip
+        sw      r0, 0x0004(t0)              // if (ret == 0), frames_held.right = 0
+        lw      t1, 0x0004(t0)              // t1 = frames_held.right
+        addiu   t1, t1, 0x0001              // ~
+        sw      t1, 0x0004(t0)              // frames_held.right++
+
+        _down:
+        lw      a0, 0x0010(sp)              // a0 - min coordinate (deadzone)
+        subu    a0, r0, a0                  // a0 - min coordinate (deadzone) (negated)
+        lli     a1, 0x0000                  // a1 - enum down/up
+        jal     check_stick_y_              // check stick y
         nop
-        lli     t1, COOLDOWN                // ~
-        sw      t1, 0x0000(t0)              // update cooldown
+        li      t0, frames_held             // t0 = address of frames_held
+        beqzl   v0, _up                     // if (ret == 0), skip
+        sw      r0, 0x0008(t0)              // if (ret == 0), frames_held.down = 0
+        lw      t1, 0x0008(t0)              // t1 = frames_held.down
+        addiu   t1, t1, 0x0001              // ~
+        sw      t1, 0x0008(t0)              // frames_held.down++
+
+        _up:
+        lw      a0, 0x0010(sp)              // a0 - min coordinate (deadzone)
+        lli     a1, 0x0001                  // a1 - enum down/up
+        jal     check_stick_y_              // check stick y
+        nop
+        li      t0, frames_held             // t0 = address of frames_held
+        beqzl   v0, _end                    // if (ret == 0), skip
+        sw      r0, 0x000C(t0)              // if (ret == 0),  frames_held.up = 0
+        lw      t1, 0x000C(t0)              // t1 = frames_held.up
+        addiu   t1, t1, 0x0001              // ~
+        sw      t1, 0x000C(t0)              // frames_held.up++
 
         _end:
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
-        lw      ra, 0x000C(sp)              // restore registers
-        addiu   sp, sp, 0x0010              // deallocate stack space
+        lw      ra, 0x000C(sp)              // ~
+        lw      a0, 0x0010(sp)              // ~ 
+        lw      a1, 0x0014(sp)              // restore registers
+        addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra                          // return
         nop
-
-        cooldown:
-        dw      0x00000000
     }
 
+
+    frames_held:
+    dw 0x00000000                       // left
+    dw 0x00000000                       // right
+    dw 0x00000000                       // down
+    dw 0x00000000                       // up
 }
 
 }
