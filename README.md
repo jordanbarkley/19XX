@@ -1,5 +1,7 @@
 # 19XX - A Super Smash Bros. 64 Hack organized by Cyjorg
 
+<img src="https://i.imgur.com/0sEYvol.png" width="250"> <img src="https://i.imgur.com/gm7Y5gb.png" width="250"> <img src="https://i.imgur.com/OSqbnw1.png" width="250">
+
 # Authors
 See [AUTHORS.md](https://github.com/jordanbarkley/19XX/blob/master/AUTHORS.md)
 
