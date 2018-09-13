@@ -1,4 +1,4 @@
-# 19XX - A Super Smash Bros. 64 Hack organized by Cyjorg
+# 19XX - A Super Smash Bros. 64 Hack Organized by Cyjorg
 
 <img src="https://i.imgur.com/0sEYvol.png" width="250"> <img src="https://i.imgur.com/gm7Y5gb.png" width="250"> <img src="https://i.imgur.com/OSqbnw1.png" width="250">
 
