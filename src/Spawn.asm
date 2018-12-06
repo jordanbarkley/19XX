@@ -114,6 +114,7 @@ scope Spawn {
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // save registers
 
+        li      t0, Global.current_screen
         lbu     t0, 0x0000(t0)              // t0 = screen_id
         ori     t1, r0, 0x0016              // ~
         beq     t0, t1, _continue           // branch if screen_id = vs mode
