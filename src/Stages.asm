@@ -699,7 +699,7 @@ scope Stages {
         nop
 
         string_title:
-        String.insert("19XX 1.0 BETA")
+        String.insert("19XX 1.1 BETA")
     }
 
     // @ Descirption
