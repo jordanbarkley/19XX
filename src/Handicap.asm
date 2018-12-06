@@ -18,10 +18,10 @@ scope Handicap {
         OS.patch_start(0x0010A38C, 0x8018D49C)
         j       use_stocks_
         nop
+        _use_stocks_return:
         lbu     t5, 0x0020(v1)              // original line 3
         sb      t5, 0x0076(sp)              // original line 4
         nop                                 // move stock to use_stock_
-        _use_stocks_return:
         OS.patch_end()
 
         lbu     t9, 0x0021(v1)              // original line 1 (t9 = handicap)
