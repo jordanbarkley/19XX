@@ -1,7 +1,7 @@
 // Pause.asm (original by Fray)
 if !{defined __PAUSE__} {
 define __PAUSE__()
-print "include Pause.asm\n"
+print "included Pause.asm\n"
 
 // @ Description
 // Hold to pause is implemented in this file.
