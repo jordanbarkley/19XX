@@ -1,6 +1,7 @@
 // Costumes.asm
 if !{defined __COSTUMES__} {
 define __COSTUMES__()
+print "included Costumes.asm\n"
 
 // @ Description
 // This file makes all SSB costumes usable in versus.

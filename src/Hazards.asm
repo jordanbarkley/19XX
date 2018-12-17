@@ -1,6 +1,7 @@
 // Hazards.asm [bit]
 if !{defined __HAZARDS__} {
 define __HAZARDS__()
+print "included Hazards.asm\n"
 
 // @ Description
 // This file contains various functions for disabling stage hazards (when Stages.frozen_mode is on).

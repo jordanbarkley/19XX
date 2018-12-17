@@ -1,6 +1,7 @@
 // TimedStock.asm (original by Danny_SsB and Mada0)
 if !{defined __TIMED_STOCK__} {
 define __TIMED_STOCK__()
+print "included TimedStock.asm\n"
 
 // @ Description
 // SSB uses a bitwise behavior for time and stock so (mode 1 = time, mode 2 = stock, 1 & 2 = both).

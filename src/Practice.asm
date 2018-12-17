@@ -1,7 +1,8 @@
 // Practice.asm (by Fray and bit)
+if {defined __CE__} {
 if !{defined __PRACTICE__} {
 define __PRACTICE__()
-if {defined __CE__} {
+print "included Practice.asm\n"
 
 // @ Description
 // This file include enhancements for practice purposes.
@@ -9,7 +10,6 @@ if {defined __CE__} {
 include "Global.asm"
 include "OS.asm"
 include "Toggles.asm"
-
 
 scope Practice {
 

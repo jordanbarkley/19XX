@@ -1,7 +1,8 @@
 // Combo.asm (by Fray)
+if {defined __CE__} {
 if !{defined __COMBO__} {
 define __COMBO__()
-if {defined __CE__} {
+print "included Combo.asm\n"
 
 // @ Description
 // This file contains extensions to Sakurai's combo meter.

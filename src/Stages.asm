@@ -1,6 +1,7 @@
 // Stages.asm
 if !{defined __STAGES__} {
 define __STAGES__()
+print "included Stages.asm\n"
 
 // @ Descirption
 // This file expands the stage select screen.

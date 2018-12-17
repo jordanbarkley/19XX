@@ -1,6 +1,7 @@
 // Menu.asm
 if !{defined __MENU__} {
 define __MENU__()
+print "included Menu.asm\n"
 
 include "Color.asm"
 include "FGM.asm"

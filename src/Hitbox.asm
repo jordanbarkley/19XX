@@ -1,7 +1,8 @@
 // Hitbox.asm (by Fray)
+if {defined __CE__} {
 if !{defined __HITBOX__} {
 define __HITBOX__()
-if {defined __CE__} {
+print "included Hitbox.asm\n"
 
 // @ Description
 // Hitbox display is implemented in this file

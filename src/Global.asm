@@ -1,6 +1,7 @@
 // Global.asm
 if !{defined __GLOBAL__} {
 define __GLOBAL__()
+print "included Global.asm\n"
 
 // @ Description
 // This file enumerates several of SSB's global variables.

@@ -1,6 +1,7 @@
 // Toggles.asm
 if !{defined __TOGGLES__} {
 define __TOGGLES__()
+print "included Toggles.asm\n"
 
 include "Color.asm"
 include "Data.asm"

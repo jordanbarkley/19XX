@@ -1,7 +1,8 @@
 // Shield.asm
+if {defined __CE__} {
 if !{defined __SHIELD__} {
 define __SHIELD__()
-if {defined __CE__} {
+print "included Shield.asm\n"
 
 // @ Description
 // Thise file changes shield colors to match port colors.

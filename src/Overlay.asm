@@ -1,6 +1,7 @@
 // Overlay.asm
 if !{defined __OVERLAY__} {
 define __OVERLAY__()
+print "included Overlay.asm\n"
 
 // @ Description
 // The framebuffer overlay is implemented in this file.

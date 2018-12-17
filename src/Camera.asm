@@ -1,7 +1,9 @@
 // Camera.asm
+if {defined __CE__} {
 if !{defined __CAMERA__} {
 define __CAMERA__()
-if !{defined __TE___} {
+print "included Camera.asm\n"
+
 
 // @ Description
 // This file disables the cinematic introduction before VS. matches.

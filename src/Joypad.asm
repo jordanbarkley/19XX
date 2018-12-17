@@ -1,6 +1,7 @@
 // Joypad.asm
 if !{defined __JOYPAD__} {
 define __JOYPAD__()
+print "included Joypad.asm\n"
 
 include "OS.asm"
 

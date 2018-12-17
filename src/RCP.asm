@@ -1,6 +1,7 @@
 // RCP.asm
 if !{defined __RCP__} {
 define __RCP__()
+print "included RCP.asm\n"
 
 // @ Description
 // for use with f3dex2

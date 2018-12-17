@@ -1,6 +1,7 @@
 // Handicap.asm
 if !{defined __HANDICAP__} {
 define __HANDICAP__()
+print "included Handicap.asm\n"
 
 include "Global.asm"
 include "Toggles.asm"

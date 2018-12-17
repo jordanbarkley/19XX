@@ -1,6 +1,7 @@
 // Boot.asm
 if !{defined __BOOT__} {
 define __BOOT__()
+print "included Boot.asm\n"
 
 // @ Description
 // This file loads 19XX data into RAM.

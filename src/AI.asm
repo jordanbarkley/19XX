@@ -1,8 +1,8 @@
 // AI.asm (by bit)
+if {defined __CE__} {
 if !{defined __AI__} {
 define __AI__()
-if {defined __CE__} {
-
+print "included AI.asm\n"
 
 // @ Description
 // This file includes things that make the AIs/CPUs suck a little less.

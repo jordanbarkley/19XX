@@ -1,6 +1,7 @@
 // String.asm
 if !{defined __STRING__} {
 define __STRING__()
+print "included String.asm\n"
 
 // @ Description
 // Implementation of a few string.h functions.

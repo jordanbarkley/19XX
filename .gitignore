@@ -1,5 +1,8 @@
 # ROMs
 *.z64
+
+# Dev Info
+*.log
 *.log
 
 # Tools

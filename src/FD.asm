@@ -1,6 +1,7 @@
 // FD.asm
 if !{defined __FD__} {
 define __FD__()
+print "included FD.asm\n"
 
 // @ Description
 // This file makes Final Destination playable in VS. mode.

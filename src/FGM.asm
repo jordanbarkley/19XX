@@ -1,6 +1,7 @@
 // FGM.asm
 if !{defined __FGM__} {
 define __FGM__()
+print "included FGM.asm\n"
 
 // @ Description
 // This file allows FGM (forground music) to be played.

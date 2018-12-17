@@ -1,6 +1,7 @@
 // Settings.asm
 if !{defined __SETTINGS__} {
 define __SETTINGS__()
+print "included Settings.asm\n"
 
 // @ Description
 // This file is used for loading default tournament settings on boot.

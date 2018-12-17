@@ -1,6 +1,7 @@
 // Spawn.asm
 if !{defined __SPAWN__} {
 define __SPAWN__()
+print "included Spawn.asm\n"
 
 // @ Description
 // This file alters spawn position for different circumstances such as Neutral Spawns.

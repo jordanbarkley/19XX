@@ -1,6 +1,7 @@
 // Character.asm
 if !{defined __CHARACTER__} {
 define __CHARACTER__()
+print "included Character.asm\n"
 
 // @ Description
 // This file contains character related information, constants, and functions

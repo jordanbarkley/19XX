@@ -1,7 +1,8 @@
 // Data.asm
+if {defined __CE__} {
 if !{defined __DATA__} {
 define __DATA__()
-if {defined __CE__} {
+print "included "Data.asm\n"
 
 // @ Description
 // This file contains binary data such as images and stage files. It all gets dumped to expansion

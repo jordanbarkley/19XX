@@ -1,6 +1,7 @@
 // SRAM.asm (read/write fround by bit)
 if !{defined __SRAM__} {
 define __SRAM__()
+print "included SRAM.asm\n"
 
 // @ Description
 // SRAM = Static RAM. This file controls saving/loading.

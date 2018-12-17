@@ -1,7 +1,7 @@
 all:
 	# assemble rom
-	tools/_bass -o roms/19XXCE.z64 19XXCE.asm -sym CE.log
-	tools/_bass -o roms/19XXTE.z64 19XXTE.asm -sym TE.log
+	tools/_bass -o roms/19XXCE.z64 19XXCE.asm -sym CE.sym > CE.log
+	tools/_bass -o roms/19XXTE.z64 19XXTE.asm -sym TE.sym > TE.log
 
 	# update checksum
 	tools/n64crc roms/19XXCE.z64 > /dev/null
@@ -31,6 +31,7 @@ clean:
 
 	# remove log files
 	rm -rf *.log
+	rm -rf *.sym
 
 	# remove bass github repository
 	rm -rf tools/bass

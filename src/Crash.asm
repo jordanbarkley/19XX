@@ -1,6 +1,7 @@
 // Crash.asm
 if !{defined __CRASH__} {
 define __CRASH__()
+print "included Crash.asm\n"
 
 scope Crash {
     // @ Description

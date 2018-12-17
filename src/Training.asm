@@ -1,7 +1,8 @@
 // Training.asm (functions by Fray, menu implementation by Cyjorg)
+if {defined __CE__} {
 if !{defined __TRAINING__} {
 define __TRAINING__()
-if {defined __CE__} {
+print "included Training.asm\n"
 
 // @ Description
 // This file contains functions and defines structs intended to assist training mode modifications.

@@ -1,6 +1,7 @@
 // Texture.asm
 if !{defined __TEXTURE__} {
 define __TEXTURE__()
+print "included Texture.asm\n"
 
 include "OS.asm"
 

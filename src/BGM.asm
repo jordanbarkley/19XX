@@ -1,6 +1,7 @@
 // BGM.asm
 if !{defined __BGM__} {
 define __BGM__()
+print "included BGM.asm\n"
 
 // @ Description
 // This file allows BGM (background music) to be played and stopped.

@@ -1,6 +1,7 @@
 // OS.asm
 if !{defined __OS__} {
 define __OS__()
+print "included OS.asm\n"
 
 // @ Description
 // This file is where bass setup occurs and must be included in all bass projects. It also contains

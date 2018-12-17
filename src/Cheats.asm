@@ -1,6 +1,7 @@
 // Cheats.asm
 if !{defined __CHEATS__} {
 define __CHEATS__()
+print "included Cheats.asm\n"
 
 // @ Description
 // This file contains a list of permanent, random patches to make SSB better.
