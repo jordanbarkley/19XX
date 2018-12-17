@@ -162,5 +162,5 @@ scope Hitbox {
 }
 
 }
-} 
+} // __CE__
         

@@ -93,4 +93,4 @@ scope Shield {
 }
 
 }
-}
+} // __CE__

@@ -78,4 +78,4 @@ scope GameEnd {
 }
 
 }
-}
+} // __CE__

@@ -15,7 +15,7 @@ scope Spawn {
 
     // @ Description
     // hook to load respawn point. This fixes the lack of respawn points on the beta stages.
-    if {defined __CE__} {
+if {defined __CE__} {
     scope load_respawn_point_: {
         OS.patch_start(0x000780B0, 0x800FC8B0)
         j       load_respawn_point_
@@ -60,7 +60,7 @@ scope Spawn {
         nop
 
     }
-    }
+} // __CE__
 
     // Neutral Spawns (2 or 3 plat stages)
 
@@ -102,7 +102,7 @@ scope Spawn {
         sw      v0, 0x0018(sp)              // ~
         sw      ra, 0x001C(sp)              // save registers
         
-        if {defined __CE__} {
+if {defined __CE__} {
         // this block checks if we're in training mode
         li      t0, Global.current_screen
         lbu     t0, 0x0000(t0)              // t0 = screen_id
@@ -125,7 +125,7 @@ scope Spawn {
         addiu   t0, t3, 0x0014              // t0 = spawn_pos address
         j       _set_spawn                  // set spawn to spawn in table
         nop 
-        } // __CE__
+} // __CE__
         
         // at this point we know we're not in training mode
         // this block checks if we're in vs mode

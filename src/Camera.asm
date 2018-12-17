@@ -49,5 +49,5 @@ scope Camera {
     OS.patch_end()
 }
 
-}
-}
+} // __CAMERA__
+} // __CE__

@@ -95,7 +95,7 @@ scope Stages {
     // [00] [01] [02] [03] [04] [05]
     // [06] [07] [08] [09] [0A] [RR]
 
-    if {defined __TE__} {
+if {defined __TE__} {
     constant NUM_ROWS(2)
     constant NUM_COLUMNS(6)
     constant NUM_ICONS(NUM_ROWS * NUM_COLUMNS)
@@ -173,7 +173,7 @@ scope Stages {
     dw 201, 062                             // 0A
     dw 243, 062                             // 0B
 
-    }
+} // __TE__
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // CE STAGE SELECT SCREEN
@@ -183,7 +183,7 @@ scope Stages {
     // [06] [07] [08] [09] [0A] [0B]
     // [RR] [0C] [0D] [0E] [0F] [RR]
 
-    if {defined __CE__} {
+if {defined __CE__} {
     constant NUM_ROWS(3)
     constant NUM_COLUMNS(6)
     constant NUM_ICONS(NUM_ROWS * NUM_COLUMNS)
@@ -264,7 +264,7 @@ scope Stages {
     icon_random:
     dw Data.icon_random
 
-    } // __TE__
+} // __CE__
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Logic for Both
@@ -1074,13 +1074,15 @@ scope Stages {
         add_to_list(Toggles.entry_random_stage_mushroom_kingdom, id.MUSHROOM_KINGDOM)
         add_to_list(Toggles.entry_random_stage_battlefield, id.BATTLEFIELD)
         add_to_list(Toggles.entry_random_stage_final_destination, id.FINAL_DESTINATION)
-        if {defined __CE__} {
+        
+if {defined __CE__} {
+        // this block is a continuation of the previous, includes CE exclusive stages
         add_to_list(Toggles.entry_random_stage_dream_land_beta_1, id.DREAM_LAND_BETA_1)
         add_to_list(Toggles.entry_random_stage_dream_land_beta_2, id.DREAM_LAND_BETA_2)
         add_to_list(Toggles.entry_random_stage_how_to_play, id.HOW_TO_PLAY)
         add_to_list(Toggles.entry_random_stage_mini_yoshis_island, id.MINI_YOSHIS_ISLAND)
         add_to_list(Toggles.entry_random_stage_meta_crystal, id.META_CRYSTAL)
-        } // __CE__
+} // __CE__
 
         // this block loads from the random list using a random int
         move    a0, v1                      // a0 - range (0, N-1)

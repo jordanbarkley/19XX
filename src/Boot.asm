@@ -48,7 +48,7 @@ scope Boot {
         OS.patch_end()
 
 
-        if {defined __CE__} {
+if {defined __CE__} {
         jal     SRAM.check_saved_       // v0 = has_saved
         nop
         addiu   sp, sp,-0x0008          // allocate stack space
@@ -62,7 +62,8 @@ scope Boot {
         _continue:
         lw      t0, 0x0004(sp)          // restore t0
         addiu   sp, sp, 0x0008          // deallocate stack space
-        }
+} // __CE__
+        
         lui     a0, 0x0140              // load rom address (0x01400000)
         lui     a1, 0x8040              // load ram address (0x80400000)
         jal     Global.dma_copy_        // add custom functions
@@ -112,4 +113,4 @@ scope Boot {
 
 }
 
-}
+} // __BOOT__

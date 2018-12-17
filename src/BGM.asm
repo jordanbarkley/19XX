@@ -23,7 +23,7 @@ scope BGM {
     // This function is not yet documented.
     constant stop_(0x00000000)
 
-    if {defined __CE__} {
+if {defined __CE__} {
     // @ Description
     // This function implements the mono/stero toggle (boolean stereo_enabled - 0x8003CB24)
     scope get_type_: {
@@ -41,7 +41,7 @@ scope BGM {
         j       _get_type_return            // return
         nop
     }
-    } // __CE__
+} // __CE__
 
     // @ Descirption
     // Adds a song to the random list if it's toggled on.

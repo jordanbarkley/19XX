@@ -38,14 +38,14 @@ scope Toggles {
         addiu   sp, sp, 0x0008              // deallocate stack space
     }
 
-    if {defined __CE__} {
+if {defined __CE__} {
         // @ Description
         // This patch disables functionality on the OPTION screen.
         OS.patch_start(0x001205FC, 0x80132E4C)
         jr      ra
         nop
         OS.patch_end()
-    }
+} // __CE__
 
     // @ Description
     // This patch disables back (press B) on Main Menu
@@ -56,7 +56,7 @@ scope Toggles {
     nop
     OS.patch_end()
 
-    if {defined __CE__} {
+if {defined __CE__} {
     scope run_: {
         addiu   sp, sp,-0x0020              // allocate stack space
         sw      ra, 0x0004(sp)              // ~
@@ -160,7 +160,7 @@ scope Toggles {
         jr      ra                          // return
         nop
     }
-    }
+} // __CE__
     
     // @ Description
     // Save toggles to SRAM
@@ -356,8 +356,7 @@ scope Toggles {
     // @ Description
     // Random Stage Toggles
     head_random_stage_settings:
-    if {defined __TE__} {
-
+if {defined __TE__} {
     entry_random_stage_battlefield:;            Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
     entry_random_stage_congo_jungle:;           Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
     entry_random_stage_dream_land:;             Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
@@ -369,11 +368,9 @@ scope Toggles {
     entry_random_stage_saffron_city:;           Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
     entry_random_stage_sector_z:;               Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
     entry_random_stage_yoshis_island:;          Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, OS.NULL)
+} // __TE__
 
-    } // __TE__
-
-    if {defined __CE__} {
-    
+if {defined __CE__} {
     entry_random_stage_battlefield:;            Menu.entry_bool("BATTLEFIELD", OS.TRUE, pc() + 16)
     entry_random_stage_congo_jungle:;           Menu.entry_bool("CONGO JUNGLE", OS.TRUE, pc() + 20)
     entry_random_stage_dream_land:;             Menu.entry_bool("DREAM LAND", OS.TRUE, pc() + 16)
@@ -389,9 +386,8 @@ scope Toggles {
     entry_random_stage_saffron_city:;           Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
     entry_random_stage_sector_z:;               Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
     entry_random_stage_yoshis_island:;          Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, pc() + 20)
-    entry_random_stage_mini_yoshis_island:;     Menu.entry_bool("YOSHI'S ISLAND MINI", OS.TRUE, OS.NULL)
-    
-    } // __CE__
+    entry_random_stage_mini_yoshis_island:;     Menu.entry_bool("YOSHI'S ISLAND MINI", OS.TRUE, OS.NULL) 
+} // __CE__
 
     // @ Description
     // SRAM blocks for toggle saving.
