@@ -1,4 +1,5 @@
 // Menu.asm
+if {defined __CE__} {
 if !{defined __MENU__} {
 define __MENU__()
 print "included Menu.asm\n"
@@ -663,3 +664,4 @@ scope Menu {
 }
 
 } // __MENU__
+} // __CE__

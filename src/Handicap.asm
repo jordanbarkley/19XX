@@ -28,13 +28,15 @@ scope Handicap {
         lbu     t9, 0x0021(v1)              // original line 1 (t9 = handicap)
         sb      t9, 0x0075(sp)              // original line 2
         lbu     t8, 0x0007(a1)              // original line 5 (t8 = stocks)
+
+if {defined __CE__} {
         Toggles.guard(Toggles.entry_stock_handicap, _use_stocks_return)
+} // __CE__
 
         li      t9, Global.vs.handicap      // ~
         lbu     t9, 0x0000(t9)              // at = handicap
         beqz    t9, _end                    // if handicap disabled, end
         nop
-
 
         lbu     t8, 0x0021(v1)              // t8 = handicap value = stocks (overwritten below)
         addiu   t8, t8,-0x0001              // off by 1 error

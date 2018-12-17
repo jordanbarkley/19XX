@@ -1,4 +1,5 @@
 // Hazards.asm [bit]
+if {defined __CE__} {
 if !{defined __HAZARDS__} {
 define __HAZARDS__()
 print "included Hazards.asm\n"
@@ -147,3 +148,4 @@ scope Hazards {
 
 
 } // __HAZARDS__
+} // __CE__

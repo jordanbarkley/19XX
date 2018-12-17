@@ -149,7 +149,10 @@ if {defined __CE__} {
         nop
 
         _guard:
+        // Neutral spawns are always enabled in TE. They are toggleable in CE.
+if {defined __CE__} {
         Toggles.guard(Toggles.entry_neutral_spawns, _toggle_off)
+} // __CE__
 
         _setup:
         li      t0, team_table              // t0 = team_table

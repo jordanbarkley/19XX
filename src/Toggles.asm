@@ -1,4 +1,5 @@
 // Toggles.asm
+if {defined __CE__} {
 if !{defined __TOGGLES__} {
 define __TOGGLES__()
 print "included Toggles.asm\n"
@@ -398,3 +399,4 @@ if {defined __CE__} {
 
 
 } // __TOGGLES__
+} // __CE__

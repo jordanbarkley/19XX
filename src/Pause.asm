@@ -31,7 +31,11 @@ scope Pause {
 
         lhu     t6, 0x0002(s1)              // original line 1
         andi    t7, t6, 0x1000              // original line 2
+
+        // this feature is always enabled in TE. It is toggleable in CE.
+if {defined __CE__} {
         Toggles.guard(Toggles.entry_hold_to_pause, _hold_return)
+} // __CE__
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~

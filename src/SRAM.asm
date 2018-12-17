@@ -1,4 +1,5 @@
 // SRAM.asm (read/write fround by bit)
+if {defined __CE__} {
 if !{defined __SRAM__} {
 define __SRAM__()
 print "included SRAM.asm\n"
@@ -155,3 +156,4 @@ scope SRAM {
 }
 
 } // __SRAM__
+} // __CE__

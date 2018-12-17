@@ -67,19 +67,23 @@ scope Costumes {
 
         // change tint
         _up:
+if {defined __CE__} {
         sltiu   at, t2, 0x0002              // ~
         beql    at, r0, _end                // if (shade < 2)
         or      t2, r0, r0                  // then, t2 = 0
         addiu   t2, t2, 0x0001              // else, shade_id++
         b       _end                        // end
         nop
+}
 
         _down:
+if {defined __CE__} {
         bgtz    t2, _end                    // if (costume_id =)
         addiu   t2, t2,-0x0001              // then, t2--
         li      t2, 0x00000002              // else, t2 = 2
         b       _end                        // end
-        nop     
+        nop
+}
 
         _end:
         sw      v0, 0x004C(s0)              // store updated costume_id

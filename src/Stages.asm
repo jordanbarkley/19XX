@@ -998,8 +998,12 @@ if {defined __CE__} {
 
         // this block checks to see if a stage should be added to the table. 
         _check_add:
-        lw      t0, 0x0004(a0)              // t0 = curr_value
         lli     v0, OS.FALSE                // v0 = false
+        beqz    a0, _continue               // if entry is NULL, add stage
+        lli     t0, OS.TRUE                 // set curr_value to true
+        lw      t0, 0x0004(a0)              // t0 = curr_value
+        
+        _continue:
         li      v1, random_count            // ~
         lw      v1, 0x0000(v1)              // v1 = random_count
         beqz    t0, _end                    // end, return false and count
@@ -1014,7 +1018,7 @@ if {defined __CE__} {
         li      t0, random_table            // t0 = address of random_table
         addu    t0, t0, t1                  // t0 = random_table + offset
         sw      a1, 0x0000(t0)              // add stage
-        or      v0, OS.TRUE                 // v0 = true
+        lli     v0, OS.TRUE                 // v0 = true
 
         _end:
         lw      t0, 0x0004(sp)              // ~
@@ -1062,7 +1066,21 @@ if {defined __CE__} {
         li      t0, random_count            // ~
         sw      r0, 0x0000(t0)              // reset count
 
-        // this block builds the list of stages available in the random list (using macro above)
+if {defined __TE__} {
+        add_to_list(OS.NULL, id.PEACHS_CASTLE)
+        add_to_list(OS.NULL, id.SECTOR_Z)
+        add_to_list(OS.NULL, id.CONGO_JUNGLE)
+        add_to_list(OS.NULL, id.PLANET_ZEBES)
+        add_to_list(OS.NULL, id.HYRULE_CASTLE)
+        add_to_list(OS.NULL, id.YOSHIS_ISLAND)
+        add_to_list(OS.NULL, id.DREAM_LAND)
+        add_to_list(OS.NULL, id.SAFFRON_CITY)
+        add_to_list(OS.NULL, id.MUSHROOM_KINGDOM)
+        add_to_list(OS.NULL, id.BATTLEFIELD)
+        add_to_list(OS.NULL, id.FINAL_DESTINATION)
+} // __TE__
+        
+if {defined __CE__} {
         add_to_list(Toggles.entry_random_stage_peachs_castle, id.PEACHS_CASTLE)
         add_to_list(Toggles.entry_random_stage_sector_z, id.SECTOR_Z)
         add_to_list(Toggles.entry_random_stage_congo_jungle, id.CONGO_JUNGLE)
@@ -1074,9 +1092,6 @@ if {defined __CE__} {
         add_to_list(Toggles.entry_random_stage_mushroom_kingdom, id.MUSHROOM_KINGDOM)
         add_to_list(Toggles.entry_random_stage_battlefield, id.BATTLEFIELD)
         add_to_list(Toggles.entry_random_stage_final_destination, id.FINAL_DESTINATION)
-        
-if {defined __CE__} {
-        // this block is a continuation of the previous, includes CE exclusive stages
         add_to_list(Toggles.entry_random_stage_dream_land_beta_1, id.DREAM_LAND_BETA_1)
         add_to_list(Toggles.entry_random_stage_dream_land_beta_2, id.DREAM_LAND_BETA_2)
         add_to_list(Toggles.entry_random_stage_how_to_play, id.HOW_TO_PLAY)
@@ -1113,7 +1128,6 @@ if {defined __CE__} {
     // number of stages in random_table.
     random_count:
     dw 0
-
 
     // @ Description
     // This function fixes a bug that does not allow single player stages to be loaded in training.
