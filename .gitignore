@@ -3,7 +3,7 @@
 
 # Dev Info
 *.log
-*.log
+*.sym
 
 # Tools
 tools/*
