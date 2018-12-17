@@ -50,4 +50,4 @@ scope Color {
     }
 }
 
-}
+} // __COLOR__

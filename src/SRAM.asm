@@ -154,4 +154,4 @@ scope SRAM {
     }
 }
 
-}
+} // __SRAM__

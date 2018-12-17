@@ -63,4 +63,4 @@ scope Settings {
     }
 }
 
-}
+} // __SETTINGS__

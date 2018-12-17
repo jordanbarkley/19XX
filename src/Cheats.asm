@@ -60,4 +60,4 @@ scope Cheats {
     OS.patch_end()
 }
 
-}
+} // __CHEATS__

@@ -344,4 +344,4 @@ scope Joypad {
     dw 0x00000000                       // up
 }
 
-}
+} // __JOYPAD__

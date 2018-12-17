@@ -662,4 +662,4 @@ scope Menu {
 
 }
 
-}
+} // __MENU__

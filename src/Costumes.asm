@@ -154,4 +154,4 @@ scope Costumes {
     constant update_(0x800E9248)
 }
 
-}
+} // __COSTUMES__

@@ -52,5 +52,5 @@ scope Data {
     pullvar origin
 }
 
-}
+} // __DATA__
 } // __CE__

@@ -92,5 +92,5 @@ scope Shield {
 
 }
 
-}
+} // __SHIELD__
 } // __CE__

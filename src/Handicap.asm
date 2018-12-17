@@ -48,4 +48,4 @@ scope Handicap {
 
 }
 
-}
+} // __HANDICAP__

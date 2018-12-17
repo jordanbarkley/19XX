@@ -14,4 +14,4 @@ scope Texture {
     }
 }
 
-}
+} // __TEXTURE__

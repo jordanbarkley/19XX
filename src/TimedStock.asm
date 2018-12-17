@@ -39,4 +39,4 @@ scope TimedStock {
     OS.patch_end()
 }
 
-}
+} // __TIMED_STOCK__

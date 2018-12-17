@@ -112,4 +112,4 @@ scope Global {
     constant P_STRUCT_LENGTH(0x0B50)
 }
 
-}
+} // __GLOBAL__

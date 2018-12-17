@@ -71,4 +71,4 @@ scope Pause {
 
 }
 
-}
+} // __PAUSE__

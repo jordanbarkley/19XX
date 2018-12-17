@@ -563,4 +563,4 @@ if {defined __CE__} {
     float32  0900,  0005
 }
 
-}
+} // __SPAWN__

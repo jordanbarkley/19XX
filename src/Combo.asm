@@ -106,5 +106,5 @@ scope Combo {
     }
 }
 
-}
+} // __COMBO__
 } // __CE__

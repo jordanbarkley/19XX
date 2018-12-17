@@ -77,5 +77,5 @@ scope GameEnd {
 
 }
 
-}
+} // __GAME_END__
 } // __CE__

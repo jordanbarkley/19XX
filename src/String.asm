@@ -126,4 +126,4 @@ scope String {
     }
 }
 
-}
+} // __STRING__

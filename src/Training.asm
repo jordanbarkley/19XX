@@ -1002,5 +1002,5 @@ scope Training {
     Menu.entry("PORT", Menu.type.U8, 1, 1, 4, OS.NULL, OS.NULL, OS.NULL, tail_p1)
 }
 
-}
-} // __CE__
+} // __TRAINING__
+} // __CE__ 

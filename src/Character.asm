@@ -93,4 +93,4 @@ scope Character {
 
 }
 
-}
+} // __CHARACTER__
