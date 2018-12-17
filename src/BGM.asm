@@ -41,7 +41,6 @@ if {defined __CE__} {
         j       _get_type_return            // return
         nop
     }
-} // __CE__
 
     // @ Descirption
     // Adds a song to the random list if it's toggled on.
@@ -162,7 +161,6 @@ if {defined __CE__} {
         add_to_list(Toggles.entry_random_music_data, menu.DATA)
         add_to_list(Toggles.entry_random_music_meta_crystal, stage.META_CRYSTAL)
 
-
         // this block loads from the random list using a random int
         move    a0, v1                      // a0 - range (0, N-1)
         jal     Global.get_random_int_      // v0 = (0, N-1)
@@ -181,6 +179,8 @@ if {defined __CE__} {
         j       _random_music_return        // return
         nop
     }
+} // __CE__
+
 
     scope stage {
         constant DREAM_LAND(0)
