@@ -53,6 +53,11 @@ scope TimedStock {
     // @ Free Registers
     // t6, t7
     scope score_fix_: {
+        OS.patch_start(0x155DA8, 0x80136C08)
+        j   score_fix_
+        nop
+        OS.patch_end()
+
         li      t6, Global.vs.game_mode     // t6 = address of vs game_mode
         lbu     t6, 0x0000(t6)              // t6 = vs game_mode ( 1 = time, 2 = stock, 3 = both)
         lli     t7, 0x0001                  // t7 = stock
@@ -85,8 +90,12 @@ scope TimedStock {
 
 
     // @ Description
-    // Correct scoring (time/stock update) [bit]
+    // Correct scoring (time/stock mode update) [bit]
     scope pick_scoring_: {
+        OS.patch_start(0x156564, 0x801373C4)
+        j   pick_scoring_ 
+        OS.patch_end()
+
         lli     t0, 0x0001              // t1 = time
         beq     t6, t0, _time           // if mode == time, branch to time
         nop
