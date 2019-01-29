@@ -44,7 +44,7 @@ scope TimedStock {
 
     // @ Description
     // Correct scoring for matches with timer [bit]
-    // This hook is used any time there the timer is enabled. Score is adjusted
+    // This hook is used any time there the timer reachs 0. Score is adjusted
     // to (KOs - deaths) for Time and (stock setting - deaths) for Stock
     // @ Arguments
     // a0 = player
@@ -79,8 +79,8 @@ scope TimedStock {
         sll     v1, a0, 0x0002              // (original) v1 = offset = player * 4 
         lui     t6, 0x8014                  // (original) t6 = address of ?
         addu    t6, t6, v1                  // (original) t6 = address of ? + offset
-        lw      t6, 0x9B80 (t6)             // (original) t6 = KOs
-        lw      t7, 0x9B90 (t6)             // (original) t7 = deaths
+        lw      t7, 0x9B90(t6)              // (original) t7 = deaths
+        lw      t6, 0x9B80(t6)              // (original) t6 = KOs
         subu    v0, t6, t7                  // (original) v0 = score = KOs - deaths
     
         _end:
@@ -101,7 +101,7 @@ scope TimedStock {
         nop
         li      t0, Global.vs.timer     // t0 = address of timer
         lw      t0, 0x0000(t0)          // t0 = timer
-        beqz    t0, _time               // if timer at 0, use time scoring
+        beqz    t0, _time               // if timer at 0, use time scoring hook
         nop
 
         _stock:
@@ -113,7 +113,19 @@ scope TimedStock {
         nop
     }
 
+    // Prevent sudden death [bit]
+    OS.patch_start(0x10A4EC, 0x8018D5FC)
+    lbu     t6, 0x0003(t5)
+    lui     a0, 0x800A
+    addiu   a0, a0, 0x4EF8
+    lli     t7, 0x0001
+    beq     t6, t7, 0x8018D61C
+    OS.patch_end()
 
+    // Always view full results screen [bit]
+    OS.patch_start(0x15688C, 0x801376EC)
+    nop
+    OS.patch_end()
 }
 
 } // __TIMED_STOCK__
