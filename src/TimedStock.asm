@@ -9,8 +9,12 @@ print "included TimedStock.asm\n"
 // matches with timed stock matches.
 
 include "OS.asm"
+include "Global.asm"
 
 scope TimedStock {
+    constant calculate_time_score_(0x801373F4)
+    constant calculate_stock_score_(0x801373CC)
+
     // @ Description
     // Enable TimedStock scoring for FFA (mode = 2 to mode = 3)
     OS.patch_start(0x001241A0, 0x801337F0)
@@ -37,6 +41,70 @@ scope TimedStock {
     OS.patch_start(0x00156560, 0x801373C0)
     addiu   at, r0, 0x0003
     OS.patch_end()
+
+    // @ Description
+    // Correct scoring for matches with timer [bit]
+    // This hook is used any time there the timer is enabled. Score is adjusted
+    // to (KOs - deaths) for Time and (stock setting - deaths) for Stock
+    // @ Arguments
+    // a0 = player
+    // @ Returns
+    // v0 - score
+    // @ Free Registers
+    // t6, t7
+    scope score_fix_: {
+        li      t6, Global.vs.game_mode     // t6 = address of vs game_mode
+        lbu     t6, 0x0000(t6)              // t6 = vs game_mode ( 1 = time, 2 = stock, 3 = both)
+        lli     t7, 0x0001                  // t7 = stock
+        beq     t6, t7, _time               // branch if timer is enabled
+        nop
+
+        _stock:
+        sll     v1, a0, 0x0002              // (original) v1 = offset = player * 4 
+        lui     t6, 0x8014                  // (original) t6 = address of ?
+        addu    t6, t6, v1                  // (original) t6 = address of ? + offset
+        lw      t6, 0x9B90 (t6)             // (original) t6 = deaths
+        li      t7, Global.vs.stocks        // t7 = address of stocks_setting
+        lbu     t7, 0x0000(t7)              // t7 = stocks_setting
+        subu    v0, t6, t7                  // v0 = score = stocks_setting - deaths
+        b       _end
+        nop
+        
+        _time:
+        sll     v1, a0, 0x0002              // (original) v1 = offset = player * 4 
+        lui     t6, 0x8014                  // (original) t6 = address of ?
+        addu    t6, t6, v1                  // (original) t6 = address of ? + offset
+        lw      t6, 0x9B80 (t6)             // (original) t6 = KOs
+        lw      t7, 0x9B90 (t6)             // (original) t7 = deaths
+        subu    v0, t6, t7                  // (original) v0 = score = KOs - deaths
+    
+        _end:
+        jr      ra 
+        nop
+    }
+
+
+    // @ Description
+    // Correct scoring (time/stock update) [bit]
+    scope pick_scoring_: {
+        lli     t0, 0x0001              // t1 = time
+        beq     t6, t0, _time           // if mode == time, branch to time
+        nop
+        li      t0, Global.vs.timer     // t0 = address of timer
+        lw      t0, 0x0000(t0)          // t0 = timer
+        beqz    t0, _time               // if timer at 0, use time scoring
+        nop
+
+        _stock:
+        j       calculate_stock_score_
+        nop
+
+        _time:
+        j       calculate_time_score_
+        nop
+    }
+
+
 }
 
 } // __TIMED_STOCK__

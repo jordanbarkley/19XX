@@ -72,6 +72,10 @@ scope Global {
         constant damage(0x800A4D13)
 
         // @ Description
+        // Word, timer in second
+        constant timer(0x800A4D1C)
+
+        // @ Description
         // Byte, 0 = none, 5 = high
         constant item_frequency(0x800A4D24)
 
