@@ -112,7 +112,16 @@ if {defined __TE__} {
     db id.PLANET_ZEBES                      // 03
     db id.MUSHROOM_KINGDOM                  // 04
     db id.BATTLEFIELD                       // 05
+
+    // Genesis 6 will be using cloudless yoshi's island
+    if !{defined __G6__} {
     db id.YOSHIS_ISLAND                     // 06
+    }
+
+    if {defined __G6__} {
+    db id.MINI_YOSHIS_ISLAND                // 06
+    }    
+
     db id.DREAM_LAND                        // 07
     db id.SECTOR_Z                          // 08
     db id.SAFFRON_CITY                      // 09
@@ -147,7 +156,7 @@ if {defined __TE__} {
     dw OS.NULL                              // Dream Land Beta 1
     dw OS.NULL                              // Dream Land Beta 2
     dw OS.NULL                              // How To Play
-    dw OS.NULL                              // Mini Yoshi's Island
+    dw icon_yoshis_island                   // Mini Yoshi's Island
     dw OS.NULL                              // Meta Crystal
     dw icon_battlefield
     dw OS.NULL                              // Race to the Finish (Placeholder)
@@ -666,7 +675,7 @@ if {defined __CE__} {
         sw      ra, 0x0014(sp)              // save registers
 
         // this block draws "19XX <version>"
-        lli     a0, 178                     // a0 - ulx
+        lli     a0, 194                     // a0 - ulx
         lli     a1, 130                     // a1 - uly
         li      a2, string_title            // a2 - address of string
         jal     Overlay.draw_string_        // draw string
@@ -699,8 +708,15 @@ if {defined __CE__} {
         jr      ra                          // return
         nop
 
+        if !{defined __G6__} {
         string_title:
-        String.insert("19XX 1.1 BETA")
+        String.insert("19XX 1.2")
+        }
+
+        if {defined __G6__} {
+        string_title:
+        String.insert("G6 READY")
+        }
     }
 
     // @ Descirption
