@@ -3,7 +3,7 @@
 
 ## Prequesites
 ### `gcc`, `git`, and `make`
-For Linux and macOS, these are built-in (`clang` is fine for `gcc`). For Windows 10 users, the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is recommended. To install for previous Windows versions, see [MSYS2](https://www.msys2.org/), [Cygwin](https://www.cygwin.com/), or [MinGW](http://www.mingw.org/). 
+For Linux and macOS, these are built-in (`clang` is fine for `gcc`). For Windows 10 users, the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is recommended. To install for previous Windows versions, see [MSYS2](https://www.msys2.org/), [Cygwin](https://www.cygwin.com/), or [MinGW](http://www.mingw.org/).
 
 ### `xdelta3`
 The easiest way to install `xdelta3` is to use your package manager.
@@ -14,7 +14,7 @@ $   apt-get xdelta3
 
 #### macOS
 ```
-$   brew xdelta
+$   brew install xdelta
 ```
 
 #### Windows (using pacman)
