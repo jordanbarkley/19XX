@@ -25,7 +25,7 @@ scope BGM {
 
 
 if {defined __TE__} { 
-    // @ Descirption
+    // @ Description
     // Replaces Ness victory music with another song to avoid copyright issues
     scope swap_music_: {
         OS.patch_start(0x000216F0, 0x80020AF0)
@@ -70,7 +70,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Adds a song to the random list if it's toggled on.
     // @ Arguments
     // a0 - address of entry (random music entry)
@@ -111,7 +111,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Macro to (maybe) add a song to the random list.
     macro add_to_list(entry, bgm_id) {
         li      a0, {entry}                 // a0 - address of entry
@@ -120,17 +120,17 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Table of bgm_id (as words, 32 bit values)
     random_table:
     fill 4 * 32                             // assumes there will never be more than 32 songs
 
-    // @ Descirption
+    // @ Description
     // number of stages in random_table.
     random_count:
     dw 0
 
-    // @ Descirption
+    // @ Description
     // This function is an implementation of a play music tooggle
     scope play_music_: {
         OS.patch_start(0x000216B4, 0x80020AB4)

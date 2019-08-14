@@ -3,7 +3,7 @@ if !{defined __STAGES__} {
 define __STAGES__()
 print "included Stages.asm\n"
 
-// @ Descirption
+// @ Description
 // This file expands the stage select screen.
 
 include "Color.asm"
@@ -17,7 +17,7 @@ include "Texture.asm"
 
 scope Stages {
 
-    // @ Descirption
+    // @ Description
     // Stage ID's. Used in various loading sequences.
     scope id {
         constant PEACHS_CASTLE(0x00)
@@ -40,7 +40,7 @@ scope Stages {
         constant RANDOM(0xDE)               // not an actual id, arbitary number used by Sakurai
     }
 
-    // @ Descirption
+    // @ Description
     // type controls a branch that executes code for single player modes when 0x00 or skips that 
     // entirely for 0x14. This branch can be found at 0x(TODO). (pulled from table @ 0xA7D20)
     scope type {
@@ -63,7 +63,7 @@ scope Stages {
         constant FINAL_DESTINATION(0x00)
     }
 
-    // @ Descirption
+    // @ Description
     // File id for each stage (pulled from table @ 0xA7D20)
     scope file {
         constant PEACHS_CASTLE(0x0103)
@@ -102,7 +102,7 @@ if {defined __TE__} {
     constant LEFT_RANDOM_INDEX(0x0B)
     constant RIGHT_RANDOM_INDEX(0x0B)
 
-    // @ Descirption
+    // @ Description
     // Stage IDs in order
     // Viable Stage (Most Viable at the Top)
     stage_table:
@@ -199,7 +199,7 @@ if {defined __CE__} {
     constant LEFT_RANDOM_INDEX(12)
     constant RIGHT_RANDOM_INDEX(17)
 
-    // @ Descirption
+    // @ Description
     // Stage IDs in order
     // Viable Stage (Most Viable at the Top)
     stage_table:
@@ -223,7 +223,7 @@ if {defined __CE__} {
     db id.RANDOM                            // RR
     OS.align(4)
 
-    // @ Descirption
+    // @ Description
     // Coordinates of stage icons in vanilla Super Smash Bros.
     position_table:
     // row 0
@@ -279,22 +279,22 @@ if {defined __CE__} {
     // Logic for Both
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // @ Descirption
+    // @ Description
     // Row the cursor is on
     row:
     dw 0
 
-    // @ Descirption
+    // @ Description
     // column the cursor is on
     column:
     dw 0
 
-    // @ Descirption
+    // @ Description
     // Toggle for frozen mode.
     frozen_mode:
     dw OS.FALSE
 
-    // @ Descirption
+    // @ Description
     // Prevents series logo from being drawn on wood circle
     OS.patch_start(0x0014E418, 0x801328A8)
     jr      ra                              // return immediately
@@ -308,21 +308,21 @@ if {defined __CE__} {
     nop
     OS.patch_end()
 
-    // @ Descirption
+    // @ Description
     // Prevents "Stage Select" texture from being drawn.
     OS.patch_start(0x0014DDF8, 0x80132288)
     jr      ra                              // return immediately
     nop
     OS.patch_end()
 
-    // @ Descirption
+    // @ Description
     // Prevents the wooden circle from being drawn.
     OS.patch_start(0x0014DBB8, 0x80132048)
     //jr      ra                              // return immediately
     //nop
     OS.patch_end()
 
-    // @ Descirption
+    // @ Description
     // Prevents stage name text from being drawn.
     OS.patch_start(0x0014E2A8, 0x80132738)
     jr      ra                              // return immediately
@@ -341,7 +341,7 @@ if {defined __CE__} {
     nop
     OS.patch_end()
 
-    // @ Descirption
+    // @ Description
     // These following functions are designed to fix get_preview for RANDOM.
     scope random_fix_1_: {
         OS.patch_start(0x0014EF2C, 0x801333BC)
@@ -437,7 +437,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Modifies the zoom of the model previews.
     scope set_zoom_: {
         OS.patch_start(0x0014ECE4, 0x80133174)
@@ -469,7 +469,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // This functions modifies which preview file is drawn based on stage_table
     scope get_preview_: {
         OS.patch_start(0x0014E708, 0x80132B98)
@@ -501,7 +501,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // This functions modifies which preview type is used based on stage_table
     scope get_type_: {
         OS.patch_start(0x0014E720, 0x80132BB0)
@@ -532,7 +532,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Draw stage icons to the screen
     scope draw_icons_: {
         addiu   sp, sp,-0x0020              // allocate stack space
@@ -602,26 +602,26 @@ if {defined __CE__} {
         Texture.info(ICON_WIDTH, ICON_HEIGHT)
     }
 
-    // @ Descirption
+    // @ Description
     // This replaces the previous the original draw cursor function. The new function draws based on
     // the Stages.row and Stages.column variables as well as the position_table. It also replaces
     // the cursor itself with a filled rectangle
     scope draw_cursor_: {
 
-        // @ Descirption
+        // @ Description
         // Set original cursor position.
         OS.patch_start(0x0014E5C8, 0x80132A58)
         // not used, for documentation only
         OS.patch_end()
 
-        // @ Descirption
+        // @ Description
         // (part of set cursor position)
         OS.patch_start(0x0014E5F4, 0x80132A84)
 //      lui     at, 0x41B8                  // original line (at = (float cursor y))
         lui     at, 0xC800                  // at =  a very negative float
         OS.patch_end()
 
-        // @ Descirption
+        // @ Description
         // (part of set cursor position)
         OS.patch_start(0x0014E62C, 0x80132ABC)
 //      lui     at, 0x4274                  // original line (at = (float cursor y))
@@ -719,7 +719,7 @@ if {defined __CE__} {
         }
     }
 
-    // @ Descirption
+    // @ Description
     // Returns an index based on column and row
     // @ Returns
     // v0 - index
@@ -746,7 +746,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // returns a stage id based on cursor position
     // @ Returns
     // v0 - stage_id
@@ -768,7 +768,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // This is what Overlay.HOOKS_GO_HERE_ calls. It is the main() of Stages.asm
     scope run_: {
         addiu   sp, sp,-0x0020              // allocate stack space
@@ -817,11 +817,11 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Equivalent of _update_right_return.
     constant update_(0x80134210)
 
-    // @ Descirption
+    // @ Description
     // The following update_<direction>_ functions update Stages.row/Stages.column. Thee functions
     // use in game hooks (play_sound_ is conserved). The original cursor_id is set to 1 when
     // going left or right to avoid bugs with RANDOM.
@@ -999,7 +999,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Adds a stage to the random list if it's toggled on.
     // @ Arguments
     // a0 - address of entry (random stage entry)
@@ -1044,7 +1044,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Macro to (maybe) add a stage to the random list.
     macro add_to_list(entry, stage_id) {
         li      a0, {entry}                 // a0 - address of entry
@@ -1053,7 +1053,7 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // This function replaces the logic to convert the default cursor_id to a stage_id.
     // @ Returns
     // v0 - stage_id
@@ -1135,12 +1135,12 @@ if {defined __CE__} {
         nop
     }
 
-    // @ Descirption
+    // @ Description
     // Table of stage IDs (as words, 32 bit values)
     random_table:
     fill 4 * 32                             // assumes there will never be more than 32 stages
 
-    // @ Descirption
+    // @ Description
     // number of stages in random_table.
     random_count:
     dw 0
