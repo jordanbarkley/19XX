@@ -45,6 +45,11 @@ scope Data {
     Texture.info(80,16)
     insert options_text, "../textures/menu_options_text.rgba5551"
 
+    // VS Mode Textures
+    combo_text_info:
+    Texture.info(64,16)
+    insert combo_text, "../textures/combo.rgba5551"
+
     display_list:
     fill 0x10000
     
