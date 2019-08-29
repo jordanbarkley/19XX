@@ -74,10 +74,17 @@ if {defined __CE__} {
         // training mode
         _training:
         lli     t1, 0x0036
-        bne     t0, t1, _sss                // if (screen_id != training), skip
+        bne     t0, t1, _vs                // if (screen_id != training), skip
         nop
         jal     Training.run_
         nop        
+
+        _vs:
+        lli     t1, 0x0016
+        bne     t0, t1, _sss               // if (screen_id != vs mode), skip
+        nop
+        jal     VsCombo.run_
+        nop
 } // __CE__
 
         _sss:
@@ -210,7 +217,7 @@ if {defined __CE__} {
         jal     RCP.set_texture_image_      // append dlist
         nop
 
-        lw      a0, 0x0000(s2)              // a0 = width 
+        lw      a0, 0x0000(s2)              // a0 = width
         li      a1, RCP.G_IM_FMT_RGBA       // a1 - color format [f]
         li      a2, RCP.G_IM_SIZ_16b        // a2 - color size [s]
         jal     RCP.set_tile_               // append dlist
@@ -227,7 +234,7 @@ if {defined __CE__} {
         jal     RCP.pipe_sync_              // append dlist
         nop
 
-        lw      a0, 0x0000(s2)              // a0 = width 
+        lw      a0, 0x0000(s2)              // a0 = width
         li      a1, RCP.G_IM_FMT_RGBA       // a1 - color format [f]
         li      a2, RCP.G_IM_SIZ_16b        // a2 - color size [s]
         jal     RCP.set_tile_               // append dlist
