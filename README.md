@@ -30,6 +30,12 @@ Options Toggle           | Unavailable
 - Prevents the combo meter from resetting when the character is grabbed or bounces off of a wall.
 - Additionally, the “Tech Chase Combo Meter” toggle will prevent the combo meter from resetting on an inescapable tech chase.
 
+### Vs Mode Combo Meter
+19XXCE                   | 19XXTE
+-------------------------|-------------------------
+Options Toggle           | Unavailable
+- Displays a combo meter above players being combo'd in Vs mode.
+
 ### Expanded Stage Select Screen
 19XXCE                   | 19XXTE
 -------------------------|-------------------------
