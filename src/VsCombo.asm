@@ -346,14 +346,8 @@ scope VsCombo {
 
         _not_singles:
         draw_hit_count(P1_HIT_COUNT_OFFSET, P1_COMBO_METER_X_COORD, 0x0000)
-
-        _draw_for_p2:
         draw_hit_count(P2_HIT_COUNT_OFFSET, P2_COMBO_METER_X_COORD, 0x0004)
-
-        _draw_for_p3:
         draw_hit_count(P3_HIT_COUNT_OFFSET, P3_COMBO_METER_X_COORD, 0x0008)
-
-        _draw_for_p4:
         draw_hit_count(P4_HIT_COUNT_OFFSET, P4_COMBO_METER_X_COORD, 0x000C)
 
         _end:
