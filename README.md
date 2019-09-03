@@ -28,13 +28,14 @@ Computer controlled players have recieved a variety of improvements.
 -------------------------|-------------------------
 Options Toggle           | Unavailable
 - Prevents the combo meter from resetting when the character is grabbed or bounces off of a wall.
-- Additionally, the “Tech Chase Combo Meter” toggle will prevent the combo meter from resetting on an inescapable tech chase.
+- Additionally, the "Tech Chase Combo Meter" toggle will prevent the combo meter from resetting on an inescapable tech chase.
 
 ### Vs Mode Combo Meter
 19XXCE                   | 19XXTE
 -------------------------|-------------------------
 Options Toggle           | Unavailable
 - Displays a combo meter above players being combo'd in Vs mode.
+- In 1v1 matches, the "1v1 Combo Meter Swap" toggle will display the combo meter above the player performing the combo.
 
 ### Expanded Stage Select Screen
 19XXCE                   | 19XXTE
@@ -46,7 +47,7 @@ Always Enabled           | Always Enabled
 19XXCE                   | 19XXTE
 -------------------------|-------------------------
 Button Toggle            | Button Toggle
-- Pressing Z on the stage select screen will disable stage hazards. This is indicated by the selection cursor’s color changing to blue.
+- Pressing Z on the stage select screen will disable stage hazards. This is indicated by the selection cursor's color changing to blue.
 
 ### Hold to Pause
 19XXCE                   | 19XXTE
@@ -176,10 +177,10 @@ Always Enabled           | Unavailable
     - Costume: The costume used by the character.
     - Type: The type of player. (Human, CPU, Disabled)
     - Spawn: The position the character  will spawn in when the reset button is pressed.
-    - Set Custom Spawn: Sets the position to be used when the “Custom” spawn option is selected.
-    - Percent: The percent to be applied to the character on reset, or when the “Set Percent” button is pressed.
-    - Set Percent: Changes the character’s percent to the above value.
-    - Reset Sets Percent: Toggles whether or not the character’s percent will be changed on reset.
+    - Set Custom Spawn: Sets the position to be used when the "Custom" spawn option is selected.
+    - Percent: The percent to be applied to the character on reset, or when the "Set Percent" button is pressed.
+    - Set Percent: Changes the character's percent to the above value.
+    - Reset Sets Percent: Toggles whether or not the character's percent will be changed on reset.
 
 ### D-Pad Shortcuts
 19XXCE                   | 19XXTE
