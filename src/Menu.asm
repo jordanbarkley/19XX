@@ -136,11 +136,7 @@ scope Menu {
         lw      a0, 0x0004(s0)              // a0 - (int) current value
         jal     String.itoa_                // v0 = (string) current value
         nop
-        lw      a0, 0x0028(sp)              // a0 = address of info()
-        lw      at, 0x0014(a0)              // at = width
-        sll     at, at, 0x0003              // at = urx_difference
-        lw      a0, 0x0004(a0)              // a0 = ulx
-        addu    a0, a0, at                  // a0 - urx
+        lli     a0, 286                     // a0 - urx (fixes PJ64kve crash)
         move    a1, s2                      // a1 - uly
         move    a2, v0                      // a2 - address of string
         jal     Overlay.draw_string_urx_    // draw value
@@ -153,11 +149,7 @@ scope Menu {
         sll     t1, t1, 0x0002              // t1 = curr * sizeof(string pointer)
         addu    a2, t0, t1                  // ~
         lw      a2, 0x0000(a2)              // a2 - address of string
-        lw      a0, 0x0028(sp)              // a0 = address of info()
-        lw      at, 0x0014(a0)              // at = width
-        sll     at, at, 0x0003              // at = urx_difference
-        lw      a0, 0x0004(a0)              // a0 = ulx
-        addu    a0, a0, at                  // a0 - urx
+        lli     a0, 286                     // a0 - urx (fixes PJ64kve crash)
         move    a1, s2                      // a1 - uly
         jal     Overlay.draw_string_urx_    // draw string
         nop

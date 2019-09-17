@@ -7,7 +7,9 @@ print "included VsCombo.asm\n"
 // @ Description
 // This file ads combo meters to VS. matches.
 
+include "Character.asm"
 include "Data.asm"
+include "FGM.asm"
 include "OS.asm"
 include "Overlay.asm"
 include "String.asm"
@@ -25,11 +27,10 @@ scope VsCombo {
 
     // @ Description
     // Player hit count addresses
-    constant HIT_COUNT_BASE(0x800A4000)
-    constant P1_HIT_COUNT_OFFSET(0x0D7C)
-    constant P2_HIT_COUNT_OFFSET(0x0DF0)
-    constant P3_HIT_COUNT_OFFSET(0x0E64)
-    constant P4_HIT_COUNT_OFFSET(0x0ED8)
+    constant P1_HIT_COUNT(0x800A4D7C)
+    constant P2_HIT_COUNT(0x800A4DF0)
+    constant P3_HIT_COUNT(0x800A4E64)
+    constant P4_HIT_COUNT(0x800A4ED8)
 
     // @ Description
     // Default number of frames to keep a hit count displayed
@@ -38,161 +39,353 @@ scope VsCombo {
     // @ Description
     // Player count (stops counting at 3)
     player_count:
-    dw 0x00                                 // number of players
+    dw 0x00
 
-    texture_font:
-    Texture.info(16, 16)
-    insert "../textures/combo_numbers.rgba5551"
+    // @ Description
+    // This will hold the addresses of the combo text textures by port color
+    // 0 = silver (unattributed), 1 = red (p1), 2 = blue (p2), 3 = yellow (p3), 4 = green (p4)
+    // For teams, 1-4 will be set based on that player's team color
+    combo_text_map:
+    dw      Data.combo_text_r_info
+    dw      Data.combo_text_b_info
+    dw      Data.combo_text_y_info
+    dw      Data.combo_text_g_info
+    dw      Data.combo_text_s_info
+
+    // @ Description
+    // This will hold the addresses of the combo numbers textures by port color
+    // 0 = silver (unattributed), 1 = red (p1), 2 = blue (p2), 3 = yellow (p3), 4 = green (p4)
+    // For teams, 1-4 will be set based on that player's team color
+    combo_numbers_map:
+    dw      Data.combo_numbers_r_info
+    dw      Data.combo_numbers_b_info
+    dw      Data.combo_numbers_y_info
+    dw      Data.combo_numbers_g_info
+    dw      Data.combo_numbers_s_info
+
+	// @ Description
+    // This macro creates a combo struct for the given port
+    macro combo_struct(port) {
+	    combo_struct_p{port}: {
+	        dw      0x00                        // 0x0000 = combo_meter_pointer
+	        dw      0x00                        // 0x0004 = max_combo_hits
+	        dw      0x00                        // 0x0008 = max_combo_damage
+	        dw      0x00                        // 0x000C = combo_count
+	        dw      0x00                        // 0x0010 = combo color index (display)
+	        dw      0x00                        // 0x0014 = combo color index (current)
+	        dw      0x00                        // 0x0018 = x_coord
+	        dw      0x00                        // 0x001C = frame_buffer
+	        dw      0x00                        // 0x0020 = combo starting damage
+	        dw      0x00                        // 0x0024 = player struct address
+	    }
+	}
+
+	// Create combo structs
+	combo_struct(1)
+	combo_struct(2)
+	combo_struct(3)
+	combo_struct(4)
+
+	// @ Description
+    // If in teams, this will modify the color maps to point to the color of the given port's team
+    macro set_color_by_team(port, offset) {
+        li      t0, Global.vs.p{port}         // t0 = pointer to address of player struct for p{port}
+        lbu     t0, 0x0004(t0)                // t0 = team (0 = red, 1 = blue, 2 = green)
+        bnez    t0, _blue_or_green_p{port}    // if (t0 != 0) then check if blue or green
+        nop                                   // otherwise set to red
+        li      t0, Data.combo_text_r_info    // t0 = address of red combo text texture
+        li      t1, Data.combo_numbers_r_info // t1 = address of red combo numbers texture
+        b       _team_color_set_p{port}
+        nop
+
+        _blue_or_green_p{port}:
+        addi    t0, -0x0001                   // t0 = 0 if blue, 1 if green
+        bnez    t0, _green_p{port}            // if (t0 != 0) then set to green
+        nop                                   // otherwise set to blue
+        li      t0, Data.combo_text_b_info    // t0 = address of blue combo text texture
+        li      t1, Data.combo_numbers_b_info // t1 = address of blue combo numbers texture
+        b       _team_color_set_p{port}
+        nop
+
+        _green_p{port}:
+        li      t0, Data.combo_text_g_info    // t0 = address of green combo text texture
+        li      t1, Data.combo_numbers_g_info // t1 = address of green combo numbers texture
+
+        _team_color_set_p{port}:
+        sw      t0, {offset}(a0)                // set p{port} combo text color
+        sw      t1, {offset}(a1)                // set p{port} combo numbers color
+	}
+
+	// @ Description
+    // This initializes the combo structs for the match
+    scope initialize_combo_structs_: {
+        addiu   sp, sp,-0x0010                // allocate stack space
+        sw      t0, 0x0004(sp)                // ~
+        sw      t1, 0x0008(sp)                // ~
+        sw      ra, 0x000C(sp)                // save registers
+
+        li      a0, combo_struct_p1           // a0 = combo_struct_p1
+        li      a1, combo_struct_p2           // a1 = combo_struct_p2
+        li      a2, combo_struct_p3           // a2 = combo_struct_p3
+        li      a3, combo_struct_p4           // a3 = combo_struct_p4
+
+        // Set X coords
+        lli     t0, P1_COMBO_METER_X_COORD    // t0 = p1 x coord
+	    sw      t0, 0x0018(a0)                // store x coord
+        lli     t0, P2_COMBO_METER_X_COORD    // t0 = p2 x coord
+	    sw      t0, 0x0018(a1)                // store x coord
+        lli     t0, P3_COMBO_METER_X_COORD    // t0 = p3 x coord
+	    sw      t0, 0x0018(a2)                // store x coord
+        li      t0, P4_COMBO_METER_X_COORD    // t0 = p4 x coord
+	    sw      t0, 0x0018(a3)                // store x coord
+
+        // Set combo meter addresses (do here so not wasting cycles in update_combo_struct_)
+        li      t0, P1_HIT_COUNT              // t0 = p1 hit count address
+	    sw      t0, 0x0000(a0)                // store hit count address
+        li      t0, P2_HIT_COUNT              // t0 = p2 hit count address
+	    sw      t0, 0x0000(a1)                // store hit count address
+        li      t0, P3_HIT_COUNT              // t0 = p3 hit count address
+	    sw      t0, 0x0000(a2)                // store hit count address
+        li      t0, P4_HIT_COUNT              // t0 = p4 hit count address
+	    sw      t0, 0x0000(a3)                // store hit count address
+
+        // Set frame buffers (need to do this so prior match data is cleared)
+        sw      r0, 0x001C(a0)                // set frame buffer to 0 for p1
+        sw      r0, 0x001C(a1)                // set frame buffer to 0 for p2
+        sw      r0, 0x001C(a2)                // set frame buffer to 0 for p3
+        sw      r0, 0x001C(a3)                // set frame buffer to 0 for p4
+
+        // Set color maps
+        li      t0, Global.vs.teams           // t0 = pointer to teams byte
+        lbu     t0, 0x0000(t0)                // t0 = teams
+        beqz    t0, _initialize_by_port       // if (!teams), initialize color by port
+        nop                                   // otherwise we'll get each player's team and set accordingly
+
+        // We'll now determine each player's team and set the color maps up accordingly.
+        li      a0, combo_text_map            // a0 = address of combo text map
+        li      a1, combo_numbers_map         // a1 = address of combo numbers map
+
+        set_color_by_team(1, 0x0000)
+        set_color_by_team(2, 0x0004)
+        set_color_by_team(3, 0x0008)
+        set_color_by_team(4, 0x000C)
+        b       _end
+        nop
+
+        _initialize_by_port:
+        li      a0, Data.combo_text_r_info    // a0 = p1 combo text color (red)
+        li      a1, Data.combo_text_b_info    // a1 = p2 combo text color (blue)
+        li      a2, Data.combo_text_y_info    // a2 = p3 combo text color (yellow)
+        li      a3, Data.combo_text_g_info    // a3 = p4 combo text color (green)
+        li      t0, combo_text_map            // t0 = address of combo text map
+        sw      a0, 0x0000(t0)                // store p1 combo text color
+        sw      a1, 0x0004(t0)                // store p2 combo text color
+        sw      a2, 0x0008(t0)                // store p3 combo text color
+        sw      a3, 0x000C(t0)                // store p4 combo text color
+        li      a0, Data.combo_numbers_r_info // a0 = p1 combo text color (red)
+        li      a1, Data.combo_numbers_b_info // a1 = p2 combo text color (blue)
+        li      a2, Data.combo_numbers_y_info // a2 = p3 combo text color (yellow)
+        li      a3, Data.combo_numbers_g_info // a3 = p4 combo text color (green)
+        li      t0, combo_numbers_map         // t0 = address of combo numbers map
+        sw      a0, 0x0000(t0)                // store p1 combo numbers color
+        sw      a1, 0x0004(t0)                // store p2 combo numbers color
+        sw      a2, 0x0008(t0)                // store p3 combo numbers color
+        sw      a3, 0x000C(t0)                // store p4 combo numbers color
+
+		_end:
+        lw      t0, 0x0004(sp)                // ~
+        lw      t1, 0x0008(sp)                // ~
+        lw      ra, 0x000C(sp)                // save registers
+        addiu   sp, sp, 0x0010                // deallocate stack space
+        jr      ra                            // return
+        nop
+	}
 
     // @ Description
     // This macro draws the given hit count at the specified X coordinate
     scope draw_hit_count_: {
-        // a0 = hit_count
-        // a1 = player_x_coord
-        // a2 = player_offset
+        // a0 = combo struct
+        // a1 = player struct
 
-        addiu   sp, sp,-0x0020              // allocate stack space
-        sw      t0, 0x0004(sp)              // ~
-        sw      t1, 0x0008(sp)              // ~
-        sw      t2, 0x000C(sp)              // ~
-        sw      t3, 0x0010(sp)              // ~
-        sw      t4, 0x0014(sp)              // ~
-        sw      t5, 0x0018(sp)              // ~
-        sw      ra, 0x001C(sp)              // save registers
+        addiu   sp, sp,-0x0020                    // allocate stack space
+        sw      t0, 0x0004(sp)                    // ~
+        sw      t1, 0x0008(sp)                    // ~
+        sw      t2, 0x000C(sp)                    // ~
+        sw      t3, 0x0010(sp)                    // ~
+        sw      t4, 0x0014(sp)                    // ~
+        sw      t5, 0x0018(sp)                    // ~
+        sw      ra, 0x001C(sp)                    // save registers
 
-		move    t4, a1                      // t4 = player_x_coord
+		move    t5, a0                            // t5 = player combo struct
+		lw      t0, 0x0000(t5)                    // t0 = combo meter address
+		lw      a0, 0x0000(t0)                    // a0 = hit count
+		lw      t4, 0x0018(t5)                    // t4 = player_x_coord
 
         // Check if currently in a combo (hit count > 1)
-        lli     t0, 0x0001                  // t0 = 1
-        sltu    t1, t0, a0                  // if (hit count > 1) then store to display table
-        bnez    t1, _in_combo               // skip to store to display table section
+        lli     t0, 0x0001                        // t0 = 1
+        sltu    t1, t0, a0                        // if (hit count > 1) then update frame buffer
+        bnez    t1, _in_combo                     // skip to _in_combo to update frame buffer
         nop
 
+        // Sync colors
+        beqz    a0, _check_frame_buffer           // if (hit count = 1), then set combo color index via port
+        nop                                       // ~
+        lw      t1, 0x080C(a1)                    // t1 = port attributed with hit, or 4 if unattributed
+        lli     t2, -0x0001                       // t2 = -1
+        beq     t2, t3, _sync_color_first_hit     // if (current hit attribution = -1) then use 4 (silver)
+        nop                                       // ~
+        lli     t1, 0x0004                        // t1 = 4 (silver)
+        _sync_color_first_hit:
+        sw      t1, 0x0014(t5)                    // store current color index
+        // TODO: update starting combo damage
+
         // Check if frame buffer is active (frame buffer > 0)
-        li      t2, frame_buffer_table      // t2 = address of frame_buffer
-        addu    t2, t2, a2                  // t2 = address of frame_buffer for this player
-        lw      t3, 0x0000(t2)              // t3 = frame_buffer
-        bnez    t3, _post_combo             // if (frame buffer > 0) then frame_buffer-- and draw
+        _check_frame_buffer:
+        lw      t3, 0x001C(t5)                    // t3 = frame_buffer
+        bnez    t3, _post_combo                   // if (frame buffer > 0) then frame_buffer-- and draw
         nop
-        b       _end                        // don't draw - skip to end
+        b       _end                              // don't draw - skip to end
         nop
 
         // Move hit count to display table and restore frame buffer
         _in_combo:
-        li      t2, frame_buffer_table      // t2 = address of frame_buffer
-        addu    t2, t2, a2                  // t2 = address of frame_buffer for this player
-        lli     t3, DEFAULT_FRAME_BUFFER    // t3 = DEFAULT_FRAME_BUFFER
-        sll     t1, a0, 0x0002              // t1 = hit_count * 4
-        sltiu   t5, t1, 0x0096              // if (hit_count * 4 >= 150) then only add 150 frames
-        bnez    t5, _continue_in_combo      // hit_count * 4 is ok to use as an additional frame buffer; skip
+        lli     t3, DEFAULT_FRAME_BUFFER          // t3 = DEFAULT_FRAME_BUFFER
+        sll     t1, a0, 0x0002                    // t1 = hit_count * 4
+        sltiu   t2, t1, 0x0096                    // if (hit_count * 4 >= 150) then only add 150 frames
+        bnez    t2, _continue_in_combo            // hit_count * 4 is ok to use as an additional frame buffer; skip
         nop
-        lli     t1, 0x0096                  // Only add 150 frames
+        lli     t1, 0x0096                        // Only add 150 frames
 
         _continue_in_combo:
-        addu    t3, t3, t1                  // t3 = t3 + t1 (add more frames for higher combo values)
-        sw      t3, 0x0000(t2)              // frame buffer = DEFAULT_FRAME_BUFFER
-        li      t2, display_table           // t2 = address of display_table
-        addu    t2, t2, a2                  // t2 = address of display_table for this player
-        sw      a0, 0x0000(t2)              // store hit count in display table
-        b       _draw                       // skip to draw
+        addu    t3, t3, t1                        // t3 = t3 + t1 (add more frames for higher combo values)
+        sw      t3, 0x001C(t5)                    // frame buffer = DEFAULT_FRAME_BUFFER + additional frames
+
+        lli     t1, 0x0014                        // t1 = 20
+	    bne     t1, a0, _max_hit_check            // if (hit count != 20) then don't play sound effect
+	    nop                                       // ~
+	    lw      t1, 0x000C(t5)                    // t1 = current combo count previously
+	    beq     t1, a0, _continue_in_combo2       // if (hit count already is 20) then don't play sound effect (because we already did)
+	    nop                                       // ~
+	    move    t1, a0                            // t1 = hit count
+	    li      a0, FGM.announcer.misc.INCREDIBLE // a0 - fgm_id for INCREDIBLE
+        jal     FGM.play_                         // play INCREDIBLE sound effect
+        nop
+        move    a0, t1                            // a0 = hit count
+
+	    _max_hit_check:
+	    lw      t2, 0x0004(t5)                    // Load previous max_combo_hits
+	    slt     t3, t2, a0                        // if (combo count > max_combo_hits) then update max_combo_hits
+	    beqz    t3, _max_damage_check             // skip to max_damage_check if not a higher max_combo_hits
+	    nop                                       // ~
+        sw      a0, 0x0004(t5)                    // store max_combo_hits
+
+        _max_damage_check:
+        lw      t2, 0x0008(t5)                    // Load previous max_combo_damage
+	    //slt     t3, t2, t4                        // if (combo damage > max_combo_damage) then update max_combo_damage
+	    //beqz    t3, _continue_in_combo2           // skip to team_check if not a higher max_combo_damage
+	    //nop                                       // ~
+        sw      t2, 0x0008(t5)                    // store max_combo_damage
+
+        _continue_in_combo2:
+        sw      a0, 0x000C(t5)                    // store current combo count
+        lw      t3, 0x080C(a1)                    // color index for player attributed to current hit based on port
+        lli     t2, -0x0001                       // t2 = -1
+        beq     t2, t3, _use_previous_color       // if (current hit attribution reset to -1) then use previous value
+        nop                                       // ~
+        sltiu   t2, t3, 0x0004                    // if (current hit unattributed to player) then don't store it - use previous value
+        beqz    t2, _use_previous_color           // ~
+        nop
+        sw      t3, 0x0014(t5)                    // store color index as current color index
+        sw      t3, 0x0010(t5)                    // store color index as color index for display
+        // TODO: calculate current combo damage and store
+        b       _draw                             // skip to draw
+        nop
+
+        _use_previous_color:
+        lw      t3, 0x0014(t5)                    // t3 = previously stored color index
+        sw      t3, 0x0010(t5)                    // store color index as color index for display
+        b       _draw                             // skip to draw
         nop
 
         // Decrease frame buffer
         _post_combo:
-        addiu   t3, t3, -0x0001             // frame_buffer--
-        sw      t3, 0x0000(t2)              // save new frame buffer
-        li      t2, display_table           // t2 = address of display_table
-        addu    t2, t2, a2                  // t2 = address of display_table for this player
-        lw      a0, 0x0000(t2)              // a0 = hit count from display table
+        addiu   t3, t3, -0x0001                   // frame_buffer--
+        sw      t3, 0x001C(t5)                    // save new frame buffer
+        lw      a0, 0x000C(t5)                    // get previous combo count
 
         // Draw combo meter
         _draw:
-        jal     String.itoa_                // v0 = (string) hit count
+        jal     String.itoa_                      // v0 = (string) hit count
         nop
-        move    a0, t4                      // a0 - ulx
-        lli     a1, COMBO_METER_Y_COORD     // a1 - uly
-        li      a2, Data.combo_text_info    // a2 - address of texture struct
-        jal     Overlay.draw_texture_big_   // draw combo text texture
+        move    a0, t4                            // a0 - ulx
+        lli     a1, COMBO_METER_Y_COORD           // a1 - uly
+        lw      t0, 0x0010(t5)                    // t0 - color index (0 = silver, 1 = p1, 2 = p2, 3 = p3, 4 = p4)
+        sll     t1, t0, 0x0002                    // t1 = color index * 4 = offset in color maps
+        li      t2, combo_text_map                // t2 = combo_text_map address
+        addu    t2, t2, t1                        // t2 = address of texture struct address
+        lw      a2, 0x0000(t2)                    // a2 = address of texture struct
+        jal     Overlay.draw_texture_big_         // draw combo text texture
         nop
-        move    a0, t4                      // a0 - ulx
-        addiu   a0, a0, 64                  // a0 = ulx + 64 pixels
-        lli     a1, COMBO_METER_Y_COORD     // a1 = uly
-        move    a2, v0                      // a2 = address of string
-        jal     draw_string_                // draw current hit count
+        addiu   a0, t4, 64                        // a0 = ulx + 64
+        lli     a1, COMBO_METER_Y_COORD           // a1 = uly
+        move    a2, v0                            // a2 = address of string
+        li      t2, combo_numbers_map             // t2 = combo_numbers_map address
+        addu    t2, t2, t1                        // t2 = address of font struct address
+        lw      a3, 0x0000(t2)                    // a3 = address of font struct
+        jal     draw_string_                      // draw current hit count
         nop
 
         _end:
-        lw      t0, 0x0004(sp)              // ~
-        lw      t1, 0x0008(sp)              // ~
-        lw      t2, 0x000C(sp)              // ~
-        lw      t3, 0x0010(sp)              // ~
-        lw      t4, 0x0014(sp)              // ~
-        lw      t5, 0x0018(sp)              // ~
-        lw      ra, 0x001C(sp)              // save registers
-        addiu   sp, sp, 0x0020              // deallocate stack space
-        jr      ra                          // return
-        nop
-
-        frame_buffer_table:
-        dw 0x00                             // p1 frame buffer (left player for singles)
-        dw 0x00                             // p2 frame buffer (right player for singles)
-        dw 0x00                             // p3 frame buffer
-        dw 0x00                             // p4 frame buffer
-
-        display_table:
-        dw 0x00                             // p1 hit count holder (left player for singles)
-        dw 0x00                             // p2 player hit count holder (right player for singles)
-        dw 0x00                             // p3 hit count holder
-        dw 0x00                             // p4 hit count holder
-    }
-
-    // @ Description
-    // This macro draws the given hit count at the specified X coordinate...
-    // it is a helper that allows passing in immediates
-    macro draw_hit_count(hit_count_offset, player_x_coord, player_offset) {
-    	li      t0, HIT_COUNT_BASE          // t0 = hit count base address
-    	addiu   t0, t0, {hit_count_offset}  // t0 = address of hit_count
-        lw      a0, 0x0000(t0)              // a0 = hit_count
-        li      a1, {player_x_coord}        // a1 = player_x_coord
-        lli     a2, {player_offset}         // a2 = player_offset
-        jal     VsCombo.draw_hit_count_     // values now in registers; draw
+        lw      t0, 0x0004(sp)                    // ~
+        lw      t1, 0x0008(sp)                    // ~
+        lw      t2, 0x000C(sp)                    // ~
+        lw      t3, 0x0010(sp)                    // ~
+        lw      t4, 0x0014(sp)                    // ~
+        lw      t5, 0x0018(sp)                    // ~
+        lw      ra, 0x001C(sp)                    // save registers
+        addiu   sp, sp, 0x0020                    // deallocate stack space
+        jr      ra                                // return
         nop
     }
 
     // @ Description
-    // This macro helps clear out a 4 word table
-    macro clear_array(address_of_table) {
-    	li      t2, {address_of_table}
-        sw      r0, 0x0000(t2)              // Set table[0] to 0
-        sw      r0, 0x0004(t2)              // Set table[1] to 0
-        sw      r0, 0x0008(t2)              // Set table[2] to 0
-        sw      r0, 0x000C(t2)              // Set table[3] to 0
+    // This macro draws the given port's combo meter
+    macro draw_hit_count(port) {
+    	li      a0, combo_struct_p{port}    // a0 = combo_struct_pX address
+    	lw      a1, 0x0024(a0)              // a1 = player struct address
+    	jal     VsCombo.draw_hit_count_     // draw combo meter
+        nop
     }
 
     // @ Description
     // This macro checks if the given port is a man/cpu and increments player count
     // accordingly. Then it sets up the tables needed for swapping the combo meter
-    // in singles or skips to _not_singles once the number of players over 2.
-    macro port_check(type_address, next, x_coord, hit_count_offset) {
+    // in singles and also stores the correct player struct address.
+    macro port_check(port, next) {
+        // t0 = player_count address
         // t1 = player_count
         // t8 = x_coord_table
-        // t9 = hit_count_table
-        li      t2, {type_address}          // address of player type
-        lb      t3, 0x0002(t2)              // t3 = type (0 = man, 1 = cpu, 2 = n/a)
-        sltiu   t4, t3, 0x0002              // if (p3 = man/cpu) then player_count++
-        beqz    t4, {next}                  // not man/cpu so skip
+        // t9 = combo_struct_table
+        li      t2, Global.vs.p{port}            // address of player struct
+        lbu     t3, 0x0002(t2)                   // t3 = player type (0 = man, 1 = cpu, 2 = n/a)
+        sltiu   t4, t3, 0x0002                   // if (p3 = man/cpu) then player_count++
+        beqz    t4, {next}                       // not man/cpu so skip
         nop
-        addu    t1, t1, t4                  // player_count++
-        sw      t1, 0x0000(t0)              // store player count
-        li      t5, 0x0003                  // t5 = 3
-        beq     t1, t5, _not_singles        // if (>=3 players) then not singles so stop counting
+        or      a0, r0, t1                       // a0 = player struct index, (p1 = 0, p4 = 3)
+    	jal     Character.get_struct_            // v0 = player struct address
         nop
-        lli     t5, {x_coord}               // t5 = x coord for left/right port
-        sw      t5, 0x0000(t8)              // store x coord for left/right port
-        addiu   t8, t8, 0x0004              // t8 = x_coord_table++
-        li      t5, {hit_count_offset}      // t5 = hit count for right/left port
-        sw      t5, 0x0000(t9)              // store hit count for right/left port
-        addiu   t9, t9, 0x0004              // t9 = hit_count_table++
+        addu    t1, t1, t4                       // player_count++
+        li      t4, combo_struct_p{port}         // t4 = combo struct address for right/left port
+        sw      v0, 0x0024(t4)                   // store address of player struct
+        sw      t1, 0x0000(t0)                   // store player count
+        sltiu   t5, t1, 0x0003                   // if (>=3 players) then not singles so don't set up swap tables
+        beqz    t5, {next}                       // ~
+        nop                                      // ~
+        li      t5, P{port}_COMBO_METER_X_COORD  // t5 = x coord for left/right port
+        sw      t5, 0x0000(t8)                   // store x coord for left/right port
+        addiu   t8, t8, 0x0004                   // t8 = x_coord_table++
+        sw      t4, 0x0000(t9)                   // store combo struct address for right/left port
+        addiu   t9, t9, 0x0004                   // t9 = combo_struct_table++
     }
 
     // @ Description
@@ -201,15 +394,16 @@ scope VsCombo {
     // a0 - ulx
     // a1 - uly
     // a2 - char
+    // a3 - address of font
     scope draw_char_: {
         addiu   sp, sp,-0x0018              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
         sw      a2, 0x000C(sp)              // ~
-        sw      ra, 0x0010(sp)              // save registers
+        sw      a3, 0x0010(sp)              // ~
+        sw      ra, 0x0014(sp)              // save registers
 
-        li      t0, texture_font            // ~
-        lw      t0, 0x0008(t0)              // t0 = address of image_data
+        lw      t0, 0x0008(a3)              // t0 = address of image_data
 
 
         addiu   a2, a2, -0x0030             // a2 = char - 48 (we only care about numbers, sprite not padded)
@@ -224,7 +418,8 @@ scope VsCombo {
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // ~
         lw      a2, 0x000C(sp)              // ~
-        lw      ra, 0x0010(sp)              // restore registers
+        lw      a3, 0x0010(sp)              // ~
+        lw      ra, 0x0014(sp)              // restore registers
         addiu   sp, sp, 0x0018              // deallocate stack space
         jr      ra                          // return
         nop
@@ -239,6 +434,7 @@ scope VsCombo {
     // a0 - ulx
     // a1 - uly
     // a2 - address of string
+    // a3 - address of font
     scope draw_string_: {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -268,6 +464,8 @@ scope VsCombo {
         nop
     }
 
+    // @ Description
+    // This is the entry for Overlay.asm
     scope run_: {
         OS.save_registers()                 // save registers
 
@@ -277,78 +475,66 @@ scope VsCombo {
         b       _end                        // toggle is off, skip to end
         nop
         _swap_toggle_off:
-        b       _not_singles                // 1v1 swap toggle is off, skip to end
+        b       _draw_hit_counts            // 1v1 swap toggle is off, skip to _draw_hit_counts
         nop
 
         _guard:
         // If combo meter is off, skip to _end and don't draw hit counts
         Toggles.guard(Toggles.entry_vs_mode_combo_meter, _toggle_off)
 
-        // If 1v1 swap is off, skip to _not_singles
-        Toggles.guard(Toggles.entry_1v1_combo_meter_swap, _swap_toggle_off)
+        li      t0, player_count            // t0 = number of players
+        lw      t1, 0x0000(t0)              // t1 = player_count
+        bnez    t1, _draw_hit_counts        // if (player_count > 0) skip setup
+        nop
 
         // We swap hit count meter location for 1v1, so the next few blocks check
         // how many players there are and set up tables for the left and right
         // player ports. This is only run once per match.
         _setup:
-        li      t0, player_count            // t0 = number of players
-        lw      t1, 0x0000(t0)              // t1 = player_count
-        bnez    t1, _check_singles          // if (player_count > 0) skip setup
-        nop
         li      t8, x_coord_table           // t8 = x_coord_table
-        li      t9, hit_count_table         // t9 = hit_count_table
-
-        // Reset variables from previous match
-        clear_array(VsCombo.draw_hit_count_.display_table)
-        clear_array(VsCombo.draw_hit_count_.frame_buffer_table)
+        li      t9, combo_struct_table      // t9 = combo_struct_table
+        jal     initialize_combo_structs_   // Reset variables from previous match
+        nop
 
         _p1:
-        port_check(Global.vs.p1, _p2, P1_COMBO_METER_X_COORD, P1_HIT_COUNT_OFFSET)
+        port_check(1, _p2)                  // check port 1
 
         _p2:
-        port_check(Global.vs.p2, _p3, P2_COMBO_METER_X_COORD, P2_HIT_COUNT_OFFSET)
+        port_check(2, _p3)                  // check port 2
 
 		_p3:
-        port_check(Global.vs.p3, _p4, P3_COMBO_METER_X_COORD, P3_HIT_COUNT_OFFSET)
+        port_check(3, _p4)                  // check port 3
 
 		_p4:
-        port_check(Global.vs.p4, _check_singles, P4_COMBO_METER_X_COORD, P4_HIT_COUNT_OFFSET)
-        b       _singles                    // we're in singles so skip _check_singles
+        port_check(4, _check_singles)       // check port 4
+        b       _swap_for_singles           // we're in singles so skip _check_singles
         nop
 
         _check_singles:
-        li      t5, 0x0002                  // t5 = 2
-        bne     t1, t5, _not_singles        // if (player_count != 2) then not singles
+        // If 1v1 swap is off, skip to _draw_hit_counts
+        Toggles.guard(Toggles.entry_1v1_combo_meter_swap, _swap_toggle_off)
+
+        lli     t5, 0x0002                  // t5 = 2
+        bne     t1, t5, _draw_hit_counts    // if (player_count != 2) then not singles
         nop
 
-        _singles:
-        li      t8, x_coord_table           // t0 = address of x_coord_table
-        li      t9, hit_count_table         // t9 = address of hit_count_table
-        li      t0, HIT_COUNT_BASE          // t2 = hit count base address
+        _swap_for_singles:
+        li      t8, x_coord_table           // t8 = address of x_coord_table
+        li      t9, combo_struct_table      // t9 = address of combo_struct_table
+        lw      t0, 0x0000(t8)              // t0 = left player x_coord
+        lw      t1, 0x0004(t9)              // t1 = left player combo_struct address
+        sw      t0, 0x0018(t1)              // update combo_struct_pX with x coord for left player
+        lw      t0, 0x0004(t8)              // t0 = right player x_coord
+        lw      t1, 0x0000(t9)              // t1 = right player combo_struct address
+        sw      t0, 0x0018(t1)              // update combo_struct_pX with x coord for right player
 
-        lw      t1, 0x0004(t9)              // t1 = left player hit_count offset
-    	addu    t1, t0, t1                  // t1 = address of left player hit_count
-        lw      a0, 0x0000(t1)              // a0 = left player hit_count
-        lw      a1, 0x0000(t8)              // a1 = left player x coord
-        lli     a2, 0x0000                  // a2 = player_offset
-        jal     VsCombo.draw_hit_count_
-        nop
+        // end of setup
 
-        lw      t1, 0x0000(t9)              // t1 = right player hit_count offset
-        addu    t1, t0, t1                  // t1 = address of right player hit_count
-        lw      a0, 0x0000(t1)              // a0 = right player hit_count
-        lw      a1, 0x0004(t8)              // a1 = right player x coord
-        lli     a2, 0x0004                  // a2 = player_offset
-        jal     VsCombo.draw_hit_count_
-        nop
-        b       _end                        // no need to draw more; skip to end
-        nop
-
-        _not_singles:
-        draw_hit_count(P1_HIT_COUNT_OFFSET, P1_COMBO_METER_X_COORD, 0x0000)
-        draw_hit_count(P2_HIT_COUNT_OFFSET, P2_COMBO_METER_X_COORD, 0x0004)
-        draw_hit_count(P3_HIT_COUNT_OFFSET, P3_COMBO_METER_X_COORD, 0x0008)
-        draw_hit_count(P4_HIT_COUNT_OFFSET, P4_COMBO_METER_X_COORD, 0x000C)
+        _draw_hit_counts:
+        draw_hit_count(1)                   // draw combo meter for port 1
+        draw_hit_count(2)                   // draw combo meter for port 2
+        draw_hit_count(3)                   // draw combo meter for port 3
+        draw_hit_count(4)                   // draw combo meter for port 4
 
         _end:
         OS.restore_registers()              // restore registers
@@ -359,9 +545,9 @@ scope VsCombo {
         dw 0x00                             // left player x_coord (singles)
         dw 0x00                             // right player x_coord (singles)
 
-        hit_count_table:
-        dw 0x00                             // right player hit count address (singles)
-        dw 0x00                             // left player hit count address (singles)
+        combo_struct_table:
+        dw 0x00                             // right player combo struct address (singles)
+        dw 0x00                             // left player combo struct address (singles)
 
     }
 } // VsCombo

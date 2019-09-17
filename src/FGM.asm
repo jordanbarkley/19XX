@@ -79,7 +79,7 @@ scope FGM {
             constant DRAW_GAME(484)                 // unused
             constant NO_CONTEST(502)
             constant WINS(533)
-            constant THIS_GAMES_WINNER_IS(533)
+            constant THIS_GAMES_WINNER_IS(534)
         }
 
         scope singleplayer {
@@ -111,7 +111,7 @@ scope FGM {
             constant HOW_TO_PLAY(494)
             constant ARE_YOU_READY(509)
             constant SUPER_SMASH_BROTHERS(528)
-            constant INCREDIBLE(533)
+            constant INCREDIBLE(466)
             constant SHINE(189)
             constant MARIO_POWERUP(212)
             constant MARIO_POWERDOWN(213)
