@@ -507,8 +507,6 @@ scope VsCombo {
 
 		_p4:
         port_check(4, _check_singles)       // check port 4
-        b       _swap_for_singles           // we're in singles so skip _check_singles
-        nop
 
         _check_singles:
         // If 1v1 swap is off, skip to _draw_hit_counts
