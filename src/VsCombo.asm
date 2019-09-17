@@ -43,7 +43,7 @@ scope VsCombo {
 
     // @ Description
     // This will hold the addresses of the combo text textures by port color
-    // 0 = silver (unattributed), 1 = red (p1), 2 = blue (p2), 3 = yellow (p3), 4 = green (p4)
+    // 0 = red (p1), 1 = blue (p2), 2 = yellow (p3), 3 = green (p4), 4 = silver (unattributed)
     // For teams, 1-4 will be set based on that player's team color
     combo_text_map:
     dw      Data.combo_text_r_info
@@ -54,7 +54,7 @@ scope VsCombo {
 
     // @ Description
     // This will hold the addresses of the combo numbers textures by port color
-    // 0 = silver (unattributed), 1 = red (p1), 2 = blue (p2), 3 = yellow (p3), 4 = green (p4)
+    // 0 = red (p1), 1 = blue (p2), 2 = yellow (p3), 3 = green (p4), 4 = silver (unattributed)
     // For teams, 1-4 will be set based on that player's team color
     combo_numbers_map:
     dw      Data.combo_numbers_r_info
