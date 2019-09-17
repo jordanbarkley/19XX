@@ -35,6 +35,7 @@ Options Toggle           | Unavailable
 -------------------------|-------------------------
 Options Toggle           | Unavailable
 - Displays a combo meter above players being combo'd in Vs mode.
+- Combo meter color corresponds with attacking player's port or team.
 - In 1v1 matches, the "1v1 Combo Meter Swap" toggle will display the combo meter above the player performing the combo.
 
 ### Expanded Stage Select Screen
