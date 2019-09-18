@@ -139,7 +139,7 @@ scope VsCombo {
         li      t0, P4_COMBO_METER_X_COORD    // t0 = p4 x coord
 	    sw      t0, 0x0018(a3)                // store x coord
 
-        // Set combo meter addresses (do here so not wasting cycles in update_combo_struct_)
+        // Set combo meter addresses
         li      t0, P1_HIT_COUNT              // t0 = p1 hit count address
 	    sw      t0, 0x0000(a0)                // store hit count address
         li      t0, P2_HIT_COUNT              // t0 = p2 hit count address
@@ -207,18 +207,21 @@ scope VsCombo {
         // a0 = combo struct
         // a1 = player struct
 
-        addiu   sp, sp,-0x0020                    // allocate stack space
+        addiu   sp, sp,-0x0024                    // allocate stack space
         sw      t0, 0x0004(sp)                    // ~
         sw      t1, 0x0008(sp)                    // ~
         sw      t2, 0x000C(sp)                    // ~
         sw      t3, 0x0010(sp)                    // ~
         sw      t4, 0x0014(sp)                    // ~
         sw      t5, 0x0018(sp)                    // ~
-        sw      ra, 0x001C(sp)                    // save registers
+        sw      t6, 0x001C(sp)                    // ~
+        sw      ra, 0x0020(sp)                    // save registers
 
 		move    t5, a0                            // t5 = player combo struct
 		lw      t0, 0x0000(t5)                    // t0 = combo meter address
 		lw      a0, 0x0000(t0)                    // a0 = hit count
+		addiu   t0, -0x0004                       // t0 = combo damage address
+		lw      t6, 0x0000(t0)                    // t6 = combo damage
 		lw      t4, 0x0018(t5)                    // t4 = player_x_coord
 
         // Check if currently in a combo (hit count > 1)
@@ -237,7 +240,6 @@ scope VsCombo {
         lli     t1, 0x0004                        // t1 = 4 (silver)
         _sync_color_first_hit:
         sw      t1, 0x0014(t5)                    // store current color index
-        // TODO: update starting combo damage
 
         // Check if frame buffer is active (frame buffer > 0)
         _check_frame_buffer:
@@ -281,10 +283,10 @@ scope VsCombo {
 
         _max_damage_check:
         lw      t2, 0x0008(t5)                    // Load previous max_combo_damage
-	    //slt     t3, t2, t4                        // if (combo damage > max_combo_damage) then update max_combo_damage
-	    //beqz    t3, _continue_in_combo2           // skip to team_check if not a higher max_combo_damage
-	    //nop                                       // ~
-        sw      t2, 0x0008(t5)                    // store max_combo_damage
+	    slt     t3, t2, t6                        // if (combo damage > max_combo_damage) then update max_combo_damage
+	    beqz    t3, _continue_in_combo2           // skip to team_check if not a higher max_combo_damage
+	    nop                                       // ~
+        sw      t6, 0x0008(t5)                    // store max_combo_damage
 
         _continue_in_combo2:
         sw      a0, 0x000C(t5)                    // store current combo count
@@ -297,7 +299,6 @@ scope VsCombo {
         nop
         sw      t3, 0x0014(t5)                    // store color index as current color index
         sw      t3, 0x0010(t5)                    // store color index as color index for display
-        // TODO: calculate current combo damage and store
         b       _draw                             // skip to draw
         nop
 
@@ -342,8 +343,9 @@ scope VsCombo {
         lw      t3, 0x0010(sp)                    // ~
         lw      t4, 0x0014(sp)                    // ~
         lw      t5, 0x0018(sp)                    // ~
-        lw      ra, 0x001C(sp)                    // save registers
-        addiu   sp, sp, 0x0020                    // deallocate stack space
+        sw      t6, 0x001C(sp)                    // ~
+        lw      ra, 0x0020(sp)                    // save registers
+        addiu   sp, sp, 0x0024                    // deallocate stack space
         jr      ra                                // return
         nop
     }
