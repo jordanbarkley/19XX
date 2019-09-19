@@ -136,11 +136,7 @@ scope Menu {
         lw      a0, 0x0004(s0)              // a0 - (int) current value
         jal     String.itoa_                // v0 = (string) current value
         nop
-        lw      a0, 0x0028(sp)              // a0 = address of info()
-        lw      at, 0x0014(a0)              // at = width
-        sll     at, at, 0x0003              // at = urx_difference
-        lw      a0, 0x0004(a0)              // a0 = ulx
-        addu    a0, a0, at                  // a0 - urx
+        lw      a0, 0x0028(sp)              // a0 = urx
         move    a1, s2                      // a1 - uly
         move    a2, v0                      // a2 - address of string
         jal     Overlay.draw_string_urx_    // draw value
@@ -153,11 +149,7 @@ scope Menu {
         sll     t1, t1, 0x0002              // t1 = curr * sizeof(string pointer)
         addu    a2, t0, t1                  // ~
         lw      a2, 0x0000(a2)              // a2 - address of string
-        lw      a0, 0x0028(sp)              // a0 = address of info()
-        lw      at, 0x0014(a0)              // at = width
-        sll     at, at, 0x0003              // at = urx_difference
-        lw      a0, 0x0004(a0)              // a0 = ulx
-        addu    a0, a0, at                  // a0 - urx
+        lw      a0, 0x0028(sp)              // a0 = urx
         move    a1, s2                      // a1 - uly
         jal     Overlay.draw_string_urx_    // draw string
         nop
@@ -223,10 +215,12 @@ scope Menu {
         // draw first entry
         lw      at, 0x0010(sp)              // at = address of info()
         lw      a0, 0x0000(at)              // a0 - entry
-        lw      a1, 0x0004(at)              // ~
-        addiu   a1, a1, 0x0008              // a1 - ulx
+        lw      a1, 0x0004(at)              // a1 - ulx, unadjusted
         lw      a2, 0x0008(at)              // a2 - uly
-        move    a3, at                      // a3 - address of info()
+        lw      a3, 0x0014(at)              // a3 = width
+        sll     a3, a3, 0x0003              // a3 = urx_difference
+        addu    a3, a3, a1                  // a3 - urx
+        addiu   a1, a1, 0x0008              // a1 - ulx, adjusted
         jal     draw_entry_                 // draw first entry
         nop
 
@@ -242,10 +236,12 @@ scope Menu {
         addiu   t0, t0, ROW_HEIGHT          // increment height
         lw      at, 0x0010(sp)              // at = address of Menu.info()
         move    a0, s0                      // a0 - entry
-        lw      a1, 0x0004(at)              // ~
-        addiu   a1, a1, 0x0008              // a1 - ulx
+        lw      a1, 0x0004(at)              // a1 - ulx, unadjusted
         move    a2, t0                      // a2 - ulx
-        move    a3, at                      // a3 - address of info()
+        lw      a3, 0x0014(at)              // a3 = width
+        sll     a3, a3, 0x0003              // a3 = urx_difference
+        addu    a3, a3, a1                  // a3 - urx
+        addiu   a1, a1, 0x0008              // a1 - ulx, adjusted
         jal     draw_entry_
         nop
         b       _loop

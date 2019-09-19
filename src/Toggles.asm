@@ -327,7 +327,8 @@ if {defined __CE__} {
     entry_hold_to_pause:;               Menu.entry_bool("HOLD TO PAUSE", OS.TRUE, entry_improved_combo_meter)
     entry_improved_combo_meter:;        Menu.entry_bool("IMPROVED COMBO METER", OS.TRUE, entry_tech_chase_combo_meter)
     entry_tech_chase_combo_meter:;      Menu.entry_bool("TECH CHASE COMBO METER", OS.FALSE, entry_vs_mode_combo_meter)
-    entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", OS.TRUE, entry_improved_ai)
+    entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", OS.TRUE, entry_1v1_combo_meter_swap)
+    entry_1v1_combo_meter_swap:;        Menu.entry_bool("1V1 COMBO METER SWAP", OS.FALSE, entry_improved_ai)
     entry_improved_ai:;                 Menu.entry_bool("IMPROVED AI", OS.TRUE, entry_neutral_spawns)
     entry_neutral_spawns:;              Menu.entry_bool("NEUTRAL SPAWNS", OS.TRUE, entry_skip_results_screen)
     entry_skip_results_screen:;         Menu.entry_bool("SKIP RESULTS SCREEN", OS.FALSE, entry_stereo_sound)
@@ -393,7 +394,7 @@ if {defined __CE__} {
 
     // @ Description
     // SRAM blocks for toggle saving.
-    block_misc:; SRAM.block(14 * 4)
+    block_misc:; SRAM.block(15 * 4)
     block_music:; SRAM.block(16 * 4)
     block_stages:; SRAM.block(16 * 4)
 }

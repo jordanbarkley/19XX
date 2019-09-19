@@ -74,14 +74,14 @@ if {defined __CE__} {
         // training mode
         _training:
         lli     t1, 0x0036
-        bne     t0, t1, _vs                // if (screen_id != training), skip
+        bne     t0, t1, _vs                 // if (screen_id != training), skip
         nop
         jal     Training.run_
         nop        
 
         _vs:
         lli     t1, 0x0016
-        bne     t0, t1, _sss               // if (screen_id != vs mode), skip
+        bne     t0, t1, _sss                // if (screen_id != vs mode), skip
         nop
         jal     VsCombo.run_
         nop
@@ -93,6 +93,11 @@ if {defined __CE__} {
         nop
         jal     Stages.run_                 //
         nop
+if {defined __CE__} {
+        // Need this so that the combo meter correctly differentiates singles
+        li      t1, VsCombo.player_count    // t1 = address of number of players
+        sw      r0, 0x0000(t1)              // Set player_count to 0
+} // __CE__
 
         _finish:
         jal     end_                        // end display list
