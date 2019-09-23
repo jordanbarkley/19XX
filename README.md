@@ -80,6 +80,13 @@ Available/Options Toggle | Available
 Available                | Available
 - Stock matches have a timer. Enabled by default but can be toggled off by setting TIME to "infinity."
 
+### Match Stats
+19XXCE                   | 19XXTE
+-------------------------|-------------------------
+Available                | Unavailable
+- Results screen has the option to show stats about the match such as damage given to each player.
+- If the Vs Mode Combo Meter toggle is on, combo stats are also displayed.
+
 ## Customization
 ### Costume Selection Improvements
 19XXCE                   | 19XXTE
