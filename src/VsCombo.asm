@@ -37,7 +37,7 @@ scope VsCombo {
     constant DEFAULT_FRAME_BUFFER(30)
 
     // @ Description
-    // Player count (stops counting at 3)
+    // Player count
     player_count:
     dw 0x00
 
@@ -75,8 +75,12 @@ scope VsCombo {
 	        dw      0x00                        // 0x0014 = combo color index (current)
 	        dw      0x00                        // 0x0018 = x_coord
 	        dw      0x00                        // 0x001C = frame_buffer
-	        dw      0x00                        // 0x0020 = combo starting damage
-	        dw      0x00                        // 0x0024 = player struct address
+	        dw      0x00                        // 0x0020 = player struct address
+	        dw      0x00                        // 0x0024 = highest_combo_vs_p1
+	        dw      0x00                        // 0x0028 = highest_combo_vs_p2
+	        dw      0x00                        // 0x002C = highest_combo_vs_p3
+	        dw      0x00                        // 0x0030 = highest_combo_vs_p4
+	        dw      0x00                        // 0x0034 = current_attribution_start_hit_count
 	    }
 	}
 
@@ -155,6 +159,32 @@ scope VsCombo {
         sw      r0, 0x001C(a2)                // set frame buffer to 0 for p3
         sw      r0, 0x001C(a3)                // set frame buffer to 0 for p4
 
+        // Reset combo stats
+        sw      r0, 0x0004(a0)                // set max_combo_hits to 0 for p1
+        sw      r0, 0x0004(a1)                // set max_combo_hits to 0 for p2
+        sw      r0, 0x0004(a2)                // set max_combo_hits to 0 for p3
+        sw      r0, 0x0004(a3)                // set max_combo_hits to 0 for p4
+        sw      r0, 0x0008(a0)                // set max_combo_damage to 0 for p1
+        sw      r0, 0x0008(a1)                // set max_combo_damage to 0 for p2
+        sw      r0, 0x0008(a2)                // set max_combo_damage to 0 for p3
+        sw      r0, 0x0008(a3)                // set max_combo_damage to 0 for p4
+        sw      r0, 0x0024(a0)                // set highest_combo_vs_p1 to 0 for p1
+        sw      r0, 0x0024(a1)                // set highest_combo_vs_p1 to 0 for p2
+        sw      r0, 0x0024(a2)                // set highest_combo_vs_p1 to 0 for p3
+        sw      r0, 0x0024(a3)                // set highest_combo_vs_p1 to 0 for p4
+        sw      r0, 0x0028(a0)                // set highest_combo_vs_p2 to 0 for p1
+        sw      r0, 0x0028(a1)                // set highest_combo_vs_p2 to 0 for p2
+        sw      r0, 0x0028(a2)                // set highest_combo_vs_p2 to 0 for p3
+        sw      r0, 0x0028(a3)                // set highest_combo_vs_p2 to 0 for p4
+        sw      r0, 0x002C(a0)                // set highest_combo_vs_p3 to 0 for p1
+        sw      r0, 0x002C(a1)                // set highest_combo_vs_p3 to 0 for p2
+        sw      r0, 0x002C(a2)                // set highest_combo_vs_p3 to 0 for p3
+        sw      r0, 0x002C(a3)                // set highest_combo_vs_p3 to 0 for p4
+        sw      r0, 0x0030(a0)                // set highest_combo_vs_p4 to 0 for p1
+        sw      r0, 0x0030(a1)                // set highest_combo_vs_p4 to 0 for p2
+        sw      r0, 0x0030(a2)                // set highest_combo_vs_p4 to 0 for p3
+        sw      r0, 0x0030(a3)                // set highest_combo_vs_p4 to 0 for p4
+
         // Set color maps
         li      t0, Global.vs.teams           // t0 = pointer to teams byte
         lbu     t0, 0x0000(t0)                // t0 = teams
@@ -202,12 +232,13 @@ scope VsCombo {
 	}
 
     // @ Description
-    // This macro draws the given hit count at the specified X coordinate
+    // This draws the given hit count at the specified X coordinate
     scope draw_hit_count_: {
         // a0 = combo struct
         // a1 = player struct
+        // a2 = port
 
-        addiu   sp, sp,-0x0024                    // allocate stack space
+        addiu   sp, sp,-0x0028                    // allocate stack space
         sw      t0, 0x0004(sp)                    // ~
         sw      t1, 0x0008(sp)                    // ~
         sw      t2, 0x000C(sp)                    // ~
@@ -215,7 +246,8 @@ scope VsCombo {
         sw      t4, 0x0014(sp)                    // ~
         sw      t5, 0x0018(sp)                    // ~
         sw      t6, 0x001C(sp)                    // ~
-        sw      ra, 0x0020(sp)                    // save registers
+        sw      t7, 0x0020(sp)                    // ~
+        sw      ra, 0x0024(sp)                    // save registers
 
 		move    t5, a0                            // t5 = player combo struct
 		lw      t0, 0x0000(t5)                    // t0 = combo meter address
@@ -223,6 +255,7 @@ scope VsCombo {
 		addiu   t0, -0x0004                       // t0 = combo damage address
 		lw      t6, 0x0000(t0)                    // t6 = combo damage
 		lw      t4, 0x0018(t5)                    // t4 = player_x_coord
+		lw      t7, 0x0014(t5)                    // t7 = previous color index
 
         // Check if currently in a combo (hit count > 1)
         lli     t0, 0x0001                        // t0 = 1
@@ -235,11 +268,12 @@ scope VsCombo {
         nop                                       // ~
         lw      t1, 0x080C(a1)                    // t1 = port attributed with hit, or 4 if unattributed
         lli     t2, -0x0001                       // t2 = -1
-        beq     t2, t3, _sync_color_first_hit     // if (current hit attribution = -1) then use 4 (silver)
+        bne     t2, t1, _sync_color_first_hit     // if (current hit attribution = -1) then use 4 (silver)
         nop                                       // ~
         lli     t1, 0x0004                        // t1 = 4 (silver)
         _sync_color_first_hit:
         sw      t1, 0x0014(t5)                    // store current color index
+        sw      a0, 0x0034(t5)                    // store 1 as starting hit
 
         // Check if frame buffer is active (frame buffer > 0)
         _check_frame_buffer:
@@ -299,12 +333,35 @@ scope VsCombo {
         nop
         sw      t3, 0x0014(t5)                    // store color index as current color index
         sw      t3, 0x0010(t5)                    // store color index as color index for display
-        b       _draw                             // skip to draw
+        beq     t3, t7, _highest_combo_check      // if (previoius color index != current color index) then set attribution start
+        nop
+        sw      a0, 0x0034(t5)                    // store hit count as starting hit
+        b       _highest_combo_check              // skip to _highest_combo_check
         nop
 
         _use_previous_color:
         lw      t3, 0x0014(t5)                    // t3 = previously stored color index
         sw      t3, 0x0010(t5)                    // store color index as color index for display
+
+        _highest_combo_check:
+        lw      t0, 0x0034(t5)                    // t0 = starting hit
+        subu    t1, a0, t0                        // t1 = current hit count - starting hit
+        addiu   t1, t1, 0x0001                    // t1 = current combo hit count attributed to this player
+        li      t0, 0x0038                        // t0 = size of combo struct
+        multu   t0, t3                            // t3 * t0 is the offset from combo_struct_p1 for the attacking player
+        mflo    t0                                // t0 = t3 * t0
+        li      t2, combo_struct_p1               // t2 = address of port 1 combo struct
+        addu    t2, t2, t0                        // t2 = address of attacking player's combo struct (combo_struct_pX)
+        li      t0, 0x0004                        // t0 = size of word
+        multu   t0, a2                            // a2 * t0 is the offset from highest_combo_vs_p1 for the defending player
+        mflo    t0                                // t0 = a2 * t0
+        addiu   t2, t2, 0x0020                    // t2 = word before highest_combo_vs_p1 for attacking player
+        addu    t2, t2, t0                        // t2 = address of highest_combo_vs_pX for attacking player where X is the defending port
+        lw      t0, 0x0000(t2)                    // t0 = highest_combo_vs_pX
+        sltu    t0, t0, t1                        // if (current combo hit count > highest stored) then update
+        beqz    t0, _draw                         // else skip to draw
+        nop                                       // ~
+        sw      t1, 0x0000(t2)                    // store highest_combo_vs_pX
         b       _draw                             // skip to draw
         nop
 
@@ -344,8 +401,9 @@ scope VsCombo {
         lw      t4, 0x0014(sp)                    // ~
         lw      t5, 0x0018(sp)                    // ~
         sw      t6, 0x001C(sp)                    // ~
-        lw      ra, 0x0020(sp)                    // save registers
-        addiu   sp, sp, 0x0024                    // deallocate stack space
+        sw      t7, 0x0020(sp)                    // ~
+        lw      ra, 0x0024(sp)                    // save registers
+        addiu   sp, sp, 0x0028                    // deallocate stack space
         jr      ra                                // return
         nop
     }
@@ -354,7 +412,8 @@ scope VsCombo {
     // This macro draws the given port's combo meter
     macro draw_hit_count(port) {
     	li      a0, combo_struct_p{port}    // a0 = combo_struct_pX address
-    	lw      a1, 0x0024(a0)              // a1 = player struct address
+    	lw      a1, 0x0020(a0)              // a1 = player struct address
+    	lli     a2, {port}                  // a2 = port
     	jal     VsCombo.draw_hit_count_     // draw combo meter
         nop
     }
@@ -378,7 +437,7 @@ scope VsCombo {
         nop
         addu    t1, t1, t4                       // player_count++
         li      t4, combo_struct_p{port}         // t4 = combo struct address for right/left port
-        sw      v0, 0x0024(t4)                   // store address of player struct
+        sw      v0, 0x0020(t4)                   // store address of player struct
         sw      t1, 0x0000(t0)                   // store player count
         sltiu   t5, t1, 0x0003                   // if (>=3 players) then not singles so don't set up swap tables
         beqz    t5, {next}                       // ~

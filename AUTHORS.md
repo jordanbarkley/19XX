@@ -5,6 +5,8 @@ Lead Developer
 Gameplay Developer
 ## tehz
 Lead Documentation Wizard
+## MarioReincarnate
+Developer
 ## bit
 AI Developer 
 ## CEnnis

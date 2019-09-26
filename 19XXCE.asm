@@ -53,6 +53,7 @@ include "src/Timeouts.asm"
 include "src/Toggles.asm"
 include "src/Training.asm"
 include "src/VsCombo.asm"
+include "src/VsStats.asm"
 variable end(pc())
 variable size(end - start)
 
