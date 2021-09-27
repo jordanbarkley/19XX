@@ -13,7 +13,7 @@ include "SRAM.asm"
 scope Toggles {
 
     // @ Description
-    // Allows function 
+    // Allows function
     macro guard(entry_address, exit_address) {
         addiu   sp, sp,-0x0008              // allocate stack space
         sw      at, 0x0004(sp)              // save at
@@ -126,7 +126,7 @@ if {defined __CE__} {
         lli     a1, 000069                  // a1 - whatever you like!
         lli     a2, Joypad.PRESSED          // a2 - type
         jal     Joypad.check_buttons_all_   // check if B pressed
-        nop 
+        nop
         beqz    v0, _end                    // nop
         nop
         li      t0, info                    // t0 = address of info
@@ -162,7 +162,7 @@ if {defined __CE__} {
         nop
     }
 } // __CE__
-    
+
     // @ Description
     // Save toggles to SRAM
     scope save_: {
@@ -196,7 +196,7 @@ if {defined __CE__} {
         li      a0, block_stages            // ~
         jal     SRAM.save_                  // save data
         nop
-    
+
         jal     SRAM.mark_saved_            // mark save file present
         nop
 
@@ -231,7 +231,7 @@ if {defined __CE__} {
         li      a0, block_music             // a0 - address of block (music)
         jal     SRAM.load_                  // load data
         nop
-        li      a0, head_music_settings     // a0 - address of head 
+        li      a0, head_music_settings     // a0 - address of head
         li      a1, block_music             // a1 - address of block
         jal     Menu.import_
         nop
@@ -269,7 +269,7 @@ if {defined __CE__} {
         addiu   sp, sp, 0x0010              // deallocate stack space
         jr      ra                          // return
         nop
-    } 
+    }
 
     info:
     Menu.info(head_super_menu, 30, 35, 0, 32)
@@ -304,7 +304,7 @@ if {defined __CE__} {
         lw      t1, 0x000C(sp)              // ~
         lw      a0, 0x0010(sp)              // restore registers
         addiu   sp, sp, 0x0018              // deallocate stack sapce
-        jr      ra                          // return 
+        jr      ra                          // return
         nop
     }
 
@@ -317,7 +317,7 @@ if {defined __CE__} {
     Menu.entry_title("RANDOM STAGE SETTINGS", set_info_4_, pc() + 28)
     Menu.entry_title("SCREEN ADJUST", load_screen_adjust_, OS.NULL)
 
-    // @ Description 
+    // @ Description
     // Miscellaneous Toggles
     head_19xx_settings:
     entry_practice_overlay:;            Menu.entry_bool("COLOR OVERLAYS", OS.FALSE, entry_disable_cinematic_camera)
@@ -326,8 +326,15 @@ if {defined __CE__} {
     entry_hitbox_mode:;                 Menu.entry_bool("HITBOX DISPLAY", OS.FALSE, entry_hold_to_pause)
     entry_hold_to_pause:;               Menu.entry_bool("HOLD TO PAUSE", OS.TRUE, entry_improved_combo_meter)
     entry_improved_combo_meter:;        Menu.entry_bool("IMPROVED COMBO METER", OS.TRUE, entry_tech_chase_combo_meter)
-    entry_tech_chase_combo_meter:;      Menu.entry_bool("TECH CHASE COMBO METER", OS.FALSE, entry_vs_mode_combo_meter)
-    entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", OS.TRUE, entry_1v1_combo_meter_swap)
+
+    if {defined __NE__} {
+        entry_tech_chase_combo_meter:;      Menu.entry_bool("TECH CHASE COMBO METER", OS.TRUE, entry_vs_mode_combo_meter)
+        entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", OS.FALSE, entry_1v1_combo_meter_swap)
+    } else {
+        entry_tech_chase_combo_meter:;      Menu.entry_bool("TECH CHASE COMBO METER", OS.FALSE, entry_vs_mode_combo_meter)
+        entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", OS.TRUE, entry_1v1_combo_meter_swap)
+    }
+
     entry_1v1_combo_meter_swap:;        Menu.entry_bool("1V1 COMBO METER SWAP", OS.FALSE, entry_improved_ai)
     entry_improved_ai:;                 Menu.entry_bool("IMPROVED AI", OS.TRUE, entry_neutral_spawns)
     entry_neutral_spawns:;              Menu.entry_bool("NEUTRAL SPAWNS", OS.TRUE, entry_skip_results_screen)
@@ -389,7 +396,7 @@ if {defined __CE__} {
     entry_random_stage_saffron_city:;           Menu.entry_bool("SAFFRON CITY", OS.TRUE, pc() + 20)
     entry_random_stage_sector_z:;               Menu.entry_bool("SECTOR Z", OS.TRUE, pc() + 16)
     entry_random_stage_yoshis_island:;          Menu.entry_bool("YOSHI'S ISLAND", OS.TRUE, pc() + 20)
-    entry_random_stage_mini_yoshis_island:;     Menu.entry_bool("YOSHI'S ISLAND MINI", OS.TRUE, OS.NULL) 
+    entry_random_stage_mini_yoshis_island:;     Menu.entry_bool("YOSHI'S ISLAND MINI", OS.TRUE, OS.NULL)
 } // __CE__
 
     // @ Description

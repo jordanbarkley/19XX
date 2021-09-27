@@ -266,17 +266,20 @@ scope VsCombo {
         // Sync colors
         beqz    a0, _check_frame_buffer           // if (hit count = 1), then set combo color index via port
         nop                                       // ~
+        lw      t1, 0x0034(t5)                    // t1 = starting hit
+        beq     t1, a0, _check_frame_buffer       // if we've already set the starting hit to 1, skip synching color
+        nop
         lw      t1, 0x080C(a1)                    // t1 = port attributed with hit, or 4 if unattributed
-        lli     t2, -0x0001                       // t2 = -1
+        addiu   t2, r0, 0xFFFF                    // t2 = -1
         bne     t2, t1, _sync_color_first_hit     // if (current hit attribution = -1) then use 4 (silver)
         nop                                       // ~
         lli     t1, 0x0004                        // t1 = 4 (silver)
         _sync_color_first_hit:
         sw      t1, 0x0014(t5)                    // store current color index
-        sw      a0, 0x0034(t5)                    // store 1 as starting hit
 
         // Check if frame buffer is active (frame buffer > 0)
         _check_frame_buffer:
+        sw      a0, 0x0034(t5)                    // store 1 as starting hit or reset to 0
         lw      t3, 0x001C(t5)                    // t3 = frame_buffer
         bnez    t3, _post_combo                   // if (frame buffer > 0) then frame_buffer-- and draw
         nop
@@ -325,7 +328,7 @@ scope VsCombo {
         _continue_in_combo2:
         sw      a0, 0x000C(t5)                    // store current combo count
         lw      t3, 0x080C(a1)                    // color index for player attributed to current hit based on port
-        lli     t2, -0x0001                       // t2 = -1
+        addiu   t2, r0, 0xFFFF                    // t2 = -1
         beq     t2, t3, _use_previous_color       // if (current hit attribution reset to -1) then use previous value
         nop                                       // ~
         sltiu   t2, t3, 0x0004                    // if (current hit unattributed to player) then don't store it - use previous value

@@ -41,7 +41,7 @@ scope Stages {
     }
 
     // @ Description
-    // type controls a branch that executes code for single player modes when 0x00 or skips that 
+    // type controls a branch that executes code for single player modes when 0x00 or skips that
     // entirely for 0x14. This branch can be found at 0x(TODO). (pulled from table @ 0xA7D20)
     scope type {
         constant PEACHS_CASTLE(0x14)
@@ -120,7 +120,7 @@ if {defined __TE__} {
 
     if {defined __G6__} {
     db id.MINI_YOSHIS_ISLAND                // 06
-    }    
+    }
 
     db id.DREAM_LAND                        // 07
     db id.SECTOR_Z                          // 08
@@ -128,7 +128,7 @@ if {defined __TE__} {
     db id.FINAL_DESTINATION                 // 0A
     db id.RANDOM                            // RR
     OS.align(4)
-    
+
     insert icon_peachs_castle, "../textures/icon_peachs_castle.rgba5551"
     insert icon_sector_z, "../textures/icon_sector_z.rgba5551"
     insert icon_congo_jungle, "../textures/icon_congo_jungle.rgba5551"
@@ -249,7 +249,7 @@ if {defined __CE__} {
     dw 159, 084                             // 0E
     dw 201, 084                             // 0F
     dw 243, 084                             // RR
-    
+
     // sorted by stage id
     icon_table:
     dw Data.icon_peachs_castle
@@ -292,7 +292,11 @@ if {defined __CE__} {
     // @ Description
     // Toggle for frozen mode.
     frozen_mode:
-    dw OS.FALSE
+    if {defined __NE__} {
+        dw OS.TRUE
+    } else {
+        dw OS.FALSE
+    }
 
     // @ Description
     // Prevents series logo from being drawn on wood circle
@@ -377,7 +381,7 @@ if {defined __CE__} {
 
 //      lli     at, 0x00DE                      // original line 1
 //      beq     s0, at, 0x80133464              // original line 2
-        
+
         addiu   sp, sp,-0x0010                  // allocate stack space
         sw      ra, 0x0004(sp)                  // ~
         sw      v0, 0x0008(sp)                  // save registers
@@ -490,7 +494,7 @@ if {defined __CE__} {
         addu    t0, v0, t0                      // t0 = address of file/preview
 
         addu    v1, t6, t7                      // original line 1
-//      lw      a0, 0x0000(v1)                  // original line 2 
+//      lw      a0, 0x0000(v1)                  // original line 2
         lw      a0, 0x0000(t0)                  // a0 - file preview id
 
         lw      ra, 0x0004(sp)                  // ~
@@ -709,8 +713,13 @@ if {defined __CE__} {
         nop
 
         if !{defined __G6__} {
-        string_title:
-        String.insert("19XX 1.2")
+            if {defined __NE__} {
+                string_title:
+                String.insert("19XX 1.5")
+            } else {
+                string_title:
+                String.insert("19XX 1.2")
+            }
         }
 
         if {defined __G6__} {
@@ -923,7 +932,7 @@ if {defined __CE__} {
 
         lui     a1, 0x8013                  // original line 1 (update_right_)
         addiu   a1, a1, 0x4BD8              // original line 2 (update_right_)
-        
+
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // ~
@@ -964,7 +973,7 @@ if {defined __CE__} {
 
         lui     v1, 0x8013                  // original line 1
         lw      v1, 0x4BD8(v1)              // original line 2
-        
+
         lui     a1, 0x8013                  // original line 1 (update_right_)
         addiu   a1, a1, 0x4BD8              // original line 2 (update_right_)
 
@@ -1012,13 +1021,13 @@ if {defined __CE__} {
         sw      t0, 0x0004(sp)              // ~
         sw      t1, 0x0008(sp)              // save registers
 
-        // this block checks to see if a stage should be added to the table. 
+        // this block checks to see if a stage should be added to the table.
         _check_add:
         lli     v0, OS.FALSE                // v0 = false
         beqz    a0, _continue               // if entry is NULL, add stage
         lli     t0, OS.TRUE                 // set curr_value to true
         lw      t0, 0x0004(a0)              // t0 = curr_value
-        
+
         _continue:
         li      v1, random_count            // ~
         lw      v1, 0x0000(v1)              // v1 = random_count
@@ -1095,7 +1104,7 @@ if {defined __TE__} {
         add_to_list(OS.NULL, id.BATTLEFIELD)
         add_to_list(OS.NULL, id.FINAL_DESTINATION)
 } // __TE__
-        
+
 if {defined __CE__} {
         add_to_list(Toggles.entry_random_stage_peachs_castle, id.PEACHS_CASTLE)
         add_to_list(Toggles.entry_random_stage_sector_z, id.SECTOR_Z)

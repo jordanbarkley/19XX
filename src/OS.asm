@@ -98,6 +98,14 @@ scope OS {
         pullvar base, origin
     }
 
+    macro print_hex(variable value) {
+        if value > 15 {
+            OS.print_hex(value >> 4)
+        }
+        value = value & 15
+        putchar(value < 10 ? '0' + value : 'a' + value - 10)
+    }
+
     macro save_registers() {
         addiu   sp, sp,-0x0070              // allocate stack space
         sw      at, 0x0004(sp)              // ~
@@ -170,7 +178,7 @@ scope OS {
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         swc1    f0, 0x0008(sp)              // save registers
-        
+
         mtc1    a0, f0                      // move given float to f0
         cvt.w.s f0, f0                      // convert float to int
         mfc1    v0, f0                      // move int to v0
@@ -190,11 +198,11 @@ scope OS {
     // @ Returns
     // v0 - float val
     scope int_to_float_: {
-        
+
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
         swc1    f0, 0x0008(sp)              // save registers
-        
+
         mtc1    a0, f0                      // move given int to f0
         cvt.s.w f0, f0                      // convert int to float
         mfc1    v0, f0                      // move float to v0

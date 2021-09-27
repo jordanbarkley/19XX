@@ -26,10 +26,10 @@ scope AI {
     constant CHANCE_FORWARD(30)
     constant CHANCE_BACKWARD(30)
     constant CHANCE_IN_PLACE(30)
-    
+
     // @ Description
     // Chance to roll
-    constant CHANCE_Z_CANCEL(95) 
+    constant CHANCE_Z_CANCEL(95)
 
     // @ Description
     // Functions that execute different tech options
@@ -86,23 +86,26 @@ scope AI {
         li      t0, Global.match_info       // ~
         lw      t0, 0x0000(t0)              // t0 = address of match_info (0x800A4D08 in VS.)
         addiu   t0, t0, Global.vs.P_OFFSET  // t0 = address of first player sturct
-        
+
         _loop:
+        lbu     t2, 0x0002(t0)              // t2 = enum (man, cpu, none)
+        lli     t1, 0x0002                  // t1 = none
+        beql    t1, t2, _loop               // if (port is empty), go to next port
+        addiu   t0, t0, Global.vs.P_DIFF    // else, increment pointer and loop
         lw      t1, 0x0058(t0)              // t0 = px struct
         beq     t1, s0, _cpu_check          // if (px = p_teched), continue (compare player structs)
         nop
         addiu   t0, t0, Global.vs.P_DIFF    // else, increment pointer and loop
         b       _loop
         nop
-        
+
         _cpu_check:
-        lbu     t2, 0x0002(t0)              // t2 = enum (man, cpu, none)
         beqz    t2, _original               // if (t2 == man), skip
         nop
         lli     a0, 000100                  // ~
         jal     Global.get_random_int_      // v0 = (0-99)
         nop
-        
+
         _roll_forward:
         sltiu   t1, v0, CHANCE_FORWARD
         beqz    t1, _roll_backward          // if out of range, skip
@@ -134,14 +137,14 @@ scope AI {
         nop
         b       _end                        // end
         nop
-        
+
         _fail:
         move    a0, s0                      // a0 - player struct
         jal     tech_fail_                  // don't tech
         nop
         b       _end
         nop
-        
+
         _original:
         jal     tech_roll_og_               // original line 1
         move    a0, s0                      // original line 2
@@ -154,7 +157,7 @@ scope AI {
         jal     tech_fail_                  // original line 9
         move    a0, s0                      // original line 10
         nop                                 // original line 11
-        
+
         _end:
         lw      ra, 0x0014(sp)              // restore ra
         addiu   sp, sp, 0x0018              // deallocate stack space
@@ -189,15 +192,19 @@ scope AI {
         li      t0, Global.match_info       // ~
         lw      t0, 0x0000(t0)              // t0 = address of match_info (0x800A4D08 in VS.)
         addiu   t0, t0, Global.vs.P_OFFSET  // t0 = address of first player sturct
-        
+
         _loop:
+        lbu     t2, 0x0002(t0)              // t2 = enum (man, cpu, none)
+        lli     t1, 0x0002                  // t1 = none
+        beql    t1, t2, _loop               // if (port is empty), go to next port
+        addiu   t0, t0, Global.vs.P_DIFF    // else, increment pointer and loop
         lw      t1, 0x0058(t0)              // t0 = px struct
         beq     t1, a0, _cpu_check          // if (px = p_teched), continue (compare player structs)
         nop
         addiu   t0, t0, Global.vs.P_DIFF    // else, increment pointer and loop
         b       _loop
         nop
-        
+
         _cpu_check:
         lbu     t2, 0x0002(t0)              // t2 = enum (man, cpu, none)
         beqz    t2, _end                    // if (t2 == man), skip
@@ -213,7 +220,7 @@ scope AI {
         lli     at, OS.TRUE                 // set true
         b       _end                        // end
         nop
-    
+
         _no_cancel:
         lli     at, OS.FALSE                // set false
         b       _end                        // end
@@ -225,7 +232,7 @@ scope AI {
         lw      v1, 0x0014(sp)              // ~
         lw      a0, 0x0018(sp)              // save registers
         addiu   sp, sp, 0x0020              // deallocate stack space
-        jr      ra                          // return 
+        jr      ra                          // return
         nop
     }
 
