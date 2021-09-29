@@ -9,8 +9,8 @@ insert  "roms/original.z64"
 
 // change ROM name
 origin  0x00000020
-db  "19XXCE 1.3"
-db  0x00
+db  "19XXCE 1.6"
+fill 0x34 - origin(), 0x20
 
 // static
 origin  0x01000000

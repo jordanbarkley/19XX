@@ -277,10 +277,10 @@ if {defined __CE__} {
         lw      a0, 0x0014(sp)              // ~
         lw      v0, 0x0018(sp)              // ~
         lw      ra, 0x001C(sp)              // restore registers
+        addiu   sp, sp, 0x0020              // deallocate stack space
         lui     t6, 0x8013                  // original line 1
-        lw      t6, 0x1368(t6)              // original line 2
         j       _load_spawn_return          // use in game method for everything but VS. and training
-        nop
+        lw      t6, 0x1368(t6)              // original line 2
 
         team_table:
         db 0x00                             // p1 team

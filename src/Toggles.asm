@@ -48,15 +48,6 @@ if {defined __CE__} {
         OS.patch_end()
 } // __CE__
 
-    // @ Description
-    // This patch disables back (press B) on Main Menu
-    OS.patch_start(0x0011D768, 0x801327D8)
-    nop
-    nop
-    nop
-    nop
-    OS.patch_end()
-
 if {defined __CE__} {
     scope run_: {
         addiu   sp, sp,-0x0020              // allocate stack space
@@ -72,10 +63,10 @@ if {defined __CE__} {
         lli     a0, Color.low.MENU_BG       // a0 - menu background color
         jal     Overlay.set_color_          // set fill color
         nop
-        lli     a0, 000000                  // a0 - ulx
-        lli     a1, 000000                  // a1 - uly
-        lli     a2, 000320                  // a2 - width
-        lli     a3, 000240                  // a3 - height
+        lli     a0, 000010                  // a0 - ulx
+        lli     a1, 000010                  // a1 - uly
+        lli     a2, 000300                  // a2 - width
+        lli     a3, 000220                  // a3 - height
         jal     Overlay.draw_rectangle_     // draw background rectangle
         // draw white outline
         nop
@@ -326,8 +317,8 @@ if {defined __CE__} {
     entry_hitbox_mode:;                 Menu.entry_bool("HITBOX DISPLAY", OS.FALSE, entry_hold_to_pause)
     entry_hold_to_pause:;               Menu.entry_bool("HOLD TO PAUSE", OS.TRUE, entry_improved_combo_meter)
     entry_improved_combo_meter:;        Menu.entry_bool("IMPROVED COMBO METER", OS.TRUE, entry_tech_chase_combo_meter)
-    entry_tech_chase_combo_meter:;      Menu.entry_bool("TECH CHASE COMBO METER", OS.FALSE, entry_vs_mode_combo_meter)
-    entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", OS.TRUE, entry_1v1_combo_meter_swap)
+    entry_tech_chase_combo_meter:;      Menu.entry_bool("TECH CHASE COMBO METER", OS.TRUE, entry_vs_mode_combo_meter)
+    entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", !{defined __NE__}, entry_1v1_combo_meter_swap)
     entry_1v1_combo_meter_swap:;        Menu.entry_bool("1V1 COMBO METER SWAP", OS.FALSE, entry_improved_ai)
     entry_improved_ai:;                 Menu.entry_bool("IMPROVED AI", OS.TRUE, entry_neutral_spawns)
     entry_neutral_spawns:;              Menu.entry_bool("NEUTRAL SPAWNS", OS.TRUE, entry_skip_results_screen)

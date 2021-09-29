@@ -326,10 +326,10 @@ scope VsStats {
         lli     a0, Color.low.MENU_BG
         jal     Overlay.set_color_                       // set fill color
         nop
-        lli     a0, 000000                               // a0 - ulx
-        lli     a1, 000000                               // a1 - uly
-        li      a2, 000320                               // a2 - width
-        lli     a3, 000240                               // a3 - height
+        lli     a0, 000010                               // a0 - ulx
+        lli     a1, 000010                               // a1 - uly
+        li      a2, 000300                               // a2 - width
+        lli     a3, 000220                               // a3 - height
         jal     Overlay.draw_rectangle_                  // draw background rectangle
         nop
 

@@ -292,7 +292,11 @@ if {defined __CE__} {
     // @ Description
     // Toggle for frozen mode.
     frozen_mode:
-    dw OS.FALSE
+    if {defined __NE__} {
+        dw OS.TRUE
+    } else {
+        dw OS.FALSE
+    }
 
     // @ Description
     // Prevents series logo from being drawn on wood circle
@@ -632,31 +636,39 @@ if {defined __CE__} {
         sw      t0, 0x0004(sp)              // ~
         sw      ra, 0x0008(sp)              // save registesr
 
-        // this block gets the position
-        jal     get_index_                  // v0 = index
-        nop
-        sll     v0, v0, 0x0003              // v0 = index *= sizeof(position_table entry) = offset
-        li      t0, position_table          // ~
-        addu    t0, t0, v0                  // t0 = position_table + offset
-
         // this block selects color based of rectangle (based on frozen mode)
         li      at, frozen_mode             // ~
         lw      at, 0x0000(at)              // t0 = frozen mode
-        beqz    at, _skip
+        beqzl   at, _skip                   // if frozen, skip legend display
         lli     a0, Color.low.RED           // a0 - fill color
+
+        // clearly state hazards are off
+        lli     a0, 187                     // a0 - ulx
+        lli     a1, 163                     // a1 - uly
+        li      a2, string_frozen           // a2 - address of string
+        jal     Overlay.draw_string_        // draw string
+        nop
+
         lli     a0, Color.low.BLUE          // a0 - fill color
 
         _skip:
         // this block draws the cursor (with a border of 2)
         jal     Overlay.set_color_          // fill color = RED
         nop
+
+        // this block gets the position
+        jal     get_index_                  // v0 = index
+        nop
+        sll     v0, v0, 0x0003              // v0 = index *= sizeof(position_table entry) = offset
+        li      t0, position_table          // ~
+        addu    t0, t0, v0                  // t0 = position_table + offset
         lw      a0, 0x0000(t0)              // a0 - ulx
         addiu   a0, a0,-0x0002              // decrement ulx
         lw      a1, 0x0004(t0)              // a1 - uly
         addiu   a1, a1,-0x0002              // decrement uly
         lli     a2, ICON_WIDTH + 4          // a2 - width
         lli     a3, ICON_HEIGHT + 4         // a3 - height
-        jal     Overlay.draw_rectangle_     // draw curso
+        jal     Overlay.draw_rectangle_     // draw cursor
         nop
 
         lw      t0, 0x0004(sp)              // ~
@@ -664,6 +676,9 @@ if {defined __CE__} {
         addiu   sp, sp, 0x0010              // deallocate stack sapce
         jr      ra                          // return
         nop
+
+        string_frozen:
+        String.insert("HAZARDS OFF")
     }
 
     scope draw_names_: {
@@ -675,7 +690,7 @@ if {defined __CE__} {
         sw      ra, 0x0014(sp)              // save registers
 
         // this block draws "19XX <version>"
-        lli     a0, 194                     // a0 - ulx
+        lli     a0, 198                     // a0 - ulx
         lli     a1, 130                     // a1 - uly
         li      a2, string_title            // a2 - address of string
         jal     Overlay.draw_string_        // draw string
@@ -710,7 +725,7 @@ if {defined __CE__} {
 
         if !{defined __G6__} {
         string_title:
-        String.insert("19XX 1.2")
+        String.insert("19XX 1.6")
         }
 
         if {defined __G6__} {

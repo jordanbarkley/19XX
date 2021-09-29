@@ -549,10 +549,10 @@ if {defined __CE__} {
 
 if {defined __TE__} {
     display_list:
-    fill 0x1000
+    fill 0x1500
 
     display_list_info:
-    RCP.display_list_info(display_list, 0x1000)
+    RCP.display_list_info(display_list, 0x1500)
 } // __TE__
 
 

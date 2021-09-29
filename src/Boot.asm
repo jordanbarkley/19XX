@@ -27,6 +27,16 @@ scope Boot {
     OS.patch_end()
 
     // @ Description
+    // This patch disables back (press B) on Main Menu
+    // I don't know why the title screen crashes, too bad!
+    OS.patch_start(0x0011D768, 0x801327D8)
+    nop
+    nop
+    nop
+    nop
+    OS.patch_end()
+
+    // @ Description
     // Originally, this instruction performed one DMA as part of the boot sequence. It now branches
     // to unsused space in the boot sequence and transfers 0x10000 bytes to 0x80380000 and
     // 0x400000 to 0x80400000
@@ -62,12 +72,13 @@ if {defined __CE__} {
         _continue:
         lw      t0, 0x0004(sp)          // restore t0
         addiu   sp, sp, 0x0008          // deallocate stack space
-} // __CE__
         
         lui     a0, 0x0140              // load rom address (0x01400000)
         lui     a1, 0x8040              // load ram address (0x80400000)
         jal     Global.dma_copy_        // add custom functions
         lui     a2, 0x0040              // load length of 0x400000
+} // __CE__
+
         j       0x80000638              // return
         nop
     }
