@@ -2,6 +2,8 @@ all:
 	# assemble rom
 	tools/_bass -o roms/19XXCE.z64 19XXCE.asm -sym CE.sym > CE.log
 	tools/_bass -o roms/19XXTE.z64 19XXTE.asm -sym TE.sym > TE.log
+	tools/_bass -o roms/19XXTE+.z64 19XXTE+.asm -sym TE+.sym > TE+.log
+	tools/_bass -o roms/19XXTE-.z64 19XXTE-.asm -sym TE-.sym > TE-.log
 	tools/_bass -o roms/19XXG6.z64 19XXG6.asm -sym G6.sym > G6.log
 	tools/_bass -o roms/19XXNE.z64 19XXNE.asm -sym NE.sym > NE.log
 
@@ -9,6 +11,8 @@ all:
 	# update checksum
 	tools/n64crc roms/19XXCE.z64 > /dev/null
 	tools/n64crc roms/19XXTE.z64 > /dev/null
+	tools/n64crc roms/19XXTE+.z64 > /dev/null
+	tools/n64crc roms/19XXTE-.z64 > /dev/null
 	tools/n64crc roms/19XXG6.z64 > /dev/null
 	tools/n64crc roms/19XXNE.z64 > /dev/null
 
@@ -53,5 +57,7 @@ release:
 	# create patch files
 	xdelta3 -S none -e -f -s roms/original.z64 roms/19XXCE.z64 19XXCE.xdelta
 	xdelta3 -S none -e -f -s roms/original.z64 roms/19XXTE.z64 19XXTE.xdelta
+	xdelta3 -S none -e -f -s roms/original.z64 roms/19XXTE+.z64 19XXTE+.xdelta
+	xdelta3 -S none -e -f -s roms/original.z64 roms/19XXTE-.z64 19XXTE-.xdelta
 	xdelta3 -S none -e -f -s roms/original.z64 roms/19XXG6.z64 19XXG6.xdelta
 	xdelta3 -S none -e -f -s roms/original.z64 roms/19XXNE.z64 19XXNE.xdelta

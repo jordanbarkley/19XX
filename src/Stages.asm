@@ -292,7 +292,7 @@ if {defined __CE__} {
     // @ Description
     // Toggle for frozen mode.
     frozen_mode:
-    if {defined __NE__} {
+    if ({defined __NE__} || {defined __TE-__}) {
         dw OS.TRUE
     } else {
         dw OS.FALSE
@@ -795,20 +795,26 @@ if {defined __CE__} {
         sw      t0, 0x0018(sp)              // ~
         sw      t1, 0x001C(sp)              // save registers
 
-        // check for z/r press to toggle frozen mode
-        li      a0, Joypad.Z                // a0 - button mask
-        li      a2, Joypad.PRESSED          // a2 - type
-        jal     Joypad.check_buttons_all_   // v0 = l/r pressed
-        nop
-        beqz    v0, _draw                   // if not pressed, skip
-        nop
-        li      t0, frozen_mode             // t0 = address of frozen mode
-        lw      t1, 0x0000(t0)              // t1 = frozen_mode
-        xori    t1, t1, 0x0001              // 0 -> 1 or 1 -> 0
-        sw      t1, 0x0000(t0)
-        lli     a0, FGM.menu.TOGGLE         // a0 - fgm_id
-        jal     FGM.play_                   // play menu sound
-        nop
+        if !{defined __TE+__} && !{defined __TE-__} {
+            // check for z press to toggle frozen mode (z + d-pad down in TE)
+            if {defined __CE__} {
+                lli     a0, Joypad.Z            // a0 - button mask
+            } else {
+                lli     a0, Joypad.Z | Joypad.DD // a0 - button mask
+            }
+            lli     a2, Joypad.PRESSED          // a2 - type
+            jal     Joypad.check_buttons_all_   // v0 = z pressed
+            nop
+            beqz    v0, _draw                   // if not pressed, skip
+            nop
+            li      t0, frozen_mode             // t0 = address of frozen mode
+            lw      t1, 0x0000(t0)              // t1 = frozen_mode
+            xori    t1, t1, 0x0001              // 0 -> 1 or 1 -> 0
+            sw      t1, 0x0000(t0)
+            lli     a0, FGM.menu.TOGGLE         // a0 - fgm_id
+            jal     FGM.play_                   // play menu sound
+            nop
+        }
 
         _draw:
         jal     draw_cursor_                // draw selection cursor
