@@ -11,7 +11,7 @@ See [BUILDING.md](https://github.com/jordanbarkley/19XX/blob/master/BUILDING.md)
 # Contributing
 See [CONTRIBUTING.md](https://github.com/jordanbarkley/19XX/blob/master/CONTRIBUTING.md)
 
-# Features (Note: 19XXCE requires the the 8 MB expansion pak to be enabled).
+# Features (Note: 19XXCE requires the 8 MB expansion pak to be enabled).
 ## Gameplay
 ### AI Improvements
 19XXCE                   | 19XXTE
