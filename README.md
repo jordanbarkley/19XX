@@ -47,8 +47,8 @@ Always Enabled           | Always Enabled
 ### Frozen Mode
 19XXCE                   | 19XXTE
 -------------------------|-------------------------
-Button Toggle            | Button Toggle
-- Pressing Z on the stage select screen will disable stage hazards. This is indicated by the selection cursor's color changing to blue.
+Button Toggle: Z         | Button Toggle: Z + D-pad Down
+- Pressing the button combo on the stage select screen will disable stage hazards. This is indicated by the selection cursor's color changing to blue and "HAZARDS OFF" appearing on the wooden circle.
 
 ### Hold to Pause
 19XXCE                   | 19XXTE
