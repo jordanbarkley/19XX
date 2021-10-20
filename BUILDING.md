@@ -9,7 +9,7 @@ For Linux and macOS, these are built-in (`clang` is fine for `gcc`). For Windows
 The easiest way to install `xdelta3` is to use your package manager.
 #### Linux (and Windows Subsystem for Linux)
 ```
-$   apt-get xdelta3
+$   apt-get install xdelta3
 ```
 
 #### macOS
