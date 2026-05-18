@@ -18,7 +18,12 @@ scope Shield {
     // This function overwrites the logic to generate a shield color. This is a controversial "fix"
     // and will soon be replaced by selectable shield colors.
     scope color_fix_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0007C898, 0x800FED08)
+        } else {
         OS.patch_start(0x0007C8E8, 0x801010E8)
+        }
         j       color_fix_
         nop
         _color_fix_return:

@@ -21,7 +21,12 @@ scope Combo {
     // @ Description
     // This function makes the combo meter take grabs and wall bounces into account.
     scope improve_meter_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0005D3DC, 0x800DF84C)
+        } else {
         OS.patch_start(0x0005D1CC, 0x800E19CC)
+        }
         j       improve_meter_
         nop
         _improve_meter_return:

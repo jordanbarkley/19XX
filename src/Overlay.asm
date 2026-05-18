@@ -65,7 +65,7 @@ scope Overlay {
 
 if {defined __CE__} {
         // OPTION screen
-        lli     t1, 0x0039                  // t1 = OPTION screen
+        lli     t1, Global.SCREEN_OPTION    // t1 = OPTION screen
         bne     t0, t1, _training           // if (screen_id != OPTION), skip
         nop
         jal     Toggles.run_
@@ -73,7 +73,7 @@ if {defined __CE__} {
 
         // training mode
         _training:
-        lli     t1, 0x0036
+        lli     t1, Global.SCREEN_TRAINING
         bne     t0, t1, _vs                 // if (screen_id != training), skip
         nop
         jal     Training.run_
@@ -130,7 +130,12 @@ if {defined __CE__} {
     }
     
     scope highjack_1_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00005F10, 0x80005310)
+        } else {
         OS.patch_start(0x00006150, 0x80005550)
+        }
         j        highjack_1_
         nop
         _highjack_1_return:
@@ -140,7 +145,12 @@ if {defined __CE__} {
     }
 
     scope highjack_2_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00006064, 0x80005464)
+        } else {
         OS.patch_start(0x000062A4, 0x800056A4)
+        }
         j       highjack_2_
         nop
         _highjack_2_return:

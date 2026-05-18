@@ -7,19 +7,44 @@ scope Crash {
     // @ Description
     // These patches disable button checks for the debugger by changing the contents of a0 from 
     // random button masks to none.
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x00023E28, 0x80023228)
+    } else {
     OS.patch_start(0x00024088, 0x80023488)
+    }
     lli     a0, 0x0000
     OS.patch_end()
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x00023E40, 0x80023240)
+    } else {
     OS.patch_start(0x000240A0, 0x800234A0)
+    }
     lli     a0, 0x0000
     OS.patch_end()
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x00023E58, 0x80023258)
+    } else {
     OS.patch_start(0x000240B8, 0x800234B8)
+    }
     lli     a0, 0x0000
     OS.patch_end()
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x00023E70, 0x80023270)
+    } else {
     OS.patch_start(0x000240D0, 0x800234D0)
+    }
     lli     a0, 0x0000
     OS.patch_end()
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x00023E88, 0x80023288)
+    } else {
     OS.patch_start(0x000240E8, 0x800234E8)
+    }
     lli     a0, 0x0000
     OS.patch_end()
 }

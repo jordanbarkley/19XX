@@ -24,7 +24,12 @@ scope Practice {
     // This function checks for various conditions and applies a colour overlay when they are met
     // [Fray]
     scope overlay_colour_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0005E01C, 0x800E048C)
+        } else {
         OS.patch_start(0x0005DE0C, 0x800E260C)
+        }
         j       overlay_colour_
         nop
         _overlay_colour_return:
@@ -190,14 +195,24 @@ scope Practice {
     scope flash_on_z_cancel_: {
         constant Z_CACNEL_WINDOW(10)
 
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x000CB3F8, 0x8014E628)
+        } else {
         OS.patch_start(0x000CB528, 0x80150AE8)
+        }
         jal     flash_on_z_cancel_
         nop
         OS.patch_end()
 
 //      jal     0x80142D9C                  // original line 1
 //      nop                                 // original line 2
+        // @region:SYM
+        if {defined REGION_JP} {
+        Toggles.guard(Toggles.entry_flash_on_z_cancel, 0x801408BC)
+        } else {
         Toggles.guard(Toggles.entry_flash_on_z_cancel, 0x80142D9C)
+        }
 
         addiu   sp, sp, -0x0018             // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -205,7 +220,12 @@ scope Practice {
         sw      v1, 0x000C(sp)              // ~
         sw      ra, 0x0014(sp)              // save registers
 
+        // @region:SYM
+        if {defined REGION_JP} {
+        jal     0x801408BC                  // original line 1
+        } else {
         jal     0x80142D9C                  // original line 1
+        }
         nop                                 // original line 2
         lw      v1, 0x000C(sp)              // restore v1
         lw      t0, 0x0160(v1)              // t0 = frame pressed

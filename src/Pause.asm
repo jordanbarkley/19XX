@@ -19,7 +19,12 @@ scope Pause {
     // This is a hook into the pause function. It increment input_table[player] until that value
     // reaches NUM_FRAMES. One NUM_FRAMES is reached, the function continues as normal.
     scope hold_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0008F82C, 0x80111C9C)
+        } else {
         OS.patch_start(0x0008F88C, 0x8011408C)
+        }
         j       Pause.hold_
         nop
         _hold_return:

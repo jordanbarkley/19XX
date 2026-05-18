@@ -15,7 +15,12 @@ scope FD {
     // Makes Final Destination playables in VS. mode by skipping a jal to code only available in 
     // in singleplayer
     scope fix_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00080434, 0x801028A4)
+        } else {
         OS.patch_start(0x00080484 , 0x80104C84)
+        }
 //      jal     0x80192764                  // original line 1
         j       fix_
         nop
@@ -45,7 +50,12 @@ scope FD {
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // restore registers
         addiu   sp, sp, 0x0010              // deallocate stack space
+        // @region:SYM
+        if {defined REGION_JP} {
+        jal     0x801900E4                  // original line 1
+        } else {
         jal     0x80192764                  // original line 1
+        }
         nop
         j       _fix_return
         nop
@@ -55,7 +65,15 @@ scope FD {
 
     // @ Description
     // Sets track to 0x18 (FD battle music)
+    // the relocData asset blob sits at a different ROM offset on JP; the FD
+    // track halfword (vanilla 0xC31E) is at 0x486FA2 there, verified by a
+    // unique 64-byte signature.  The old 0x640F52 clobbered unrelated data.
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x00486FA2, 0x00000000)
+    } else {
     OS.patch_start(0x640CD2, 0x00000000)
+    }
     dh 0xC33E
     OS.patch_end()
 }

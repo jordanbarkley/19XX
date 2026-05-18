@@ -12,6 +12,7 @@ include "Toggles.asm"
 include "SRAM.asm"
 
 scope Boot {
+    if {defined REGION_US} {
     // @ Description
     // Nintendo 64 logo exits to character select screen because t1 contains screen ID 0x0010
     // instead of 0x001C
@@ -25,11 +26,32 @@ scope Boot {
     OS.patch_start(0x0017EE18, 0x80131C58)
     beq     r0, r0, 0x80131C80
     OS.patch_end()
+    }
+
+    if {defined REGION_JP} {
+    // @ Description
+    // JP Quick Start: the US N64-logo skip patches above target an overlay
+    // (mnstartup) that has no JP mapping, so instead boot straight to the VS
+    // character select by overwriting dSCManagerDefaultSceneData's scene_curr
+    // and scene_prev (the default boot scene) with nSCKindPlayersVS.
+    // dSCManagerDefaultSceneData @ JP RAM 0x800A1F58, JP ROM 0x00043038;
+    // scene_curr / scene_prev are the first two bytes (default 0x1B = Startup).
+    constant nSCKindPlayersVS(0x10)
+    OS.patch_start(0x00043038, 0x00000000)
+    db nSCKindPlayersVS                 // dSCManagerDefaultSceneData.scene_curr
+    db nSCKindPlayersVS                 // dSCManagerDefaultSceneData.scene_prev
+    OS.patch_end()
+    }
 
     // @ Description
     // This patch disables back (press B) on Main Menu
     // I don't know why the title screen crashes, too bad!
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x0011D808, 0x801306B8)
+    } else {
     OS.patch_start(0x0011D768, 0x801327D8)
+    }
     nop
     nop
     nop
@@ -97,7 +119,12 @@ if {defined __CE__} {
     // 0x0008 - end of heap
     // 0x000C - heap address
     scope shrink_heap_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x000076F4, 0x80006AF4)
+        } else {
         OS.patch_start(0x00007954, 0x80006D54)
+        }
         j       shrink_heap_
         nop
         _shrink_heap_return:

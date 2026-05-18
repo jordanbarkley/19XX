@@ -16,6 +16,15 @@ all:
 	tools/n64crc roms/19XXG6.z64 > /dev/null
 	tools/n64crc roms/19XXNE.z64 > /dev/null
 
+# JP (NTSC-J) variant -- assembled from the same src/ via `if {defined
+# REGION_JP}` region guards.  Requires a vanilla NTSC-J ROM at
+# roms/original.jp.z64.
+jp:
+	tools/_bass -o roms/19XXCEJ.z64 19XXCE-JP.asm -sym CEJ.sym > CEJ.log
+	tools/_bass -o roms/19XXTEJ.z64 19XXTE-JP.asm -sym TEJ.sym > TEJ.log
+	tools/n64crc roms/19XXCEJ.z64 > /dev/null
+	tools/n64crc roms/19XXTEJ.z64 > /dev/null
+
 build:
 	# clean
 	make clean

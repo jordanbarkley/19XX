@@ -16,14 +16,23 @@ scope Settings {
     constant GAME_MODE(0x03)
     constant TIME(0x08)
     constant STOCKS(0x03)
+    if {defined REGION_JP} {
+    constant TEAM_ATTACK(0x00)
+    } else {
     constant TEAM_ATTACK(0x01)
+    }
     constant ITEM_FREQUENCY(0x00)
 
     // @ Description
     // This function sets VS. Mode settings to tournament settings. This hook was selected because
     // it occurs directly after VS. Mode settings are written. This should not be called.
     scope set_vs_settings_: {
+        // @region:OVR
+        if {defined REGION_JP} {
+        OS.patch_start(0x00040C88, 0x8009FBA8)
+        } else {
         OS.patch_start(0x00040898, 0x800A1B48)
+        }
         j       Settings.set_vs_settings_
         nop
         _set_vs_settings_return:

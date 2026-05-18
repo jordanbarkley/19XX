@@ -20,7 +20,12 @@ scope Hitbox {
     // 3 = ECB display
     // (all other values?) = hitbox display
     scope hitbox_mode_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0006E3AC, 0x800F081C)
+        } else {
         OS.patch_start(0x0006E3FC, 0x800F2BFC)
+        }
         j       hitbox_mode_
         nop
         _hitbox_mode_return:
@@ -49,7 +54,15 @@ scope Hitbox {
         lw      t1, 0x0000(t2)              // t1 = item pointer
         beqz    t1, _exit_loop              // if t1 = NULL, exit loop
         nop
-        sw      v1, 0x0374(t1)              // save hitbox display state
+        // the item's display-state field is region-specific: the US ITStruct
+        // has reflect_stat_flags/reflect_stat_count which JP omits, shifting
+        // every field after reflect_gobj down 4 bytes on JP.
+        // @region:SYM
+        if {defined REGION_JP} {
+        sw      v1, 0x0370(t1)              // save hitbox display state (JP)
+        } else {
+        sw      v1, 0x0374(t1)              // save hitbox display state (US)
+        }
         addiu   t2, t2, 0x0004              // increment buffer pointer
         b       _loop                       // loop
         nop
@@ -74,7 +87,12 @@ scope Hitbox {
         // s7 - curr_struct
         // comparing against the player struct ensures the buffer is not filled twice
     
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00060FD4, 0x800E3444)
+        } else {
         OS.patch_start(0x00060E28, 0x800E5628)
+        }
         j       item_
         nop
         _item_return:
@@ -133,7 +151,12 @@ scope Hitbox {
     // this is a hook into the function which loads the display state for projectiles
     
     scope projectile_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x000E1E28, 0x80165058)
+        } else {
         OS.patch_start(0x000E1F78, 0x80167538)
+        }
         j       projectile_
         nop
         _projectile_return:
@@ -151,7 +174,14 @@ scope Hitbox {
         lli     v1, 0x0001                  // v1 = hitbox display
         
         _update_projectile:
-        sw      v1, 0x02BC(v0)              // save projectile display state
+        // the projectile display-state field offset is region-specific
+        // (US 0x02BC, JP 0x02B8 -- see wpDisplayMain's vanilla load).
+        // @region:SYM
+        if {defined REGION_JP} {
+        sw      v1, 0x02B8(v0)              // save projectile display state (JP)
+        } else {
+        sw      v1, 0x02BC(v0)              // save projectile display state (US)
+        }
         
         end:
         lw      t0, 0x0004(sp)              // ~

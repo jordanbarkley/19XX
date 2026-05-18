@@ -3,13 +3,28 @@ if !{defined __TE__} {
     define __CE__()
 }
 
+// region selection: REGION_US is the default; a JP entry point (19XXCE-JP.asm)
+// defines REGION_JP before including this file.  The src/ files use
+// `if {defined REGION_JP} { ... } else { ... }` guards to pick addresses.
+if !{defined REGION_JP} {
+    define REGION_US()
+}
+
 // copy fresh rom
 origin  0x00000000
-insert  "roms/original.z64"
+if {defined REGION_JP} {
+    insert  "roms/original.jp.z64"
+} else {
+    insert  "roms/original.z64"
+}
 
 // change ROM name
 origin  0x00000020
-db  "19XXCE 1.6"
+if {defined REGION_JP} {
+    db  "19XXCEJ 1.6"
+} else {
+    db  "19XXCE 1.6"
+}
 fill 0x34 - origin(), 0x20
 
 // static

@@ -41,7 +41,12 @@ scope Color {
         constant YELLOW(0xFFFF00FF)
         constant GREEN(0x00FF00FF)
         constant BLUE(0x0000FFFF)
+        // @region:SYM
+        if {defined REGION_JP} {
+        constant PURPLE(0x80007E9F)
+        } else {
         constant PURPLE(0x800080FF)
+        }
         constant PINK(0xFFC0CBFF)
         constant BROWN(0xA52A2AFF)
         constant BLACK(0x000000FF)

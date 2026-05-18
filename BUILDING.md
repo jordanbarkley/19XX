@@ -47,3 +47,24 @@ $   cp <rom_path> ./roms/original.z64
 ```
 $   make
 ```
+
+## 19XX JP (NTSC-J) variant
+
+A Japanese-region (NTSC-J) variant is built from the same `src/` sources.
+Region-divergent addresses are selected inline in `src/*.asm` with bass
+region guards (`if {defined REGION_JP} { ... } else { ... }`); the entry
+points `19XXCE-JP.asm` and `19XXTE-JP.asm` define `REGION_JP`, while the
+US builds leave it undefined.
+
+After step 4 (`make build`), copy a vanilla, NTSC-J, big-endian (.z64) ROM
+titled "original.jp.z64" into the roms folder.
+```
+$   cp <rom_path> ./roms/original.jp.z64
+```
+
+Then build 19XXCEJ and 19XXTEJ.
+```
+$   make jp
+```
+
+This produces `roms/19XXCEJ.z64` and `roms/19XXTEJ.z64`.

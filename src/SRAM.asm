@@ -92,7 +92,12 @@ scope SRAM {
     // a0 - SRAM source
     // a1 - RAM destination
     // a2 - size
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant read_(0x80002B84)
+    } else {
     constant read_(0x80002DA4)
+    }
 
     // @ Description
     // Read from SRAM wrapper
@@ -126,7 +131,12 @@ scope SRAM {
     // a0 - RAM source
     // a1 - SRAM destination
     // a2 - size
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant write_(0x80002BC0)
+    } else {
     constant write_(0x80002DE0)
+    }
 
     // @ Description
     // Save to SRAM wrapper

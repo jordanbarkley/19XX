@@ -17,16 +17,23 @@ scope BGM {
     // @ Arguments
     // a0 - unknown, set to 0
     // a1 - BGM ID
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant play_(0x80020854)
+    } else {
     constant play_(0x80020AB4)
+    }
 
     // @ Description
     // This function is not yet documented.
     constant stop_(0x00000000)
 
 
-if {defined __TE__} { 
+if {defined __TE__} {
+if {defined REGION_US} {
     // @ Description
-    // Replaces Ness victory music with another song to avoid copyright issues
+    // Replaces Ness victory music with another song to avoid copyright issues.
+    // US/TE only -- the JP version is left unpatched (@region guard).
     scope swap_music_: {
         OS.patch_start(0x000216F0, 0x80020AF0)
         j       swap_music_
@@ -48,6 +55,7 @@ if {defined __TE__} {
         j       _swap_music_return          // return
         nop
     }
+} // REGION_US
 } // __TE__
 
 
@@ -55,7 +63,12 @@ if {defined __CE__} {
     // @ Description
     // This function implements the mono/stero toggle (boolean stereo_enabled - 0x8003CB24)
     scope get_type_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00020CBC, 0x800200BC)
+        } else {
         OS.patch_start(0x00020F1C, 0x8002031C)
+        }
         j       get_type_
         nop
         _get_type_return:
@@ -133,7 +146,12 @@ if {defined __CE__} {
     // @ Description
     // This function is an implementation of a play music tooggle
     scope play_music_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00021454, 0x80020854)
+        } else {
         OS.patch_start(0x000216B4, 0x80020AB4)
+        }
         j       play_music_
         nop
         _play_music_return:
@@ -141,7 +159,13 @@ if {defined __CE__} {
 
         Toggles.guard(Toggles.entry_play_music, OS.NULL)
         lui     t6, 0x800A                  // original line 1
-        lw      t6, 0xD95C(t6)              // original line 2
+        // original line 2 re-executes syAudioPlayBGM's load; the lw offset
+        // is region-specific (US reads 0x800AD95C, JP reads 0x800AA94C).
+        if {defined REGION_JP} {
+        lw      t6, 0xA94C(t6)              // original line 2 (JP)
+        } else {
+        lw      t6, 0xD95C(t6)              // original line 2 (US)
+        }
         j       _play_music_return
         nop
     }
@@ -149,7 +173,12 @@ if {defined __CE__} {
     // @ Description
     // a1 holds BGM_id. This function replaces a1 with a random id from the table
     scope random_music_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00021490, 0x80020890)
+        } else {
         OS.patch_start(0x000216F0, 0x80020AF0)
+        }
         j       random_music_
         nop
         _random_music_return:

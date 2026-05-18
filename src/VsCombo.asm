@@ -27,10 +27,18 @@ scope VsCombo {
 
     // @ Description
     // Player hit count addresses
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant P1_HIT_COUNT(0x800A2D3C)
+    constant P2_HIT_COUNT(0x800A2DB0)
+    constant P3_HIT_COUNT(0x800A2E24)
+    constant P4_HIT_COUNT(0x800A2E98)
+    } else {
     constant P1_HIT_COUNT(0x800A4D7C)
     constant P2_HIT_COUNT(0x800A4DF0)
     constant P3_HIT_COUNT(0x800A4E64)
     constant P4_HIT_COUNT(0x800A4ED8)
+    }
 
     // @ Description
     // Default number of frames to keep a hit count displayed

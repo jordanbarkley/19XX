@@ -64,25 +64,33 @@ scope Stages {
     }
 
     // @ Description
-    // File id for each stage (pulled from table @ 0xA7D20)
+    // File id for each stage (US values pulled from the file table @ 0xA7D20).
+    // The JP ROM's file table has 0x19 fewer entries before the stage map
+    // files, so every JP stage file ID is the US ID minus 0x19 (verified: all
+    // llGR*MapFileID symbols shift uniformly by 0x19 between regions).
     scope file {
-        constant PEACHS_CASTLE(0x0103)
-        constant SECTOR_Z(0x0106)
-        constant CONGO_JUNGLE(0x0105)
-        constant PLANET_ZEBES(0x0101)
-        constant HYRULE_CASTLE(0x0109)
-        constant YOSHIS_ISLAND(0x0107)
-        constant DREAM_LAND(0x00FF)
-        constant SAFFRON_CITY(0x0108)
-        constant MUSHROOM_KINGDOM(0x104)
-        constant DREAM_LAND_BETA_1(0x0100)
-        constant DREAM_LAND_BETA_2(0x0102)
-        constant HOW_TO_PLAY(0x010B)
-        constant MINI_YOSHIS_ISLAND(0x010E)
-        constant META_CRYSTAL(0x10D)
-        constant BATTLEFIELD(0x010C)
-        constant RACE_TO_THE_FINISH(0x0127)
-        constant FINAL_DESTINATION(0x010A)
+        if {defined REGION_JP} {
+            constant DELTA(0x19)
+        } else {
+            constant DELTA(0)
+        }
+        constant PEACHS_CASTLE(0x0103 - DELTA)
+        constant SECTOR_Z(0x0106 - DELTA)
+        constant CONGO_JUNGLE(0x0105 - DELTA)
+        constant PLANET_ZEBES(0x0101 - DELTA)
+        constant HYRULE_CASTLE(0x0109 - DELTA)
+        constant YOSHIS_ISLAND(0x0107 - DELTA)
+        constant DREAM_LAND(0x00FF - DELTA)
+        constant SAFFRON_CITY(0x0108 - DELTA)
+        constant MUSHROOM_KINGDOM(0x104 - DELTA)
+        constant DREAM_LAND_BETA_1(0x0100 - DELTA)
+        constant DREAM_LAND_BETA_2(0x0102 - DELTA)
+        constant HOW_TO_PLAY(0x010B - DELTA)
+        constant MINI_YOSHIS_ISLAND(0x010E - DELTA)
+        constant META_CRYSTAL(0x10D - DELTA)
+        constant BATTLEFIELD(0x010C - DELTA)
+        constant RACE_TO_THE_FINISH(0x0127 - DELTA)
+        constant FINAL_DESTINATION(0x010A - DELTA)
     }
 
     constant ICON_WIDTH(40)
@@ -300,41 +308,71 @@ if {defined __CE__} {
 
     // @ Description
     // Prevents series logo from being drawn on wood circle
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x0014F5CC, 0x801305EC)
+    } else {
     OS.patch_start(0x0014E418, 0x801328A8)
+    }
     jr      ra                              // return immediately
     nop
     OS.patch_end()
 
     // @ Description
     // Prevents the drawing of defaults icons
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x0014F0A8, 0x801300C8)
+    } else {
     OS.patch_start(0x0014E098, 0x80132528)
+    }
     jr      ra                              // return
     nop
     OS.patch_end()
 
     // @ Description
     // Prevents "Stage Select" texture from being drawn.
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x0014EE08, 0x8012FE28)
+    } else {
     OS.patch_start(0x0014DDF8, 0x80132288)
+    }
     jr      ra                              // return immediately
     nop
     OS.patch_end()
 
     // @ Description
     // Prevents the wooden circle from being drawn.
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x0014EBC8, 0x8012FBE8)
+    } else {
     OS.patch_start(0x0014DBB8, 0x80132048)
+    }
     //jr      ra                              // return immediately
     //nop
     OS.patch_end()
 
     // @ Description
     // Prevents stage name text from being drawn.
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x0014F2B8, 0x801302D8)
+    } else {
     OS.patch_start(0x0014E2A8, 0x80132738)
+    }
     jr      ra                              // return immediately
     nop
     OS.patch_end()
 
     // Modifies the x/y position of the models on the stage select screen.
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x001506E0, 0x80131700)
+    } else {
     OS.patch_start(0x0014F514, 0x801339A4)
+    }
 //  lwc1    f16,0x0000(v0)                  // original line 1 (f16 = (float) x)
 //  swc1    f16,0x0048(a0)                  // original line 2
 //  lwc1    f18,0x0004(v0)                  // original line 3 (f18 = (float) y)
@@ -348,7 +386,12 @@ if {defined __CE__} {
     // @ Description
     // These following functions are designed to fix get_preview for RANDOM.
     scope random_fix_1_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x001500F8, 0x80131118)
+        } else {
         OS.patch_start(0x0014EF2C, 0x801333BC)
+        }
         j       random_fix_1_
         nop
         _random_fix_1_return:
@@ -373,7 +416,12 @@ if {defined __CE__} {
     }
 
     scope random_fix_2_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00150170, 0x80131190)
+        } else {
         OS.patch_start(0x0014EFA4, 0x80133434)
+        }
         j       random_fix_2_
         nop
         _random_fix_2_return:
@@ -403,12 +451,22 @@ if {defined __CE__} {
         lw      ra, 0x0004(sp)                  // ~
         lw      v0, 0x0008(sp)                  // restore registers
         addiu   sp, sp, 0x0010                  // deallocate stack
+        // @region:SYM
+        if {defined REGION_JP} {
+        j       0x801311C0                      // (from original line 2)
+        } else {
         j       0x80133464                      // (from original line 2)
+        }
         nop
     }
 
     scope random_fix_3_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0014FB1C, 0x80130B3C)
+        } else {
         OS.patch_start(0x0014E950, 0x80132DE0)
+        }
         j       random_fix_3_
         nop
         _random_fix_3_return:
@@ -437,14 +495,24 @@ if {defined __CE__} {
         lw      ra, 0x0004(sp)                  // ~
         lw      v0, 0x0008(sp)                  // restore registers
         addiu   sp, sp, 0x0010                  // deallocate stack
+        // @region:SYM
+        if {defined REGION_JP} {
+        j       0x80130B74                      // (from original line 1)
+        } else {
         j       0x80132E18                      // (from original line 1)
+        }
         nop
     }
 
     // @ Description
     // Modifies the zoom of the model previews.
     scope set_zoom_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0014FEB0, 0x80130ED0)
+        } else {
         OS.patch_start(0x0014ECE4, 0x80133174)
+        }
 //      lwc1    f4, 0x0000(v1)              // original line 1
         j       set_zoom_
         or      v0, s0, r0                  // original line 2
@@ -476,7 +544,12 @@ if {defined __CE__} {
     // @ Description
     // This functions modifies which preview file is drawn based on stage_table
     scope get_preview_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0014F8D4, 0x801308F4)
+        } else {
         OS.patch_start(0x0014E708, 0x80132B98)
+        }
         j       get_preview_
         nop
         _get_preview_return:
@@ -508,7 +581,12 @@ if {defined __CE__} {
     // @ Description
     // This functions modifies which preview type is used based on stage_table
     scope get_type_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0014F8EC, 0x8013090C)
+        } else {
         OS.patch_start(0x0014E720, 0x80132BB0)
+        }
         j       get_type_
         nop
         _get_type_return:
@@ -614,20 +692,35 @@ if {defined __CE__} {
 
         // @ Description
         // Set original cursor position.
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0014F794, 0x801307B4)
+        } else {
         OS.patch_start(0x0014E5C8, 0x80132A58)
+        }
         // not used, for documentation only
         OS.patch_end()
 
         // @ Description
         // (part of set cursor position)
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0014F7C0, 0x801307E0)
+        } else {
         OS.patch_start(0x0014E5F4, 0x80132A84)
+        }
 //      lui     at, 0x41B8                  // original line (at = (float cursor y))
         lui     at, 0xC800                  // at =  a very negative float
         OS.patch_end()
 
         // @ Description
         // (part of set cursor position)
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0014F7F8, 0x80130818)
+        } else {
         OS.patch_start(0x0014E62C, 0x80132ABC)
+        }
 //      lui     at, 0x4274                  // original line (at = (float cursor y))
         lui     at, 0xC800                  // at =  a very negative float
         OS.patch_end()
@@ -840,14 +933,24 @@ if {defined __CE__} {
 
     // @ Description
     // Equivalent of _update_right_return.
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant update_(0x80131F70)
+    } else {
     constant update_(0x80134210)
+    }
 
     // @ Description
     // The following update_<direction>_ functions update Stages.row/Stages.column. Thee functions
     // use in game hooks (play_sound_ is conserved). The original cursor_id is set to 1 when
     // going left or right to avoid bugs with RANDOM.
     scope update_right_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00150F48, 0x80131F68)
+        } else {
         OS.patch_start(0x0014FD78, 0x80134208)
+        }
         j       update_right_
         nop
         _update_right_return:
@@ -856,7 +959,11 @@ if {defined __CE__} {
         OS.patch_end()
 
         lui     a1, 0x8013                  // original line 1
-        addiu   a1, a1, 0x4BD8              // original line 2
+        if {defined REGION_JP} {
+        addiu   a1, a1, 0x2938              // original line 2 (JP)
+        } else {
+        addiu   a1, a1, 0x4BD8              // original line 2 (US)
+        }
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -890,7 +997,12 @@ if {defined __CE__} {
     }
 
     scope update_left_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00150E44, 0x80131E64)
+        } else {
         OS.patch_start(0x0014FC74, 0x80134104)
+        }
         j       update_left_
         nop
         _update_left_return:
@@ -899,7 +1011,11 @@ if {defined __CE__} {
         OS.patch_end()
 
         lui     a1, 0x8013                  // original line 1
-        addiu   a1, a1, 0x4BD8              // original line 2
+        if {defined REGION_JP} {
+        addiu   a1, a1, 0x2938              // original line 2 (JP)
+        } else {
+        addiu   a1, a1, 0x4BD8              // original line 2 (US)
+        }
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -933,17 +1049,30 @@ if {defined __CE__} {
     }
 
     scope update_down_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00150D74, 0x80131D94)
+        } else {
         OS.patch_start(0x0014FBA4, 0x80134034)
+        }
         j       update_down_
         nop
         _update_down_return:
         OS.patch_end()
 
         lui     v1, 0x8013                  // original line 1
-        lw      v1, 0x4BD8(v1)              // original line 2
+        if {defined REGION_JP} {
+        lw      v1, 0x2938(v1)              // original line 2 (JP)
+        } else {
+        lw      v1, 0x4BD8(v1)              // original line 2 (US)
+        }
 
         lui     a1, 0x8013                  // original line 1 (update_right_)
-        addiu   a1, a1, 0x4BD8              // original line 2 (update_right_)
+        if {defined REGION_JP} {
+        addiu   a1, a1, 0x2938              // original line 2 (update_right_, JP)
+        } else {
+        addiu   a1, a1, 0x4BD8              // original line 2 (update_right_, US)
+        }
         
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -977,17 +1106,30 @@ if {defined __CE__} {
     }
 
     scope update_up_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00150CA0, 0x80131CC0)
+        } else {
         OS.patch_start(0x0014FAD0, 0x80133F60)
+        }
         j       update_up_
         nop
         _update_up_return:
         OS.patch_end()
 
         lui     v1, 0x8013                  // original line 1
-        lw      v1, 0x4BD8(v1)              // original line 2
+        if {defined REGION_JP} {
+        lw      v1, 0x2938(v1)              // original line 2 (JP)
+        } else {
+        lw      v1, 0x4BD8(v1)              // original line 2 (US)
+        }
         
         lui     a1, 0x8013                  // original line 1 (update_right_)
-        addiu   a1, a1, 0x4BD8              // original line 2 (update_right_)
+        if {defined REGION_JP} {
+        addiu   a1, a1, 0x2938              // original line 2 (update_right_, JP)
+        } else {
+        addiu   a1, a1, 0x4BD8              // original line 2 (update_right_, US)
+        }
 
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -1079,7 +1221,12 @@ if {defined __CE__} {
     // @ Returns
     // v0 - stage_id
     scope swap_stage_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00150944, 0x80131964)
+        } else {
         OS.patch_start(0x0014F774, 0x80133C04)
+        }
 //      jal     0x80132430                  // original line 1
 //      nop                                 // original line 2
         jal     swap_stage_
@@ -1172,14 +1319,24 @@ if {defined __CE__} {
     // file. This function switches gets a working stage id based on *0x800A50E8 and stores it in
     // expansion memory. That value is read from in two places
     scope training_id_fix_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00114270, 0x8018B750)
+        } else {
         OS.patch_start(0x001145D0, 0x8018DDB0)
+        }
         addiu   sp, sp, 0xFFE8              // original line 3
         sw      ra, 0x0014(sp)              // original line 4
         jal     training_id_fix_
         nop
         OS.patch_end()
 
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x001142CC, 0x8018B7AC)
+        } else {
         OS.patch_start(0x0011462C, 0x8018DE0C)
+        }
         jal     training_id_fix_
         nop
         lui     t5, 0x8019                  // original line 3
@@ -1192,7 +1349,12 @@ if {defined __CE__} {
         sw      t1, 0x0008(sp)              // ~
         sw      t2, 0x000C(sp)              // save registers
 
+        // @region:SYM
+        if {defined REGION_JP} {
+        li      t0, 0x800A30A8              // ~
+        } else {
         li      t0, 0x800A50E8              // ~
+        }
         lw      t0, 0x0000(t0)              // t0 = dereference 0x800A50E8
         lbu     t0, 0x0001(t0)              // t0 =  stage id
         li      t1, background_table        // t1 = stage id table (offset)
@@ -1345,6 +1507,17 @@ if {defined __CE__} {
     dw 186                              // Battlefield
     dw 190                              // Dream Land (Race to the Finish Placeholder)
     dw 162                              // Final Destination
+
+    // @ Description
+    // On JP, mnMapsMakeSubtitle is a full function that renders a stage-name
+    // subtitle texture on the SSS.  On US it is already an empty jr ra/nop
+    // stub, so stub the JP function to match US behaviour.
+    if {defined REGION_JP} {
+        OS.patch_start(0x0014F388, 0x801303A8)
+        jr      ra
+        nop
+        OS.patch_end()
+    }
 }
 
 } // __STAGES__

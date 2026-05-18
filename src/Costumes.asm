@@ -16,7 +16,12 @@ scope Costumes {
     // @ Warning
     // This is not a function that should be called. It is a patch/hook. 
     scope select_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00136FE4, 0x80135AD4)
+        } else {
         OS.patch_start(0x0001361B4, 0x80137F34)
+        }
         j       Costumes.select_
         nop
         _select_return:
@@ -141,7 +146,12 @@ if {defined __CE__} {
     // @ Description
     // This is a bug fix to prevent the costume written to using CLeft and CRight from eing updated.
     scope disable_update: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0013701C, 0x80135B0C)
+        } else {
         OS.patch_start(0x001361EC, 0x80137F6C)
+        }
         nop                                 // sw v0, 0x0050(s0)
         lw      a0, 0x0008(s0)              // original line 2
         lw      a1, 0x0024(sp)              // original line 3
@@ -155,7 +165,12 @@ if {defined __CE__} {
     // a0 - 0x00008(player struct), ???
     // a1 - costume_id
     // a2 - shade_id
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant update_(0x800E7058)
+    } else {
     constant update_(0x800E9248)
+    }
 }
 
 } // __COSTUMES__

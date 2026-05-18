@@ -88,9 +88,42 @@ scope OS {
         }
     }
 
+    // @ Description
+    // Bisection support: when BISECT is defined, every patch_start past index
+    // BISECT_N is "neutered" -- redirected to scratch ROM at 0x01F00000 so it
+    // does not modify game code.  Used to binary-search which patch breaks a
+    // build.  Normal builds (BISECT undefined) are unaffected.
+    variable patch_counter(0)
+
     macro patch_start(origin, base) {
         pushvar origin, base
-        origin  {origin}
+        if {defined BISECT} {
+            print "JPATCH["
+            print OS.patch_counter
+            print "] origin "
+            OS.print_hex({origin})
+            print " base "
+            OS.print_hex({base})
+            print "\n"
+            // default: neuter (redirect to scratch ROM)
+            origin  0x01F00000
+            // keep if within the bisect range...
+            if OS.patch_counter < {BISECT_N} {
+                origin  {origin}
+            }
+            // ...or if it is an always-on infrastructure patch:
+            // indices 11 & 12 are Boot.asm load_ (DMAs the 19XX heap to
+            // 0x80380000); without them every heap-bound patch jumps to
+            // uninitialized RAM.
+            if OS.patch_counter > 10 {
+                if OS.patch_counter < 13 {
+                    origin  {origin}
+                }
+            }
+            OS.patch_counter = OS.patch_counter + 1
+        } else {
+            origin  {origin}
+        }
         base    {base}
     }
 

@@ -16,7 +16,12 @@ scope Handicap {
     // overwrites the stock value at 0x0007(a1). This still requires handicap to be on in the VS.
     // Options menu
     scope use_stocks_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0010A09C, 0x8018AE0C)
+        } else {
         OS.patch_start(0x0010A38C, 0x8018D49C)
+        }
         j       use_stocks_
         nop
         _use_stocks_return:

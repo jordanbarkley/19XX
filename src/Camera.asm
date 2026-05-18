@@ -20,7 +20,12 @@ scope Camera {
     // This replaces a call to Global.random_int_. Usually, when 0 is returned, the cinematic entry
     // does not play. Here, v0 is always set to 0. 
     scope disable_cinematic_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0008E1F0, 0x80110660)
+        } else {
         OS.patch_start(0x0008E250, 0x80112A50)
+        }
         j       disable_cinematic_
         nop
         _disable_cinematic_return:
@@ -39,7 +44,15 @@ scope Camera {
     // @ Description
     // Allows 360 control over the camera by changing the floats to check against
     // inspired by [Gaudy (Emudigital)] 
+    // the camera-limit float block is at ROM 0xAC3B4 on JP (verified by the
+    // 24-byte vanilla signature); the symbol-mapped 0xAC3E4 was 0x30 too high
+    // and landed on a pointer table -> crash with PC at 0x39AE9681.
+    // @region:SYM
+    if {defined REGION_JP} {
+    OS.patch_start(0x000AC3B4, 0x8012E824)
+    } else {
     OS.patch_start(0x000AC494, 0x80130C94)
+    }
     float32 100                             // x limit
     dw 0x39AE9681                           // x increment
     float32 -100                            // x limit

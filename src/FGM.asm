@@ -16,7 +16,12 @@ scope FGM {
     // a0 - fgm_id
     scope play_: {
         OS.save_registers()
+        // @region:SYM
+        if {defined REGION_JP} {
+        jal     0x80026770
+        } else {
         jal     0x800269C0
+        }
         nop
         OS.restore_registers()
         jr      ra

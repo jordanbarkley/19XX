@@ -23,14 +23,24 @@ scope Training {
     // @ Description
     // Byte, determines whether the player is able to control the training mode menu, regardless of
     // if it is currently being displayed. 01 = disable control, 02 = enable control
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant toggle_menu(0x8018E2E1)
+    } else {
     constant toggle_menu(0x80190979)
+    }
     constant BOTH_DOWN(0x01)
     constant SSB_UP(0x02)
     constant CUSTOM_UP(0x03)
     
     // @ Description
     // Byte, contains the training mode stage id
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant stage(0x8018E2D1)
+    } else {
     constant stage(0x80190969)
+    }
     
     // @ Description
     // Contains game settings, as well as information and properties for each port.
@@ -132,7 +142,12 @@ scope Training {
     // @ Description
     // This hook loads various character properties when training mode is loaded
     scope load_character_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00116630, 0x8018DB10)
+        } else {
         OS.patch_start(0x00116AA0, 0x80190280)
+        }
         jal load_character_
         nop
         OS.patch_end()
@@ -263,7 +278,12 @@ scope Training {
         lw      t1, 0x000C(sp)              // ~
         lw      t2, 0x0010(sp)              // ~
         lw      t3, 0x0014(sp)              // load t0-t3
-        jal     0x801906D0                  // original line 1
+        // @region:SYM
+        if {defined REGION_JP} {
+        jal     0x8018DF60                  // original line 1 (JP)
+        } else {
+        jal     0x801906D0                  // original line 1 (US)
+        }
         nop                                 // original line 2
         lw      ra, 0x0004(sp)              // load ra
         addiu   sp, sp, 0x0018              // deallocate stack space
@@ -274,7 +294,12 @@ scope Training {
     // @ Description
     // Initializes character properties on death/reset. This hook runs in all modes.
    scope init_character_: {
+      // @region:SYM
+      if {defined REGION_JP} {
+      OS.patch_start(0x0005342C, 0x800D589C)
+      } else {
       OS.patch_start(0x0005321C, 0x800D7A1C)
+      }
 //      beq     t8, at, 0x800D7A4C          // original line 1
 //      sw      t7, 0x0008(v1)              // original line 2
         j       init_character_
@@ -292,10 +317,15 @@ scope Training {
 
         li      t0, Global.current_screen   // ~
         lbu     t0, 0x0000(t0)              // t0 = screen_id
-        ori     t1, r0, 0x0036              // ~
+        ori     t1, r0, Global.SCREEN_TRAINING // ~
         bne     t0, t1, _end                // skip if screen_id != training mode
         nop
+        // @region:SYM
+        if {defined REGION_JP} {
+        li      t1, 0x800D6534              // ~
+        } else {
         li      t1, 0x800D86B4              // ~
+        }
         bne     ra, t1, _end                // skip if ra != 800D86B4
         nop
 
@@ -326,25 +356,48 @@ scope Training {
         addiu   sp, sp, 0x0010              // deallocate stack space
         beq     t8, at, _take_branch        // original line 1
         sw      t7, 0x002C(v1)              // original line 2
+        // @region:SYM
+        if {defined REGION_JP} {
+        j       0x800D58A4                  // return (don't take branch)
+        } else {
         j       0x800D7A24                  // return (don't take branch)
+        }
         nop
 
         _take_branch:
+        // @region:SYM
+        if {defined REGION_JP} {
+        j       0x800D58CC                  // return (take branch)
+        } else {
         j       0x800D7A4C                  // return (take branch)
+        }
         nop
     }
       
     // @ Description
     // This hook runs when training is loaded from stage select, but not when reset is used
     scope load_from_sss_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x001169B0, 0x8018DE90)
+        } else {
         OS.patch_start(0x00116E20, 0x80190600)
+        }
         j   load_from_sss_
         nop
         _load_from_sss_return:
         OS.patch_end()
         
-        addiu   t6, t6, 0x5240              // original line 1
-        addiu   a0, a0, 0x0870              // original line 2
+        // original lines 1-2 are lui/addiu low-halves of data addresses;
+        // the immediates are region-specific (US 0x5240/0x0870, JP 0x3200/0xE100).
+        // @region:SYM
+        if {defined REGION_JP} {
+        addiu   t6, t6, 0x3200              // original line 1 (JP)
+        addiu   a0, a0, 0xE100              // original line 2 (JP)
+        } else {
+        addiu   t6, t6, 0x5240              // original line 1 (US)
+        addiu   a0, a0, 0x0870              // original line 2 (US)
+        }
         
         addiu   sp, sp,-0x0010              // allocate stack space
         sw      t0, 0x0004(sp)              // ~
@@ -378,7 +431,12 @@ scope Training {
     // This hook runs when training is loaded from reset, but not from the stage select screen
     // it also runs when training mode exit is used
     scope load_from_reset_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00116A18, 0x8018DEF8)
+        } else {
         OS.patch_start(0x00116E88, 0x80190668)
+        }
         j   load_from_reset_
         nop
         _exit_game:
@@ -412,7 +470,12 @@ scope Training {
         lw      t0, 0x0004(sp)              // ~
         lw      t1, 0x0008(sp)              // load t0, t1
         addiu   sp, sp, 0x0010              // deallocate stack space
+        // @region:SYM
+        if {defined REGION_JP} {
+        j       0x8018DEE4              // (original bnez target; patch-relative)
+        } else {
         j       0x80190654
+        }
         nop
     }
     
@@ -421,7 +484,12 @@ scope Training {
     // function should be called while in training mode.
     // Additionally, contains a shortcut for toggling hitbox mode.
     scope advance_frame_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00113F00, 0x8018B3E0)
+        } else {
         OS.patch_start(0x00114260, 0x8018DA40)
+        }
         j   advance_frame_
         nop
         _advance_frame_return:
@@ -478,7 +546,12 @@ scope Training {
         
         _skip_input:
         // replicate the original branch if skip_advance = true
+        // @region:SYM
+        if {defined REGION_JP} {
+        li      ra, 0x8018B3F8              // return value - skip
+        } else {
         li      ra, 0x8018DA58              // return value - skip
+        }
         bnez    t6, _skip                   // if (skip_advance), skip
         nop
         
@@ -506,7 +579,12 @@ scope Training {
         lw      t0, 0x0000(t1)              // t0 = bool freeze
         beqz    t0, _end                    // if (!freeze), end
         nop
+        // @region:SYM
+        if {defined REGION_JP} {
+        li      ra, 0x8018B3F0              // return value - freeze
+        } else {
         li      ra, 0x8018DA50              // return value - freeze
+        }
         
         _end:
         sw      r0, 0x0000(t2)              // du_pressed = false

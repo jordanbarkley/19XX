@@ -42,7 +42,12 @@ scope Toggles {
 if {defined __CE__} {
         // @ Description
         // This patch disables functionality on the OPTION screen.
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x001209F0, 0x80130BA0)
+        } else {
         OS.patch_start(0x001205FC, 0x80132E4C)
+        }
         jr      ra
         nop
         OS.patch_end()

@@ -38,7 +38,12 @@ scope Joypad {
     // 0x0008 - byte - xpos
     // 0x0009 - byte - ypos
     // what is the difference between 0x0004 and 0x0006?
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant struct(0x80045218)
+    } else {
     constant struct(0x80045228)
+    }
 
     // @ Description
     // Types

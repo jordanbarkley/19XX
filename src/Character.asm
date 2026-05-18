@@ -59,7 +59,12 @@ scope Character {
     // This function is not safe by STYLE.md conventions so it has been wrapped
     scope add_percent_: {
         OS.save_registers()
+        // @region:SYM
+        if {defined REGION_JP} {
+        jal     0x800E7E68
+        } else {
         jal     0x800EA248
+        }
         nop
         OS.restore_registers()
         jr      ra

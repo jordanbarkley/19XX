@@ -17,7 +17,12 @@ scope Spawn {
     // hook to load respawn point. This fixes the lack of respawn points on the beta stages.
 if {defined __CE__} {
     scope load_respawn_point_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00078060, 0x800FA4D0)
+        } else {
         OS.patch_start(0x000780B0, 0x800FC8B0)
+        }
         j       load_respawn_point_
         nop
         _load_respawn_point_return:
@@ -87,7 +92,12 @@ if {defined __CE__} {
         // 0x0000(a1) holds x
         // 0x0004(a1) holds y
 
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x00076714, 0x800F8B84)
+        } else {
         OS.patch_start(0x00076764, 0x800FAF64)
+        }
         j       Spawn.load_spawn_
         nop
         _load_spawn_return:
@@ -106,7 +116,7 @@ if {defined __CE__} {
         // this block checks if we're in training mode
         li      t0, Global.current_screen
         lbu     t0, 0x0000(t0)              // t0 = screen_id
-        ori     t1, r0, 0x0036              // ~
+        ori     t1, r0, Global.SCREEN_TRAINING // ~
         bne     t0, t1, _check_versus       // branch if screen_id != training mode
         nop
 
@@ -280,7 +290,12 @@ if {defined __CE__} {
         addiu   sp, sp, 0x0020              // deallocate stack space
         lui     t6, 0x8013                  // original line 1
         j       _load_spawn_return          // use in game method for everything but VS. and training
-        lw      t6, 0x1368(t6)              // original line 2
+        // original line 2 loads gMPCollisionGeometry -- region-specific offset
+        if {defined REGION_JP} {
+        lw      t6, 0xEEF8(t6)              // original line 2 (JP)
+        } else {
+        lw      t6, 0x1368(t6)              // original line 2 (US)
+        }
 
         team_table:
         db 0x00                             // p1 team

@@ -16,7 +16,12 @@ scope AI {
     // @ Description
     // This removes the up b check allowing the CPU to recover multiple times [bit].
     scope recovery_fix_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x000AFF38, 0x80133168)
+        } else {
         OS.patch_start(0x000AFFBC, 0x8013557C)
+        }
         nop                                 // bnez t1, 0x80135628
         OS.patch_end()
     }
@@ -36,11 +41,20 @@ scope AI {
     // @ Arguments
     // a0 - adress of player struct
     // a1 - enum direction (forward = 0x49, backward), if applicable
+    // @region:SYM
+    if {defined REGION_JP} {
+    constant tech_roll_(0x80142220)
+    constant tech_roll_og_(0x80142280)
+    constant tech_in_place_(0x80142180)
+    constant tech_in_place_og_(0x801421DC)
+    constant tech_fail_(0x80141FB8)
+    } else {
     constant tech_roll_(0x80144700)
     constant tech_roll_og_(0x80144760)
     constant tech_in_place_(0x80144660)
     constant tech_in_place_og_(0x801446BC)
     constant tech_fail_(0x80144498)
+    }
     constant FORWARD(0x49)
     constant BACKWARD(0x4A)
 
@@ -52,7 +66,12 @@ scope AI {
     }
 
     scope random_teching_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x000BB270, 0x8013E4A0)
+        } else {
         OS.patch_start(0x000BB3C0, 0x80140980)
+        }
         jal     random_teching_
         nop
         nop
@@ -65,7 +84,12 @@ scope AI {
         nop
         OS.patch_end()
 
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x000BDEE4, 0x80141114)
+        } else {
         OS.patch_start(0x000BE034, 0x801435F4)
+        }
         jal     random_teching_
         nop
         nop
@@ -171,7 +195,12 @@ scope AI {
     // holds a boolean for successful z-cancel. This function has been modified to make sure that
     // boolean is true for CPUs (Z_CANCEL_CHANCE)% of the time. [bit]
     scope z_cancel_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x000CB348, 0x8014E578)
+        } else {
         OS.patch_start(0x000CB478, 0x80150A38)
+        }
         jal     z_cancel_
         nop
         OS.patch_end()

@@ -19,7 +19,12 @@ scope GameEnd {
     // @ Description
     // This function changes the screen_id loaded into t6 if skip results screen is enabled
     scope update_screen_: {
+        // @region:SYM
+        if {defined REGION_JP} {
+        OS.patch_start(0x0010AF14, 0x8018BC84)
+        } else {
         OS.patch_start(0x0010B204, 0x8018E314)
+        }
         // CHECK SALTY RUNBACK FIRST
         j       update_screen_._salty_runback
         nop
