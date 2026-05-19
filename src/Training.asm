@@ -25,7 +25,7 @@ scope Training {
     // if it is currently being displayed. 01 = disable control, 02 = enable control
     // @region:SYM
     if {defined REGION_JP} {
-    constant toggle_menu(0x8018E2E1)
+    constant toggle_menu(0x8018E209)
     } else {
     constant toggle_menu(0x80190979)
     }
@@ -37,7 +37,7 @@ scope Training {
     // Byte, contains the training mode stage id
     // @region:SYM
     if {defined REGION_JP} {
-    constant stage(0x8018E2D1)
+    constant stage(0x8018E1F9)
     } else {
     constant stage(0x80190969)
     }
