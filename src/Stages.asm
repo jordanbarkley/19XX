@@ -818,7 +818,11 @@ if {defined __CE__} {
 
         if !{defined __G6__} {
         string_title:
+        if {defined REGION_JP} {
+        String.insert("19XXJ 1.6")
+        } else {
         String.insert("19XX 1.6")
+        }
         }
 
         if {defined __G6__} {

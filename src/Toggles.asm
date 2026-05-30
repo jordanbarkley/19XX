@@ -320,7 +320,11 @@ if {defined __CE__} {
     entry_disable_cinematic_camera:;    Menu.entry_bool("DISABLE CINEMATIC CAMERA", OS.FALSE, entry_flash_on_z_cancel)
     entry_flash_on_z_cancel:;           Menu.entry_bool("FLASH ON Z-CANCEL", OS.FALSE, entry_hitbox_mode)
     entry_hitbox_mode:;                 Menu.entry_bool("HITBOX DISPLAY", OS.FALSE, entry_hold_to_pause)
+    if {defined REGION_JP} {
+    entry_hold_to_pause:;               Menu.entry_bool("HOLD TO PAUSE", OS.FALSE, entry_improved_combo_meter)
+    } else {
     entry_hold_to_pause:;               Menu.entry_bool("HOLD TO PAUSE", OS.TRUE, entry_improved_combo_meter)
+    }
     entry_improved_combo_meter:;        Menu.entry_bool("IMPROVED COMBO METER", OS.TRUE, entry_tech_chase_combo_meter)
     entry_tech_chase_combo_meter:;      Menu.entry_bool("TECH CHASE COMBO METER", OS.TRUE, entry_vs_mode_combo_meter)
     entry_vs_mode_combo_meter:;         Menu.entry_bool("VS MODE COMBO METER", !{defined __NE__}, entry_1v1_combo_meter_swap)
